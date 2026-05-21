@@ -9,7 +9,7 @@ dx3d::Game::Game(const GameDesc& desc) :
 	m_LoggerPtr(&m_logger)
 {
 	m_graphicsEngine = std::make_unique<GraphicsEngine>(GraphicsEngineDesc{m_logger});
-	m_display = std::make_unique<Display>(DisplayDesc{ {m_logger, desc.windowSize}, m_graphicsEngine->getRenderSystem()});
+	m_display = std::make_unique<Display>(DisplayDesc{ {m_logger, desc.windowSize}, m_graphicsEngine->getGraphicsDevice()});
 
 	DX3DLogInfo("Game Initialized!");
 }
@@ -17,5 +17,10 @@ dx3d::Game::Game(const GameDesc& desc) :
 
 dx3d::Game::~Game()
 {
-	DX3DLogInfo("Game Deallocation Started!");
+	DX3DLogInfo("Game is shutting down...");
+}
+
+void dx3d::Game::onInternalUpdate()
+{
+	m_graphicsEngine->render(m_display->getSwapChain());
 }
