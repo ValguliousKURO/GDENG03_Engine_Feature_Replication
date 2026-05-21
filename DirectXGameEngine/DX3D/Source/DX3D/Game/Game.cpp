@@ -1,6 +1,7 @@
 #include <DX3D/Game/Game.h>
 #include <DX3D/Window/Window.h>
 #include <DX3D/Graphics/GraphicsEngine.h>
+#include <DX3D/Core/Base.h>
 #include <DX3D/Core/Logger.h>
 #include <DX3D/Game/Display.h>
 

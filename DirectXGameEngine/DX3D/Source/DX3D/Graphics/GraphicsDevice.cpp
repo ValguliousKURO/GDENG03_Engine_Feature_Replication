@@ -2,6 +2,8 @@
 #include <DX3D/Graphics/GraphicsLogUtils.h>
 #include <DX3D/Graphics/SwapChain.h>
 #include <DX3D/Graphics/DeviceContext.h>
+#include <DX3D/Graphics/ShaderBinary.h>
+#include <DX3D/Graphics/GraphicsPipelineState.h>
 
 using namespace dx3d;
 
@@ -14,20 +16,20 @@ dx3d::GraphicsDevice::GraphicsDevice(const GraphicsDeviceDesc& desc) : Base(desc
 	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	DX3DGraphicsLogThrowAndFail(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, NULL, 0, D3D11_SDK_VERSION,
+	DX3DGraphicsLogThrowOnFail(D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, NULL, 0, D3D11_SDK_VERSION,
 		&m_d3dDevice, &featureLevel, &m_d3dContext),
 		"Direcxt3D11 initialization failed!"
 		);
 
-	DX3DGraphicsLogThrowAndFail(m_d3dDevice->QueryInterface(IID_PPV_ARGS(&m_dxgiDevice)),
+	DX3DGraphicsLogThrowOnFail(m_d3dDevice->QueryInterface(IID_PPV_ARGS(&m_dxgiDevice)),
 		"QueryInterface failed to retrieve IDXGIDevice!"
 		);
 
-	DX3DGraphicsLogThrowAndFail(m_dxgiDevice->GetParent(IID_PPV_ARGS(&m_dxgiAdapter)),
+	DX3DGraphicsLogThrowOnFail(m_dxgiDevice->GetParent(IID_PPV_ARGS(&m_dxgiAdapter)),
 		"GetParent failed to retrieve IDXGIAdapter!"
 	);
 
-	DX3DGraphicsLogThrowAndFail(m_dxgiAdapter->GetParent(IID_PPV_ARGS(&m_dxgiFactory)),
+	DX3DGraphicsLogThrowOnFail(m_dxgiAdapter->GetParent(IID_PPV_ARGS(&m_dxgiFactory)),
 		"GetParent failed to retrieve IDXGIFactory!"
 	);
 
@@ -48,10 +50,20 @@ DeviceContextPtr dx3d::GraphicsDevice::createDeviceContext()
 	return std::make_shared<DeviceContext>(getGraphicsResourceDesc());
 }
 
+ShaderBinaryPtr dx3d::GraphicsDevice::compileShader(const ShaderCompileDesc& desc)
+{
+	return std::make_shared<ShaderBinary>(desc, getGraphicsResourceDesc());
+}
+
+GraphicsPipelineStatePtr dx3d::GraphicsDevice::createGraphicsPipelineState(const GraphicsPipelineStateDesc& desc)
+{
+	return std::make_shared<GraphicsPipelineState>(desc, getGraphicsResourceDesc());
+}
+
 void dx3d::GraphicsDevice::executeCommandList(DeviceContext& context)
 {
 	Microsoft::WRL::ComPtr<ID3D11CommandList> list{};
-	DX3DGraphicsLogThrowAndFail(context.m_context->FinishCommandList(false, &list),
+	DX3DGraphicsLogThrowOnFail(context.m_context->FinishCommandList(false, &list),
 		"FinishCommandList failed!"
 	);
 

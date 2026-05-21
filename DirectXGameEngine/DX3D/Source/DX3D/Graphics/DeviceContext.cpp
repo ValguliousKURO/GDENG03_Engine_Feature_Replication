@@ -1,9 +1,10 @@
 #include <DX3D/Graphics/DeviceContext.h>
 #include <DX3D/Graphics/SwapChain.h>
+#include <DX3D/Graphics/GraphicsPipelineState.h>
 
 dx3d::DeviceContext::DeviceContext(const GraphicsResourceDesc& gDesc): GraphicsResource(gDesc)
 {
-	DX3DGraphicsLogThrowAndFail(m_device.CreateDeferredContext(0, &m_context),
+	DX3DGraphicsLogThrowOnFail(m_device.CreateDeferredContext(0, &m_context),
 		"CreateDeferredContext failed!"
 		);
 }
@@ -22,4 +23,10 @@ void dx3d::DeviceContext::clearAndSetBackBuffer(const SwapChain& swapChain, cons
 		&rtv,
 		nullptr
 	);
+}
+
+void dx3d::DeviceContext::SetGraphicsPipelineState(const GraphicsPipelineState& pipeline)
+{
+	m_context->VSSetShader(pipeline.m_vs.Get(), nullptr, 0);
+	m_context->PSSetShader(pipeline.m_ps.Get(), nullptr, 0);
 }
