@@ -12,9 +12,14 @@ dx3d::GraphicsPipelineState::GraphicsPipelineState(const GraphicsPipelineStateDe
 	auto vs = desc.vs.getData();
 	auto ps = desc.ps.getData();
 
+
+	/*float3 position : POSITIONT;
+	float4 color : COLOR0;*/
+
 	constexpr D3D11_INPUT_ELEMENT_DESC elements[] =
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12,  D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
 	DX3DGraphicsLogThrowOnFail(
