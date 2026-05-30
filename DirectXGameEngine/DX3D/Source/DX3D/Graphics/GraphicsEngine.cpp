@@ -32,8 +32,9 @@ dx3d::GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc) : Base(desc
 		"VSMain", ShaderType::VertextShader});
 	auto ps = device.compileShader({ shaderFilePath, shaderSourceCode, shaderSourceCodeSize,
 		"PSMain", ShaderType::PixelShader});
+	auto vsSig = device.createVertexShaderSignature({ vs });
 
-	m_pipeline = device.createGraphicsPipelineState({ *vs, *ps, });
+	m_pipeline = device.createGraphicsPipelineState({ *vsSig, *ps, });
 
 	const Vertex vertexList[] =
 	{

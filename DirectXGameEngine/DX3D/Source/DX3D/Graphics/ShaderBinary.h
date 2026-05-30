@@ -7,7 +7,7 @@ namespace dx3d
 	{
 	public:
 		ShaderBinary(const ShaderCompileDesc& desc, const GraphicsResourceDesc& gDesc);
-		ShaderBinaryData getData() const noexcept;
+		BinaryData getData() const noexcept;
 		ShaderType getType() const noexcept;
 	private:
 		Microsoft::WRL::ComPtr<ID3DBlob> m_blob;
