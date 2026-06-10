@@ -20,6 +20,7 @@ namespace dx3d
 		RefPtr<VertexBuffer> createVertexBuffer(const VertexBufferDesc& desc);
 		RefPtr<VertexShaderSignature> createVertexShaderSignature(const VertexShaderSignatureDesc& desc);
 		RefPtr<ConstantBuffer> createConstantBuffer(const ConstantBufferDesc& desc);
+		RefPtr<IndexBuffer> createIndexBuffer(const IndexBufferDesc& desc);
 		void executeCommandList(DeviceContext& context);
 	private:
 		GraphicsResourceDesc getGraphicsResourceDesc() const noexcept;
