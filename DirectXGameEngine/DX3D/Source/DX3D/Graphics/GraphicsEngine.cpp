@@ -83,11 +83,24 @@ void dx3d::GraphicsEngine::render(SwapChain& swapChain, f32 deltaTime)
 	auto& context = *m_deviceContext; 
 	auto& cb = *m_cb;
 
-	m_sum += deltaTime * 3.0f;
-	m_scale = std::abs(std::sin(m_sum));
+	m_pos += deltaTime * 0.5f;
+	m_rot += deltaTime * 3.14f;
+	m_scale = std::abs(std::sin(m_rot));
 
-	ConstantData data{};
-	data.scale = m_scale;
+	DX3DLogInfo("Pos: X:{} Y:{}", m_pos, m_pos);
+	DX3DLogInfo("Rot: Z:{}", m_rot);
+	DX3DLogInfo("Scale: {}", m_scale);
+
+	auto worldMat =
+		Mat4x4::scale({ m_scale,m_scale,m_scale }) *
+		Mat4x4::rotateZ(m_rot) *
+		Mat4x4::translate({ m_pos ,m_pos ,0 });
+
+	ConstantData data
+	{
+		worldMat
+	};
+
 	context.updateConstantBuffer(cb, &data);
 	context.clearAndSetBackBuffer(swapChain, 
 		{ 0.66f,0.33f,0.66f,1.0f } // Background color rgba

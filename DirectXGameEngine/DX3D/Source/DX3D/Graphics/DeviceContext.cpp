@@ -62,7 +62,7 @@ void dx3d::DeviceContext::setConstantBuffer(const ConstantBuffer& buffer)
 
 void dx3d::DeviceContext::updateConstantBuffer(const ConstantBuffer& buffer, const void* data)
 {
-	if (!data) DX3DLogThrowError("Null data pointer passed to updateConstantBuffer.");
+	if (!data) DX3DLogThrowInvalidArg("Null data pointer passed to updateConstantBuffer.");
 
 	auto buf = buffer.m_buffer.Get();
 	D3D11_MAPPED_SUBRESOURCE mapped{};
