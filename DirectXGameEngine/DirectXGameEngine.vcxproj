@@ -140,6 +140,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DX3D\Source\Component\CubeComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Game\Component.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\DeviceContext.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\Display.cpp" />
@@ -147,9 +149,9 @@
     <ClCompile Include="DX3D\Source\DX3D\Game\Game.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\Win32\Win32Gme.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\GameObject.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Game\WorldRenderer.cpp" />
     <ClCompile Include="Game\main.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Window\Win32\Win32Window.cpp" />
-    <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsEngine.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Core\Logger.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\SwapChain.cpp" />
@@ -161,8 +163,11 @@
     <ClCompile Include="DX3D\Source\DX3D\Game\World.cpp" />
     <ClCompile Include="Game\MainGame.cpp" />
     <ClCompile Include="Game\Objects\MyObject.cpp" />
+    <ClCompile Include="DX3D\Source\Component\TransformComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DX3D\Include\DX3D\Component\CubeComponent.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Game\Component.h" />
     <ClInclude Include="DX3D\Include\DX3D\Core\Identifiable.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Mat4x4.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.h" />
@@ -177,9 +182,9 @@
     <ClInclude Include="DX3D\Include\DX3D\Math\Rect.h" />
     <ClInclude Include="DX3D\Include\DX3D\Window\Window.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\Game.h" />
-    <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsEngine.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsDevice.h" />
     <ClInclude Include="DX3D\Include\DX3D\Core\Logger.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Game\WorldRenderer.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsLogUtils.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsUtils.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\SwapChain.h" />
@@ -193,6 +198,7 @@
     <ClInclude Include="DX3D\Include\DX3D\Game\GameObject.h" />
     <ClInclude Include="Game\MainGame.h" />
     <ClInclude Include="Game\Objects\MyObject.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Component\TransformComponent.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

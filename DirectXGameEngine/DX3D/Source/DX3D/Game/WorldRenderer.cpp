@@ -1,18 +1,24 @@
-#include <DX3D/Graphics/GraphicsEngine.h>
+#include <DX3D/Game/WorldRenderer.h>
 #include <DX3D/Graphics/GraphicsDevice.h>
 #include <DX3D/Graphics/DeviceContext.h>
 #include <DX3D/Graphics/SwapChain.h>
 #include <DX3D/Math/Vec3.h>
 #include <DX3D/Graphics/VertexBuffer.h>
 #include <DX3D/Graphics/IndexBuffer.h>
+
+#include <DX3D/Game/World.h>
+#include <DX3D/Game/Component.h>
+#include <DX3D/Game/GameObject.h>
+
+#include <DX3D/Component/TransformComponent.h>
+#include <DX3D/Component/CubeComponent.h>
+
 #include <fstream>
+#include <ranges>
 
-dx3d::GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc) : Base(desc.base)
+dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.base), m_graphicsDevice(desc.engine)
 {
-
-	m_graphicsDevice = std::make_unique<GraphicsDevice>(GraphicsDeviceDesc{m_logger});
-
-	auto& device = *m_graphicsDevice;
+	auto& device = m_graphicsDevice;
 	m_deviceContext = device.createDeviceContext();
 
 	constexpr char shaderFilePath[] = "DX3D/Assets/Shaders/Basic.hlsl";
@@ -77,60 +83,54 @@ dx3d::GraphicsEngine::GraphicsEngine(const GraphicsEngineDesc& desc) : Base(desc
 	m_ib = device.createIndexBuffer({ indexList, std::size(indexList) });
 }
 
-dx3d::GraphicsEngine::~GraphicsEngine()
+dx3d::WorldRenderer::~WorldRenderer()
 {
 }
 
-dx3d::GraphicsDevice& dx3d::GraphicsEngine::getGraphicsDevice() noexcept
+void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 deltaTime)
 {
-	return *m_graphicsDevice;
-}
-
-void dx3d::GraphicsEngine::render(SwapChain& swapChain, f32 deltaTime)
-{
-	auto& context = *m_deviceContext; 
-	auto& cb = *m_cb;
-
-	m_pos += deltaTime * 0.0f;
-	m_rot += deltaTime * 0.707f;
-	m_scale = std::abs(std::sin(m_rot));
-
-	auto worldMat =
-		Mat4x4::scale({ m_scale,m_scale,m_scale }) *
-		Mat4x4::rotateX(m_rot) *
-		Mat4x4::rotateY(m_rot) *
-		Mat4x4::rotateZ(m_rot) *
-		Mat4x4::translate({ m_pos,m_pos,0 });
 
 	//orthographic camera setup
 	auto size = swapChain.getSize();
 	auto aspect = static_cast<f32>(size.width) / size.height;
-	auto unitsPerScreenHeight = 2.0f;
+	auto unitsPerScreenHeight = 5.0f;
 	auto viewHeight = unitsPerScreenHeight;
 	auto viewWidth = unitsPerScreenHeight * aspect;
 
-	ConstantData data
-	{ 
-		worldMat,
-		Mat4x4::orthoLH(viewWidth, viewHeight, -10.0f, 10.0f)
-	};
-
-	context.updateConstantBuffer(cb, &data);
+	auto& context = *m_deviceContext;
 	context.clearAndSetBackBuffer(swapChain, 
 		{ 0.66f,0.33f,0.66f,1.0f } // Background color rgba
 	);
 	context.SetGraphicsPipelineState(*m_pipeline);
+	context.setViewportSize(size);
 
-	context.setViewportSize(swapChain.getSize());
+	auto numComponents = 0u;
+	auto components = world.getComponents<CubeComponent>(numComponents);
+	ConstantData data{};
 
-	auto& vb = *m_vb;
-	auto& ib = *m_ib;
-	context.setVertexBuffer(vb);
-	context.setConstantBuffer(cb);
-	context.setIndexBuffer(ib);
-	context.drawIndexedTriangleList(ib.getIndexListSize(), 0u, 0u);
+	for (auto i : std::views::iota(0u, numComponents))
+	{
+		auto component = components[i];
+		auto& transform = component->getGameObject().getTransform();
 
-	auto& device = *m_graphicsDevice;
-	device.executeCommandList(context);
+		data =
+			ConstantData
+		{
+			transform.getWorldMatrix(),
+			Mat4x4::orthoLH(viewWidth, viewHeight, -10.0f, 10.0f)
+		};
+
+		auto& cb = *m_cb;
+		context.updateConstantBuffer(cb, &data);
+
+		auto& vb = *m_vb;
+		auto& ib = *m_ib;
+		context.setVertexBuffer(vb);
+		context.setConstantBuffer(cb);
+		context.setIndexBuffer(ib);
+		context.drawIndexedTriangleList(ib.getIndexListSize(), 0u, 0u);
+	}
+
+	m_graphicsDevice.executeCommandList(context);
 	swapChain.present();
 }
