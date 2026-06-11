@@ -40,10 +40,34 @@ dx3d::Vec3 dx3d::TransformComponent::getScale() const noexcept
 	return m_scale;
 }
 
-dx3d::Mat4x4 dx3d::TransformComponent::getWorldMatrix() noexcept
+dx3d::Vec3 dx3d::TransformComponent::forward()
+{
+	auto forward = getRigidWorldMatrix().row(2);
+	return dx3d::Vec3::normalize({ forward.x,forward.y,forward.z});
+}
+
+dx3d::Vec3 dx3d::TransformComponent::right()
+{
+	auto right = getRigidWorldMatrix().row(0);
+	return dx3d::Vec3::normalize({ right.x,right.y,right.z });
+}
+
+dx3d::Vec3 dx3d::TransformComponent::up()
+{
+	auto up = getRigidWorldMatrix().row(1);
+	return dx3d::Vec3::normalize({ up.x,up.y,up.z });
+}
+
+dx3d::Mat4x4 dx3d::TransformComponent::getAffineWorldMatrix() noexcept
 {
 	updateWorldMatrix();
-	return m_worldMat;
+	return m_affineWorldMatrix;
+}
+
+dx3d::Mat4x4 dx3d::TransformComponent::getRigidWorldMatrix() noexcept
+{
+	updateWorldMatrix();
+	return m_rigidWorldMatrix;;
 }
 
 void dx3d::TransformComponent::updateWorldMatrix() noexcept
@@ -51,14 +75,17 @@ void dx3d::TransformComponent::updateWorldMatrix() noexcept
 	if (!m_dirty) return;
 
 	m_dirty = false;
-	m_worldMat =
-		Mat4x4::scale(m_scale) *
+	m_rigidWorldMatrix =
 
 		Mat4x4::rotateX(m_rotation.x) *
 		Mat4x4::rotateY(m_rotation.y) *
 		Mat4x4::rotateZ(m_rotation.z) *
 
 		Mat4x4::translate(m_position);
+
+	m_affineWorldMatrix =
+		Mat4x4::scale(m_scale) *
+		m_rigidWorldMatrix;
 }
 
 void dx3d::TransformComponent::markAsDirty()

@@ -11,8 +11,7 @@ namespace dx3d
 	{
 	public:
 		explicit InputSystem(const InputSystemDesc& desc);
-		virtual ~InputSystem();
-	public:
+
 		bool isKeyDown(KeyCode key) const;
 		bool isKeyPressed(KeyCode key) const;
 		bool isKeyReleased(KeyCode key) const;

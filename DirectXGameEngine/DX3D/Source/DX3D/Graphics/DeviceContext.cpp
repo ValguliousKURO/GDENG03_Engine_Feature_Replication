@@ -12,23 +12,21 @@ dx3d::DeviceContext::DeviceContext(const GraphicsResourceDesc& gDesc): GraphicsR
 		);
 }
 
-void dx3d::DeviceContext::clearAndSetBackBuffer(const SwapChain& swapChain, const Vec4 color)
+void dx3d::DeviceContext::clearAndSetBackBuffer(const SwapChain& swapChain, const Vec4& color)
 {
 	f32 fColor[] = {color.x,color.y,color.z,color.w};
 	auto rtv = swapChain.m_rtv.Get();
+	auto dsv = swapChain.m_dsv.Get();
 
 	m_context->ClearRenderTargetView(
 		rtv,
 		fColor
 	);
-	m_context->OMSetRenderTargets(
-		1,
-		&rtv,
-		nullptr
-	);
+	m_context->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+	m_context->OMSetRenderTargets(1, &rtv, dsv);
 }
 
-void dx3d::DeviceContext::SetGraphicsPipelineState(const GraphicsPipelineState& pipeline)
+void dx3d::DeviceContext::setGraphicsPipelineState(const GraphicsPipelineState& pipeline)
 {
 	m_context->IASetInputLayout(pipeline.m_layout.Get());
 	m_context->VSSetShader(pipeline.m_vs.Get(), nullptr, 0);
@@ -68,12 +66,22 @@ void dx3d::DeviceContext::setConstantBuffer(const ConstantBuffer& buffer)
 
 void dx3d::DeviceContext::updateConstantBuffer(const ConstantBuffer& buffer, const void* data)
 {
-	if (!data) DX3DLogThrowInvalidArg("Null data pointer passed to updateConstantBuffer.");
+	if (!data)
+	{
+		DX3DLogError("Null data pointer passed to updateConstantBuffer.");
+		return;
+	}
 
 	auto buf = buffer.m_buffer.Get();
 	D3D11_MAPPED_SUBRESOURCE mapped{};
-	DX3DGraphicsLogThrowOnFail(m_context->Map(buf, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped),
-		"ID3D11DeviceContext::Map failed.");
+
+	auto hr = m_context->Map(buf, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+	if (FAILED(hr))
+	{
+		DX3DLogError("ID3D11DeviceContext::Map failed.");
+		return;
+	}
+
 	std::memcpy(mapped.pData, data, buffer.m_size);
 	m_context->Unmap(buf, 0);
 }

@@ -1,15 +1,8 @@
 #include <DX3D/Input/InputSystem.h>
 #include <ranges>
 #include <Windows.h>
-using namespace dx3d;
-
-
 
 dx3d::InputSystem::InputSystem(const InputSystemDesc& desc) : Base(desc.base)
-{
-}
-
-InputSystem::~InputSystem()
 {
 }
 
@@ -31,12 +24,12 @@ bool dx3d::InputSystem::isKeyReleased(KeyCode key) const
 }
 
 
-Vec2 dx3d::InputSystem::getMousePosition() const noexcept
+dx3d::Vec2 dx3d::InputSystem::getMousePosition() const noexcept
 {
 	return m_mousePosition;
 }
 
-Vec2 dx3d::InputSystem::getMouseDelta() const noexcept
+dx3d::Vec2 dx3d::InputSystem::getMouseDelta() const noexcept
 {
 	return m_mouseDelta;
 }
@@ -72,7 +65,7 @@ void dx3d::InputSystem::centerCursor()
 	m_mousePosition.y = static_cast<f32>(centerY);
 }
 
-void InputSystem::update()
+void dx3d::InputSystem::update()
 {
 	m_previousKeys = m_currentKeys;
 
@@ -96,7 +89,7 @@ void InputSystem::update()
 	if (m_cursorLocked) centerCursor();
 }
 
-short InputSystem::getInternalKeyCode(const KeyCode& key)
+short dx3d::InputSystem::getInternalKeyCode(const KeyCode& key)
 {
 	const auto value = static_cast<int>(key);
 	// A-Z

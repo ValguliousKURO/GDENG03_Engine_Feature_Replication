@@ -35,7 +35,7 @@ namespace dx3d
 
 	enum class ShaderType
 	{
-		VertextShader = 0,
+		VertexShader = 0,
 		PixelShader
 	};
 
@@ -84,6 +84,11 @@ namespace dx3d
 		ui32 indexListSize{};
 	};
 
+	struct GameContext
+	{
+		InputSystem& input;
+	};
+
 	struct GameDesc
 	{
 		Rect windowSize{ 1280, 720 };
@@ -93,11 +98,13 @@ namespace dx3d
 	struct WorldDesc
 	{
 		BaseDesc base;
+		GameContext gameContext;
 	};
 
 	struct GameObjectDesc
 	{
 		BaseDesc base;
+		GameContext gameContext;
 		World& world;
 	};
 
