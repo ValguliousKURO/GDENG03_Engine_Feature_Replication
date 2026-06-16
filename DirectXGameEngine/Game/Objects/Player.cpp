@@ -20,8 +20,18 @@ void Player::onUpdate(dx3d::f32 deltaTime)
 
 	auto sensitivity = 0.001f;
 	auto rot = getTransform().getRotation();
-	rot.x += getInputSystem().getMouseDelta().y * sensitivity;
-	rot.y += getInputSystem().getMouseDelta().x * sensitivity;
+	if (getInputSystem().isKeyDown(dx3d::KeyCode::MouseLeft))
+	{
+		rot.x += getInputSystem().getMouseDelta().y * sensitivity;
+		rot.y += getInputSystem().getMouseDelta().x * sensitivity;
+		input.setCursorLocked(true);
+		input.setCursorVisible(false);
+	}
+	else
+	{
+		input.setCursorLocked(false);
+		input.setCursorVisible(true);
+	}
 	if (rot.x > 1.57f) rot.x = 1.57f;
 	else if (rot.x < -1.57f) rot.x = -1.57f;
 	getTransform().setRotation(rot);
