@@ -12,6 +12,7 @@
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Component/CubeComponent.h>
 #include <DX3D/Component/CameraComponent.h>
+#include <DX3D/Component/MeshComponent.h>
 
 #include <DX3D/Math/Vec3.h>
 #include <fstream>
@@ -42,7 +43,7 @@ dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.ba
 
 	m_pipeline = device.createGraphicsPipelineState({ *vsSig, *ps });
 
-	const Vertex vertexList[] =
+	/*const Vertex vertexList[] =
 	{
 		{{-0.5f,-0.5f,-0.5f}, {1,0,0,1}},
 		{{-0.5f,0.5f,-0.5f}, {0,1,0,1} },
@@ -77,8 +78,9 @@ dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.ba
 	};
 
 	m_vb = device.createVertexBuffer({ vertexList, std::size(vertexList), sizeof(Vertex) });
+	m_ib = device.createIndexBuffer({ indexList, std::size(indexList) });*/
+
 	m_cb = device.createConstantBuffer({ {}, sizeof(ConstantData) });
-	m_ib = device.createIndexBuffer({ indexList, std::size(indexList) });
 }
 
 dx3d::WorldRenderer::~WorldRenderer()
@@ -108,30 +110,41 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 		}
 	}
 
-
+	// Render all MeshComponents
 	{
-		auto components = world.getComponents<CubeComponent>(numComponents);
+		auto components = world.getComponents<MeshComponent>(numComponents);
 
 		for (auto i : std::views::iota(0u, numComponents))
 		{
 			auto component = components[i];
 			auto& transform = component->getGameObject().getTransform();
+			auto mesh = component->getMesh();
 
 			data.world = transform.getAffineWorldMatrix();
 
 			auto& cb = *m_cb;
 			context.updateConstantBuffer(cb, &data);
 
-			auto& vb = *m_vb;
-			auto& ib = *m_ib;
-			context.setVertexBuffer(vb);
+			// Get vertex and index data from the mesh
+			auto vertexData = mesh->getVertices();
+			auto vertexCount = mesh->getVertexCount();
+			auto indexData = mesh->getIndices();
+			auto indexCount = mesh->getIndexCount();
+
+			// Create temporary buffers (ideally cache these)
+			auto vb = m_graphicsDevice.createVertexBuffer({
+				vertexData, vertexCount, sizeof(Vertex)
+				});
+			auto ib = m_graphicsDevice.createIndexBuffer({
+				indexData, indexCount
+				});
+
+			context.setVertexBuffer(*vb);
 			context.setConstantBuffer(cb);
-			context.setIndexBuffer(ib);
-			context.drawIndexedTriangleList(ib.getIndexListSize(), 0u, 0u);
+			context.setIndexBuffer(*ib);
+			context.drawIndexedTriangleList(indexCount, 0u, 0u);
 		}
 	}
-
-
 
 	m_graphicsDevice.executeCommandList(context);
 	swapChain.present();

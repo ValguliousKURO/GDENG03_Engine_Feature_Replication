@@ -140,8 +140,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="DX3D\Source\Component\CameraComponent.cpp" />
-    <ClCompile Include="DX3D\Source\Component\CubeComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Component\CameraComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Component\CubeComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\Component.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\DeviceContext.cpp" />
@@ -163,9 +163,12 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\World.cpp" />
     <ClCompile Include="Game\MainGame.cpp" />
-    <ClCompile Include="DX3D\Source\Component\TransformComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Component\TransformComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Input\InputSystem.cpp" />
     <ClCompile Include="Game\Objects\Player.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Component\MeshComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\MeshFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Component\CameraComponent.h" />
@@ -205,6 +208,9 @@
     <ClInclude Include="DX3D\Include\DX3D\Component\TransformComponent.h" />
     <ClInclude Include="DX3D\Include\DX3D\Input\InputSystem.h" />
     <ClInclude Include="Game\Objects\Player.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Component\MeshComponent.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\MeshFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
