@@ -125,24 +125,13 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 			auto& cb = *m_cb;
 			context.updateConstantBuffer(cb, &data);
 
-			// Get vertex and index data from the mesh
-			auto vertexData = mesh->getVertices();
-			auto vertexCount = mesh->getVertexCount();
-			auto indexData = mesh->getIndices();
-			auto indexCount = mesh->getIndexCount();
-
-			// Create temporary buffers (ideally cache these)
-			auto vb = m_graphicsDevice.createVertexBuffer({
-				vertexData, vertexCount, sizeof(Vertex)
-				});
-			auto ib = m_graphicsDevice.createIndexBuffer({
-				indexData, indexCount
-				});
+			auto vb = component->getOrCreateVertexBuffer(m_graphicsDevice);
+			auto ib = component->getOrCreateIndexBuffer(m_graphicsDevice);
 
 			context.setVertexBuffer(*vb);
 			context.setConstantBuffer(cb);
 			context.setIndexBuffer(*ib);
-			context.drawIndexedTriangleList(indexCount, 0u, 0u);
+			context.drawIndexedTriangleList(mesh->getIndexCount(), 0u, 0u);
 		}
 	}
 
