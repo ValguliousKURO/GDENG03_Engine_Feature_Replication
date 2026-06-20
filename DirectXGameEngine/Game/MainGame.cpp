@@ -54,6 +54,7 @@ void MainGame::onCreate()
 	auto capsuleMeshComp = capsule->createOrGetComponent<dx3d::MeshComponent>();
 	capsuleMeshComp->setMesh(capsuleMesh);
 	capsule->getTransform().setPosition({ -3.0f, 1.0f, 0.0f });
+	capsule->getTransform().setRotation({-1.57f, 0.0f, 0.0f});
 
 	// Create a cylinder
 	auto cylinder = world.createGameObject<dx3d::GameObject>();

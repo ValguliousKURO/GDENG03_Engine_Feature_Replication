@@ -128,6 +128,21 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 		}
 	}
 
+	// Cylinder body
+	for (ui32 i = 0; i <= 1; ++i) // two rings: top and bottom of cylinder
+	{
+		f32 z_offset = (i == 0 ? halfHeight : -halfHeight);
+
+		for (ui32 j = 0; j <= segments; ++j)
+		{
+			f32 theta = TWO_PI * (j / static_cast<f32>(segments));
+			f32 x = radius * cosf(theta);
+			f32 y = radius * sinf(theta);
+
+			vertices.push_back({ {x, y, z_offset}, {colorValue, colorValue, colorValue, 1.0f} });
+		}
+	}
+
 	// Bottom hemisphere
 	for (ui32 i = 1; i <= rings; ++i)
 	{
@@ -141,11 +156,27 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 			f32 x = r * cosf(theta);
 			f32 y = r * sinf(theta);
 
-			vertices.push_back({ {x, y, z_offset}, {colorValue, colorValue - 0.2f, colorValue, 1.0f} });
+			vertices.push_back({ {x, y, z_offset}, {colorValue + 0.2f, colorValue, colorValue, 1.0f} });
 		}
 	}
 
-	// Generate indices for top hemisphere
+	// Indices for cylinder
+	ui32 cylStart = (rings + 1) * (segments + 1);
+	for (ui32 j = 0; j < segments; ++j)
+	{
+		ui32 k1 = cylStart + j;
+		ui32 k2 = k1 + (segments + 1);
+
+		indices.push_back(k1);
+		indices.push_back(k2);
+		indices.push_back(k1 + 1);
+
+		indices.push_back(k1 + 1);
+		indices.push_back(k2);
+		indices.push_back(k2 + 1);
+	}
+	
+	// Indices for top hemisphere (reversed winding)
 	for (ui32 i = 0; i < rings; ++i)
 	{
 		ui32 k1 = i * (segments + 1);
@@ -154,20 +185,20 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 		for (ui32 j = 0; j < segments; ++j)
 		{
 			indices.push_back(k1);
-			indices.push_back(k2);
 			indices.push_back(k1 + 1);
+			indices.push_back(k2);
 
 			indices.push_back(k1 + 1);
-			indices.push_back(k2);
 			indices.push_back(k2 + 1);
+			indices.push_back(k2);
 
 			k1++;
 			k2++;
 		}
 	}
 
-	// Generate indices for bottom hemisphere
-	ui32 bottomStart = (rings + 1) * (segments + 1);
+	// Indices for bottom hemisphere
+	ui32 bottomStart = cylStart + 2 * (segments + 1);
 	for (ui32 i = 0; i < rings; ++i)
 	{
 		ui32 k1 = bottomStart + i * (segments + 1);
@@ -188,8 +219,11 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 		}
 	}
 
+
+
 	return std::make_shared<Mesh>(vertices, indices);
 }
+
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 height, ui32 segments)
 {
 	std::vector<Vertex> vertices;
