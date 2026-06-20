@@ -72,13 +72,7 @@
     <ClCompile Include="Game\MainGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DX3D\Source\Component\TransformComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DX3D\Source\DX3D\Game\Component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DX3D\Source\Component\CubeComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DX3D\Source\DX3D\Game\WorldRenderer.cpp">
@@ -90,7 +84,22 @@
     <ClCompile Include="Game\Objects\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DX3D\Source\Component\CameraComponent.cpp">
+    <ClCompile Include="DX3D\Source\DX3D\Component\CameraComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Component\CubeComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Component\TransformComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Component\MeshComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\MeshFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -206,5 +215,17 @@
     <ClInclude Include="DX3D\Include\DX3D\Math\MathUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\Component\MeshComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\MeshFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="DX3D\Assets\Shaders\Basic.hlsl" />
   </ItemGroup>
 </Project>

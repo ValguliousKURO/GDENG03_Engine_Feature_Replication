@@ -212,6 +212,9 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\MeshFactory.h" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="DX3D\Assets\Shaders\Basic.hlsl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

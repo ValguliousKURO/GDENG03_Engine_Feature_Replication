@@ -31,3 +31,4 @@ float4 PSMain(VSOutput input) : SV_TARGET
 {
     return input.color;
 }
+
