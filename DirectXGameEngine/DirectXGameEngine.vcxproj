@@ -143,8 +143,8 @@
     <ClCompile Include="DX3D\Source\DX3D\Component\CameraComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Component\CubeComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\Component.cpp" />
-    <ClCompile Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.cpp" />
-    <ClCompile Include="DX3D\Source\DX3D\Graphics\DeviceContext.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\RenderSystem\ConstantBuffer\ConstantBuffer.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\RenderSystem\DeviceContext\DeviceContext.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\Display.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Core\Base.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\Game.cpp" />
@@ -155,20 +155,20 @@
     <ClCompile Include="DX3D\Source\DX3D\Window\Win32\Win32Window.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Core\Logger.cpp" />
-    <ClCompile Include="DX3D\Source\DX3D\Graphics\SwapChain.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\RenderSystem\SwapChain\SwapChain.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ShaderBinary.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineState.cpp" />
-    <ClCompile Include="DX3D\Source\DX3D\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\RenderSystem\VertexBuffer\VertexBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\VertexShaderSignature.cpp" />
-    <ClCompile Include="DX3D\Source\DX3D\Graphics\IndexBuffer.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\RenderSystem\IndexBuffer\IndexBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\World.cpp" />
     <ClCompile Include="Game\MainGame.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Component\TransformComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Input\InputSystem.cpp" />
     <ClCompile Include="Game\Objects\Player.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Component\MeshComponent.cpp" />
-    <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh.cpp" />
-    <ClCompile Include="DX3D\Source\DX3D\Graphics\MeshFactory.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh\Mesh.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh\MeshFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Component\CameraComponent.h" />
@@ -178,10 +178,10 @@
     <ClInclude Include="DX3D\Include\DX3D\Math\Mat4x4.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\MathUtils.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Vec2.h" />
-    <ClInclude Include="DX3D\Source\DX3D\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\RenderSystem\ConstantBuffer\ConstantBuffer.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Vec3.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Vec4.h" />
-    <ClInclude Include="DX3D\Source\DX3D\Graphics\DeviceContext.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\RenderSystem\DeviceContext\DeviceContext.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\Display.h" />
     <ClInclude Include="DX3D\Include\DX3D\All.h" />
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h" />
@@ -195,13 +195,13 @@
     <ClInclude Include="DX3D\Source\DX3D\Game\WorldRenderer.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsLogUtils.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsUtils.h" />
-    <ClInclude Include="DX3D\Source\DX3D\Graphics\SwapChain.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\RenderSystem\SwapChain\SwapChain.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsResource.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ShaderBinary.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineState.h" />
-    <ClInclude Include="DX3D\Source\DX3D\Graphics\VertexBuffer.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\RenderSystem\VertexBuffer\VertexBuffer.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\VertexShaderSignature.h" />
-    <ClInclude Include="DX3D\Source\DX3D\Graphics\IndexBuffer.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\RenderSystem\IndexBuffer\IndexBuffer.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\World.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\GameObject.h" />
     <ClInclude Include="Game\MainGame.h" />
@@ -209,8 +209,8 @@
     <ClInclude Include="DX3D\Include\DX3D\Input\InputSystem.h" />
     <ClInclude Include="Game\Objects\Player.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\MeshComponent.h" />
-    <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh.h" />
-    <ClInclude Include="DX3D\Source\DX3D\Graphics\MeshFactory.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh\Mesh.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh\MeshFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

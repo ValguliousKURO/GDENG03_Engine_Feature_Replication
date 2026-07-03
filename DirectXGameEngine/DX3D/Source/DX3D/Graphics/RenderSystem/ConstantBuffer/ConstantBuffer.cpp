@@ -1,4 +1,4 @@
-#include <DX3D/Graphics/ConstantBuffer.h>
+#include <DX3D/Graphics/RenderSystem/ConstantBuffer/ConstantBuffer.h>
 
 dx3d::ConstantBuffer::ConstantBuffer(const ConstantBufferDesc& desc, const GraphicsResourceDesc& gDesc) :
 	GraphicsResource(gDesc), m_size(desc.bufferSize)

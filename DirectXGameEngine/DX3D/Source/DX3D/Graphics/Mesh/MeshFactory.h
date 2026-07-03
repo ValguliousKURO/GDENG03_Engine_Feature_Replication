@@ -1,5 +1,5 @@
 #pragma once
-#include <DX3D/Graphics/Mesh.h>
+#include <DX3D/Graphics/Mesh/Mesh.h>
 
 namespace dx3d
 {

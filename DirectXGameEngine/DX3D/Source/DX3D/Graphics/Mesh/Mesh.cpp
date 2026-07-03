@@ -1,4 +1,4 @@
-#include <DX3D/Graphics/Mesh.h>
+#include <DX3D/Graphics/Mesh/Mesh.h>
 
 dx3d::Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<ui32>& indices)
 	: m_vertices(vertices), m_indices(indices)

@@ -1,13 +1,13 @@
 #include <DX3D/Graphics/GraphicsDevice.h>
 #include <DX3D/Graphics/GraphicsLogUtils.h>
-#include <DX3D/Graphics/SwapChain.h>
-#include <DX3D/Graphics/DeviceContext.h>
+#include <DX3D/Graphics/RenderSystem/SwapChain/SwapChain.h>
+#include <DX3D/Graphics/RenderSystem/DeviceContext/DeviceContext.h>
 #include <DX3D/Graphics/ShaderBinary.h>
 #include <DX3D/Graphics/GraphicsPipelineState.h>
-#include <DX3D/Graphics/VertexBuffer.h>
-#include <DX3D/Graphics/IndexBuffer.h>
+#include <DX3D/Graphics/RenderSystem/VertexBuffer/VertexBuffer.h>
+#include <DX3D/Graphics/RenderSystem/IndexBuffer/IndexBuffer.h>
 #include <DX3D/Graphics/VertexShaderSignature.h>
-#include <DX3D/Graphics/ConstantBuffer.h>
+#include <DX3D/Graphics/RenderSystem/ConstantBuffer/ConstantBuffer.h>
 
 using namespace dx3d;
 

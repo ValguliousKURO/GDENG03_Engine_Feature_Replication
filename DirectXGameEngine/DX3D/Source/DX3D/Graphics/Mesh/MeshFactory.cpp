@@ -1,4 +1,4 @@
-﻿#include <DX3D/Graphics/MeshFactory.h>
+﻿#include <DX3D/Graphics/Mesh/MeshFactory.h>
 #include <cmath>
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()

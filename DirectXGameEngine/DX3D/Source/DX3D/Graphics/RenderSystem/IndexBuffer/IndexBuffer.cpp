@@ -1,4 +1,4 @@
-#include <DX3D/Graphics/IndexBuffer.h>
+#include <DX3D/Graphics/RenderSystem/IndexBuffer/IndexBuffer.h>
 #include <DX3D/Graphics/GraphicsUtils.h>
 
 dx3d::IndexBuffer::IndexBuffer(const IndexBufferDesc& desc, const GraphicsResourceDesc& gDesc) : GraphicsResource(gDesc), m_listSize(desc.indexListSize)

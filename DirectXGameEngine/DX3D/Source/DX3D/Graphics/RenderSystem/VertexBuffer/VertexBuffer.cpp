@@ -1,4 +1,4 @@
-#include <DX3D/Graphics/VertexBuffer.h>
+#include <DX3D/Graphics/RenderSystem/VertexBuffer/VertexBuffer.h>
 
 dx3d::VertexBuffer::VertexBuffer(const VertexBufferDesc& desc, const GraphicsResourceDesc& gDesc): 
 	GraphicsResource(gDesc),

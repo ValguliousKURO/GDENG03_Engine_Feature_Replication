@@ -1,9 +1,9 @@
 #include <DX3D/Game/WorldRenderer.h>
 #include <DX3D/Graphics/GraphicsDevice.h>
-#include <DX3D/Graphics/DeviceContext.h>
-#include <DX3D/Graphics/SwapChain.h>
-#include <DX3D/Graphics/VertexBuffer.h>
-#include <DX3D/Graphics/IndexBuffer.h>
+#include <DX3D/Graphics/RenderSystem/DeviceContext/DeviceContext.h>
+#include <DX3D/Graphics/RenderSystem/SwapChain/SwapChain.h>
+#include <DX3D/Graphics/RenderSystem/VertexBuffer/VertexBuffer.h>
+#include <DX3D/Graphics/RenderSystem/IndexBuffer/IndexBuffer.h>
 
 #include <DX3D/Game/World.h>
 #include <DX3D/Game/Component.h>

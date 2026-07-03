@@ -1,6 +1,6 @@
 #include "MainGame.h"
 #include "Objects/Player.h"
-#include <DX3D/Graphics/MeshFactory.h>
+#include <DX3D/Graphics/Mesh/MeshFactory.h>
 #include <DX3D/Component/MeshComponent.h>
 
 
