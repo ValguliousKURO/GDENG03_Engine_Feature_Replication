@@ -1,0 +1,87 @@
+#include <DX3D/Window/Window.h>
+#include <Windows.h>
+#include <stdexcept>
+
+using namespace dx3d;
+
+// In your main message loop
+LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	Window* pThis = nullptr;
+
+	if (msg == WM_CREATE)
+	{
+		CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lparam);
+		pThis = reinterpret_cast<Window*>(pCreate->lpCreateParams);
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)pThis);
+	}
+	else
+	{
+		pThis = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+	}
+
+	/*if (pThis)
+		return pThis->handleMessage(msg, wparam, lparam);*/
+
+	return DefWindowProc(hwnd, msg, wparam, lparam);
+}
+
+dx3d::Window::Window(const WindowDesc& desc): Base(desc.base), m_size(desc.size)
+{
+	auto registerWindowClassFunction = []()
+		{
+			WNDCLASSEX wc{};
+			wc.cbSize = sizeof(WNDCLASSEX);
+			wc.lpszClassName = L"DX3DWindow";
+			wc.lpfnWndProc = &WindowProcedure;
+			return RegisterClassEx(&wc);
+		};
+
+	static const auto windowClassId = std::invoke(registerWindowClassFunction);
+
+	if (!windowClassId)
+	{
+		DX3DLogThrowError("RegisterClassEx failed!");
+	}
+
+	RECT rc{ 0,0,m_size.width,m_size.height };
+	AdjustWindowRect(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, false);
+
+	m_handle = CreateWindowEx(NULL, MAKEINTATOM(windowClassId), L"KenshinRR Engine | Based on PardCode C++ 3D Game Tutorial Series",
+		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
+		rc.right - rc.left, rc.bottom - rc.top,
+		NULL, NULL, NULL, NULL);
+
+	if (!m_handle)
+	{
+		DX3DLogThrowError("CreateWindowEx failed!");
+	}
+
+	ShowWindow(static_cast<HWND>(m_handle), SW_SHOW);
+}
+
+dx3d::Rect dx3d::Window::getClientAreaInScreenSpace()
+{
+	auto hwnd = static_cast<HWND>(m_handle);
+
+	RECT client{};
+	GetClientRect(hwnd, &client);
+
+	POINT topLeft{ client.left, client.top };
+	POINT bottomRight{ client.right, client.bottom };
+	ClientToScreen(hwnd, &topLeft);
+	ClientToScreen(hwnd, &bottomRight);
+
+	return {
+		topLeft.x ,
+		topLeft.y ,
+		bottomRight.x - topLeft.x,
+		bottomRight.y - topLeft.y
+	};
+}
+
+
+dx3d::Window::~Window()
+{
+	DestroyWindow(static_cast<HWND>(m_handle));
+}
