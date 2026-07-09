@@ -1,0 +1,782 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="dx3d::CameraComponent" Collapsed="true">
+    <Position X="7.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAEiAAAEICgAAiAAAEAAACCAAEAoAAAAAAAABAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Component\CameraComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::CubeComponent" Collapsed="true">
+    <Position X="12.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Component\CubeComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Component" Collapsed="true">
+    <Position X="11" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAECAAAAAAAAAAAAAAACAAgAABAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Game\Component.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Identifiable" Collapsed="true">
+    <Position X="12.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAQAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Identifiable.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Mat4x4" Collapsed="true">
+    <Position X="57" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgQAAAAAAgAAAAAAWAADYAAAAAAAAAAgAABABAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Math\Mat4x4.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Vec2" Collapsed="true">
+    <Position X="55.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABggAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Math\Vec2.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::ConstantBuffer" Collapsed="true">
+    <Position X="37" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\RenderSystem\ConstantBuffer\ConstantBuffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::DeviceContext" Collapsed="true">
+    <Position X="41.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAhIMAACAEFQAAAgABAAgEAAAIAACABAAAAAgAQAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\RenderSystem\DeviceContext\DeviceContext.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Vec3" Collapsed="true">
+    <Position X="57" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQAAAAAAAAAQAAAAAAAAAAAABgAQEAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Math\Vec3.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Vec4" Collapsed="true">
+    <Position X="58.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAhgAwAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Math\Vec4.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::GraphicsDevice" Collapsed="true">
+    <Position X="50.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gwAAAAAQAgAAAAAIIAAAEAAEAIAAQBDAAAAEFAEAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\GraphicsDevice.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Display" Collapsed="true">
+    <Position X="23.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAQAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Game\Display.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Base" Collapsed="true">
+    <Position X="28" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAEAAAAAAAAAAgIAEAAAAAAQAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Base.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Window" Collapsed="true">
+    <Position X="23.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAQAEAAAQAAAAAAAAAACAIAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Window\Window.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Game" Collapsed="true">
+    <Position X="0.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAgAIAAAACAAAAAASAAAAAAiAAA0oACBAAEAACAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Game\Game.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::InputSystem" Collapsed="true">
+    <Position X="52.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAgAAAEQgAACgAIAAQAQAIgJAhAAAAAAkAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Input\InputSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Logger" Collapsed="true">
+    <Position X="55.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAIAAEAAAAAECAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Logger.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::SwapChain" Collapsed="true">
+    <Position X="25.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAIAQAwAAAAAQAAAAAAACAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\RenderSystem\SwapChain\SwapChain.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::ShaderBinary" Collapsed="true">
+    <Position X="28" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAARIAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\ShaderBinary.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::GraphicsPipelineState" Collapsed="true">
+    <Position X="30.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAACAAAAAAAIAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\GraphicsPipelineState.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::VertexBuffer" Collapsed="true">
+    <Position X="32.5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAACAAAAAAAAAAAAAgAAAAAAAAAAIAAAAAEAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\RenderSystem\VertexBuffer\VertexBuffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::IndexBuffer" Collapsed="true">
+    <Position X="34.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQACAAAAAAAAAAAEAAAAAAAAIAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\RenderSystem\IndexBuffer\IndexBuffer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Texture" Collapsed="true">
+    <Position X="39.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAABAAAAAAAAAAAAAAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\Texture.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Sampler" Collapsed="true">
+    <Position X="43.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAIA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\Sampler.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::GraphicsPipelineLayout" Collapsed="true">
+    <Position X="46" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AoAAAAQAACAAAgAAABUAAAAAEAAAAAAAgCAAAQAACAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\GraphicsPipelineLayout.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::World" Collapsed="true">
+    <Position X="48.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACQAAQBAQAAgQQAAAAUAQAACAAAAgAAAAAAgEAAQ=</HashCode>
+      <FileName>DX3D\Include\DX3D\Game\World.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::GameObject" Collapsed="true">
+    <Position X="16.75" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAACAAIAAAACEAECIAAAAAAAACAAAEgAABAAAIgAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Game\GameObject.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::TransformComponent" Collapsed="true">
+    <Position X="10" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIoEAAGAAQCAAAAAAAAQCKAAgAAACEQAAAgEAgAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Component\TransformComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::WorldRenderer" Collapsed="true">
+    <Position X="3.25" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AggAAAAAAAQAAAAAAAAAAAAAAAACABAAAAAAAAAQCAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Game\WorldRenderer.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::ResourceManager" Collapsed="true">
+    <Position X="5.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAAAAACAGAAAAAAAAAAAAAAAAQAAgAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Resource\ResourceManager.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Resource" Collapsed="true">
+    <Position X="20" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAIAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Resource\Resource.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::MaterialResource" Collapsed="true">
+    <Position X="19" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEQAAEAAAAAAgAABABCAAAAAAAAAMAgAAIAAAAACAg=</HashCode>
+      <FileName>DX3D\Include\DX3D\Resource\MaterialResource.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::TextureResource" Collapsed="true">
+    <Position X="21.25" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Resource\TextureResource.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Rect" Collapsed="true">
+    <Position X="62.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQAQAAAAQgAACAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Math\Rect.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::GraphicsResource" Collapsed="true">
+    <Position X="35.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAACAAACAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\GraphicsResource.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::MeshComponent" Collapsed="true">
+    <Position X="14.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAABAAQAAAAAAAAARAAAEAAgCwAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Component\MeshComponent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::Mesh" Collapsed="true">
+    <Position X="58.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABBABAAAAAAAQAAAABAAAAAAAAQAAAAAQAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\Mesh\Mesh.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="dx3d::MeshFactory" Collapsed="true">
+    <Position X="60.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgABAAAAAAAAAAAABIIAAAACAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\Mesh\MeshFactory.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ShaderInclude" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="64" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAIAAAAAAAAAAAAAAAAAAAACAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\ShaderInclude.h</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="MainGame" Collapsed="true">
+    <Position X="0.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAACAAAAAAAAAAAAgAAAAAAAAAAA=</HashCode>
+      <FileName>Game\MainGame.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Player" Collapsed="true">
+    <Position X="16.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAQAAABA=</HashCode>
+      <FileName>Game\Objects\Player.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="dx3d::BaseDesc" Collapsed="true">
+    <Position X="55.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::WindowDesc" Collapsed="true">
+    <Position X="57" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::DisplayDesc" Collapsed="true">
+    <Position X="62.25" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQIAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::GraphicsDeviceDesc" Collapsed="true">
+    <Position X="58.75" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::SwapChainDesc" Collapsed="true">
+    <Position X="57" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::ShaderCompileDesc" Collapsed="true">
+    <Position X="55.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAQAgAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::GraphicsPipelineStateDesc" Collapsed="true">
+    <Position X="62.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::VertexBufferDesc" Collapsed="true">
+    <Position X="55.25" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAACAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAgAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::GraphicsPipelineLayoutDesc" Collapsed="true">
+    <Position X="60.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAIAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::BinaryData" Collapsed="true">
+    <Position X="57" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::ConstantBufferDesc" Collapsed="true">
+    <Position X="60.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::IndexBufferDesc" Collapsed="true">
+    <Position X="55.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::GameContext" Collapsed="true">
+    <Position X="64" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAAAABAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::GameDesc" Collapsed="true">
+    <Position X="55.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::ResourceDesc" Collapsed="true">
+    <Position X="60.5" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAACAAAEAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::MaterialResourceDesc" Collapsed="true">
+    <Position X="58.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::TextureResourceDesc" Collapsed="true">
+    <Position X="62.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::SystemContext" Collapsed="true">
+    <Position X="58.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::ResourceManagerDesc" Collapsed="true">
+    <Position X="62.25" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::WorldDesc" Collapsed="true">
+    <Position X="58.75" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::GameObjectDesc" Collapsed="true">
+    <Position X="57" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAEAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::ComponentDesc" Collapsed="true">
+    <Position X="58.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABCEAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::WorldRendererDesc" Collapsed="true">
+    <Position X="60.5" Y="6.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::TextureDesc" Collapsed="true">
+    <Position X="60.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAAIAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::SamplerDesc" Collapsed="true">
+    <Position X="64" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::InputSystemDesc" Collapsed="true">
+    <Position X="57" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::GraphicsResourceDesc" Collapsed="true">
+    <Position X="64" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAACAAAgAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\GraphicsResource.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="dx3d::Vertex" Collapsed="true">
+    <Position X="64" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Source\DX3D\Graphics\Mesh\Mesh.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_2" Collapsed="true">
+    <Position X="13.75" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAACAEAAAAAAAAAAAAAAAQAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_3" Collapsed="true">
+    <Position X="17.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAACEAIAYAgAAgAAAAAAAhAAAAABACA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_5" Collapsed="true">
+    <Position X="9.75" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAAAAABAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_7" Collapsed="true">
+    <Position X="17.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIIAAAAAAIAAACCAAAAAAAEAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_8" Collapsed="true">
+    <Position X="5.75" Y="17.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgACBABEAAIAQEDEggMAAIBgAAgAAABAIBAQAAiAgg=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_10" Collapsed="true">
+    <Position X="1.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEEAAAAAAAAAAQAAAAAAAACAIABAIAAAgAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_11" Collapsed="true">
+    <Position X="13.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIIAAAAgIAAAACCAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_12" Collapsed="true">
+    <Position X="13.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAEAQAAAIEAJAAgAoAAAgAAAAAAIAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_13" Collapsed="true">
+    <Position X="9.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAEAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_14" Collapsed="true">
+    <Position X="5.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAQAAAAAAAAAAAAAAAIAAAIAAIAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_16" Collapsed="true">
+    <Position X="9.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAEAIAAAAACAQAAAAAAAAAAAgAAAAAKAABAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_17" Collapsed="true">
+    <Position X="1.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAIAAAAIAAAAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_18" Collapsed="true">
+    <Position X="5.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAgAAAAAAAAAgAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="__unnamed_struct_071a_19" Collapsed="true">
+    <Position X="1.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAAEICAgAIAAARAQAgAEhAYAAgAAAAQAggAAAAJgQ=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="stbi_uc" Collapsed="true">
+    <Position X="64" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_us" Collapsed="true">
+    <Position X="55.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi_io_callbacks" Collapsed="true">
+    <Position X="13.75" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__uint16" Collapsed="true">
+    <Position X="60.5" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__int16" Collapsed="true">
+    <Position X="57" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__uint32" Collapsed="true">
+    <Position X="62.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__int32" Collapsed="true">
+    <Position X="58.75" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="validate_uint32" Collapsed="true">
+    <Position X="57" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__context" Collapsed="true">
+    <Position X="17.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__result_info" Collapsed="true">
+    <Position X="9.75" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__huffman" Collapsed="true">
+    <Position X="17.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__jpeg" Collapsed="true">
+    <Position X="5.75" Y="19.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="resample_row_func" Collapsed="true">
+    <Position X="55.25" Y="9" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__resample" Collapsed="true">
+    <Position X="1.75" Y="16.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__zhuffman" Collapsed="true">
+    <Position X="13.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__zbuf" Collapsed="true">
+    <Position X="13.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__pngchunk" Collapsed="true">
+    <Position X="9.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__png" Collapsed="true">
+    <Position X="5.75" Y="14.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__bmp_data" Collapsed="true">
+    <Position X="9.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__pic_packet" Collapsed="true">
+    <Position X="1.75" Y="11.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__gif_lzw" Collapsed="true">
+    <Position X="5.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="stbi__gif" Collapsed="true">
+    <Position X="1.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="dx3d::ShaderType" Collapsed="true">
+    <Position X="64" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="dx3d::KeyCode" Collapsed="true">
+    <Position X="62.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACIAAIAAAAgQAED+YQQAAAAEAAAACAiAvv//YRM=</HashCode>
+      <FileName>DX3D\Include\DX3D\Core\Common.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_071a_1" Collapsed="true">
+    <Position X="55.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAABAAAAAAAAAAEAAABAAAAAAAIAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_071a_4" Collapsed="true">
+    <Position X="58.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAgAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_071a_6" Collapsed="true">
+    <Position X="60.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAAAAAAAAAAAAAAgAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="__unnamed_enum_071a_15" Collapsed="true">
+    <Position X="57" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAECAAAABAAIAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DX3D\Vendor\stb-image\include\stb-image\stb_image.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

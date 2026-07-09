@@ -50,8 +50,7 @@ namespace dx3d
 
 	struct GraphicsPipelineStateDesc
 	{
-		const VertexShaderSignature& vs;
-		const ShaderBinary& ps;
+		const GraphicsPipelineLayout& layout;
 	};
 
 	struct VertexBufferDesc
@@ -61,9 +60,10 @@ namespace dx3d
 		ui32 vertexSize{};
 	};
 
-	struct VertexShaderSignatureDesc
+	struct GraphicsPipelineLayoutDesc
 	{
 		const RefPtr<ShaderBinary>& vsBinary;
+		const RefPtr<ShaderBinary>& psBinary;
 	};
 
 	struct BinaryData
@@ -89,6 +89,8 @@ namespace dx3d
 	{
 		InputSystem& input;
 		ResourceManager& resourceManager;
+
+		GraphicsDevice& device;
 	};
 
 	struct GameDesc
@@ -105,6 +107,12 @@ namespace dx3d
 	};
 
 	struct MaterialResourceDesc
+	{
+		ResourceDesc base;
+		GraphicsDevice& graphicsDevice;
+	};
+
+	struct TextureResourceDesc
 	{
 		ResourceDesc base;
 		GraphicsDevice& graphicsDevice;
@@ -139,12 +147,22 @@ namespace dx3d
 		BaseDesc base;
 		GameObject& object;
 		World& world;
+		GameContext& context;
 	};
 
 	struct WorldRendererDesc
 	{
 		BaseDesc base;
 		GraphicsDevice& engine;
+	};
+
+	struct TextureDesc
+	{
+		Rect size{};
+		const void* pixels{};
+	};
+	struct SamplerDesc
+	{
 	};
 
 	enum class KeyCode

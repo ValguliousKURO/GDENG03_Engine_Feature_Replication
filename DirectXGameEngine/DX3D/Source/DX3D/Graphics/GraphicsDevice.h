@@ -18,9 +18,11 @@ namespace dx3d
 		RefPtr<ShaderBinary> compileShader(const ShaderCompileDesc& desc);
 		RefPtr<GraphicsPipelineState> createGraphicsPipelineState(const GraphicsPipelineStateDesc& desc);
 		RefPtr<VertexBuffer> createVertexBuffer(const VertexBufferDesc& desc);
-		RefPtr<VertexShaderSignature> createVertexShaderSignature(const VertexShaderSignatureDesc& desc);
+		RefPtr<GraphicsPipelineLayout> createGraphicsPipelineLayout(const GraphicsPipelineLayoutDesc& desc);
 		RefPtr<ConstantBuffer> createConstantBuffer(const ConstantBufferDesc& desc);
 		RefPtr<IndexBuffer> createIndexBuffer(const IndexBufferDesc& desc);
+		RefPtr<Texture> createTexture(const TextureDesc& desc);
+		RefPtr<Sampler> createSampler(const SamplerDesc& desc);
 		void executeCommandList(DeviceContext& context);
 	private:
 		GraphicsResourceDesc getGraphicsResourceDesc() const noexcept;

@@ -15,6 +15,7 @@
 #include <DX3D/Component/MeshComponent.h>
 
 #include <DX3D/Resource/MaterialResource.h>
+#include <DX3D/Resource/TextureResource.h>
 
 #include <DX3D/Math/Vec3.h>
 #include <fstream>
@@ -28,9 +29,13 @@ dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.ba
 
 	//m_cb = device.createConstantBuffer({ {}, sizeof(ConstantData) });
 
+	m_textures.reserve(32);
+
 	m_objectCb = device.createConstantBuffer({ {}, sizeof(ObjectData) });
 	m_cameraCb = device.createConstantBuffer({ {}, sizeof(CameraData) });
 	m_materialCb = device.createConstantBuffer({ {}, dx3d::MaterialResource::MaxDataSize });
+
+	m_sampler = device.createSampler({});
 }
 
 void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 deltaTime)
@@ -40,6 +45,9 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 	auto& context = *m_deviceContext;
 	context.clearAndSetBackBuffer(swapChain, { 0.27f, 0.39f, 0.55f, 1.0f });
 	context.setViewportSize(size);
+
+	Sampler* samplers[] = { m_sampler.get() };
+	context.setSamplers(std::span<Sampler*>{samplers});
 
 	auto numComponents = 0u;
 
@@ -87,6 +95,19 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 
 				auto vb = component->getOrCreateVertexBuffer(m_graphicsDevice);
 				auto ib = component->getOrCreateIndexBuffer(m_graphicsDevice);
+
+				/*context.setVertexBuffer(*vb);
+				context.setIndexBuffer(*ib);
+				context.drawIndexedTriangleList(mesh->getIndexCount(), 0u, 0u);*/
+
+				m_textures.clear();
+				m_textures.resize(material->getNumTextures());
+				for (auto t : std::views::iota(0u, m_textures.size()))
+				{
+					auto tex = material->getTexture(t);
+					if (tex) m_textures[t] = &tex->getTexture();
+				}
+				context.setTextures(std::span<Texture*>{m_textures});
 
 				context.setVertexBuffer(*vb);
 				context.setIndexBuffer(*ib);

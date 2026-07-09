@@ -15,5 +15,6 @@ namespace dx3d
 	protected:
 		GameObject& m_object;
 		World& m_world;
+		GameContext& m_context;
 	};
 }

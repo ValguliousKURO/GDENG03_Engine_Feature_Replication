@@ -1,17 +1,14 @@
 #include <DX3D/Graphics/GraphicsPipelineState.h>
 #include <DX3D/Graphics/ShaderBinary.h>
-#include <DX3D/Graphics/VertexShaderSignature.h>
+#include <DX3D/Graphics/GraphicsPipelineLayout.h>
 
 
 dx3d::GraphicsPipelineState::GraphicsPipelineState(const GraphicsPipelineStateDesc& desc, const GraphicsResourceDesc& gDesc): 
 	GraphicsResource(gDesc)
 {
-	if (desc.ps.getType() != ShaderType::PixelShader)
-		DX3DLogThrowInvalidArg("The 'ps' member is not a valid pixel shader binary.");
-
-	auto vs = desc.vs.getShaderBinaryData();
-	auto ps = desc.ps.getData();
-	auto vsInputElements = desc.vs.getInputElements();
+	auto vs = desc.layout.getVSBinaryData();
+	auto ps = desc.layout.getPSBinaryData();
+	auto vsInputElements = desc.layout.getInputElementsData();
 
 	DX3DGraphicsLogThrowOnFail(
 		m_device.CreateInputLayout(

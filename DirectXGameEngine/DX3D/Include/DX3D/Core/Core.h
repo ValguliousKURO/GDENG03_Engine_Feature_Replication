@@ -35,6 +35,10 @@ namespace dx3d
 
 	class IndexBuffer;
 
+	class Texture;
+	class Sampler;
+	class GraphicsPipelineLayout;
+
 	class World;
 	class GameObject;
 
@@ -46,6 +50,7 @@ namespace dx3d
 	class ResourceManager;
 	class Resource;
 	class MaterialResource;
+	class TextureResource;
 
 	using i32 = int;
 	using ui32 = unsigned int;

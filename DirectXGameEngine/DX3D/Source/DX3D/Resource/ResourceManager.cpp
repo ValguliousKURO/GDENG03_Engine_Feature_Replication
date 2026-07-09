@@ -1,5 +1,6 @@
 #include <DX3D/Resource/ResourceManager.h>
 #include <DX3D/Resource/MaterialResource.h>
+#include <DX3D/Resource/TextureResource.h>
 #include <filesystem>
 
 dx3d::ResourceManager::ResourceManager(const ResourceManagerDesc& desc) : Base(desc.base), m_context(desc.context)
@@ -31,6 +32,8 @@ dx3d::RefPtr<dx3d::Resource> dx3d::ResourceManager::createResourceFromFileConcre
 	{
 		if (!ext.compare(L".hlsl") || !ext.compare(L".fx"))
 			resPtr = std::make_shared<MaterialResource>(MaterialResourceDesc{ getResourceDesc(file_path), m_context.graphicsDevice });
+		if (!ext.compare(L".jpg") || !ext.compare(L".png"))
+			resPtr = std::make_shared<TextureResource>(TextureResourceDesc{ getResourceDesc(file_path), m_context.graphicsDevice });
 	}
 	catch (...)
 	{

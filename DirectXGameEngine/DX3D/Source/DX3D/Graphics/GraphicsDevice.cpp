@@ -6,10 +6,11 @@
 #include <DX3D/Graphics/GraphicsPipelineState.h>
 #include <DX3D/Graphics/RenderSystem/VertexBuffer/VertexBuffer.h>
 #include <DX3D/Graphics/RenderSystem/IndexBuffer/IndexBuffer.h>
-#include <DX3D/Graphics/VertexShaderSignature.h>
 #include <DX3D/Graphics/RenderSystem/ConstantBuffer/ConstantBuffer.h>
 
-using namespace dx3d;
+#include <DX3D/Graphics/Texture.h>
+#include <DX3D/Graphics/Sampler.h>
+#include <DX3D/Graphics/GraphicsPipelineLayout.h>
 
 dx3d::GraphicsDevice::GraphicsDevice(const GraphicsDeviceDesc& desc) : Base(desc.base)
 {
@@ -44,44 +45,54 @@ dx3d::GraphicsDevice::~GraphicsDevice()
 {
 }
 
-RefPtr<SwapChain> dx3d::GraphicsDevice::createSwapChain(const SwapChainDesc& desc)
+dx3d::RefPtr<dx3d::SwapChain> dx3d::GraphicsDevice::createSwapChain(const SwapChainDesc& desc)
 {
 	return std::make_shared<SwapChain>(desc, getGraphicsResourceDesc());
 }
 
-RefPtr<DeviceContext> dx3d::GraphicsDevice::createDeviceContext()
+dx3d::RefPtr<dx3d::DeviceContext> dx3d::GraphicsDevice::createDeviceContext()
 {
 	return std::make_shared<DeviceContext>(getGraphicsResourceDesc());
 }
 
-RefPtr<ShaderBinary> dx3d::GraphicsDevice::compileShader(const ShaderCompileDesc& desc)
+dx3d::RefPtr<dx3d::ShaderBinary> dx3d::GraphicsDevice::compileShader(const ShaderCompileDesc& desc)
 {
 	return std::make_shared<ShaderBinary>(desc, getGraphicsResourceDesc());
 }
 
-RefPtr<GraphicsPipelineState> dx3d::GraphicsDevice::createGraphicsPipelineState(const GraphicsPipelineStateDesc& desc)
+dx3d::RefPtr<dx3d::GraphicsPipelineState> dx3d::GraphicsDevice::createGraphicsPipelineState(const GraphicsPipelineStateDesc& desc)
 {
 	return std::make_shared<GraphicsPipelineState>(desc, getGraphicsResourceDesc());
 }
 
-RefPtr<VertexBuffer> dx3d::GraphicsDevice::createVertexBuffer(const VertexBufferDesc& desc)
+dx3d::RefPtr<dx3d::VertexBuffer> dx3d::GraphicsDevice::createVertexBuffer(const VertexBufferDesc& desc)
 {
 	return std::make_shared<VertexBuffer>(desc, getGraphicsResourceDesc());
 }
 
-RefPtr<VertexShaderSignature> dx3d::GraphicsDevice::createVertexShaderSignature(const VertexShaderSignatureDesc& desc)
+dx3d::RefPtr<dx3d::GraphicsPipelineLayout> dx3d::GraphicsDevice::createGraphicsPipelineLayout(const GraphicsPipelineLayoutDesc& desc)
 {
-	return std::make_shared<VertexShaderSignature>(desc, getGraphicsResourceDesc());
+	return std::make_shared<GraphicsPipelineLayout>(desc, getGraphicsResourceDesc());
 }
 
-RefPtr<ConstantBuffer> dx3d::GraphicsDevice::createConstantBuffer(const ConstantBufferDesc& desc)
+dx3d::RefPtr<dx3d::ConstantBuffer> dx3d::GraphicsDevice::createConstantBuffer(const ConstantBufferDesc& desc)
 {
 	return std::make_shared<ConstantBuffer>(desc, getGraphicsResourceDesc());
 }
 
-RefPtr<IndexBuffer> dx3d::GraphicsDevice::createIndexBuffer(const IndexBufferDesc& desc)
+dx3d::RefPtr<dx3d::IndexBuffer> dx3d::GraphicsDevice::createIndexBuffer(const IndexBufferDesc& desc)
 {
 	return std::make_shared<IndexBuffer>(desc, getGraphicsResourceDesc());
+}
+
+dx3d::RefPtr<dx3d::Texture> dx3d::GraphicsDevice::createTexture(const TextureDesc& desc)
+{
+	return std::make_shared<Texture>(desc, getGraphicsResourceDesc());
+}
+
+dx3d::RefPtr<dx3d::Sampler> dx3d::GraphicsDevice::createSampler(const SamplerDesc& desc)
+{
+	return std::make_shared<Sampler>(desc, getGraphicsResourceDesc());
 }
 
 void dx3d::GraphicsDevice::executeCommandList(DeviceContext& context)
@@ -97,7 +108,7 @@ void dx3d::GraphicsDevice::executeCommandList(DeviceContext& context)
 	m_d3dContext->ExecuteCommandList(list.Get(), false);
 }
 
-GraphicsResourceDesc dx3d::GraphicsDevice::getGraphicsResourceDesc() const noexcept
+dx3d::GraphicsResourceDesc dx3d::GraphicsDevice::getGraphicsResourceDesc() const noexcept
 {
 	return { {m_logger}, shared_from_this(), *m_d3dDevice.Get(), *m_dxgiFactory.Get()};
 }

@@ -12,6 +12,8 @@ void MainGame::onCreate()
 {
 	Game::onCreate();
 	auto& world = getWorld();
+	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>(L"Assets/Textures/wood.jpg");
+	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>(L"Assets/Textures/floor.jpg");
 
 	// Create mesh resources (reusable)
 	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
@@ -29,11 +31,12 @@ void MainGame::onCreate()
 	//floor->getTransform().setPosition({ 0.0f, -1.0f, 0.0f });
 
 	{
-		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>(L"Game/Assets/Shaders/Basic.hlsl");
+		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>(L"Assets/Shaders/Basic.hlsl");
 		if (basicMat)
 		{
-			auto matData = dx3d::Vec3(0.1f, 0.1f, 0.1f);
+			auto matData = dx3d::Vec3(1, 1, 1);
 			basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
+			basicMat->setTexture(0, floorTex);
 		}
 
 		auto floor = world.createGameObject<dx3d::GameObject>();
@@ -41,39 +44,36 @@ void MainGame::onCreate()
 		floorMeshComp->setMesh(planeMesh);
 		floorMeshComp->setMaterial(basicMat);
 		floor->getTransform().setScale({ 6.8f, 0.1f, 6.8f });
-		floor->getTransform().setPosition({ 0, -1, 0 });
+		floor->getTransform().setPosition({ 0, 0, 0 });
 
 	}
 
 	srand((unsigned int)time(NULL));
 
+	// Creating cubes
 	for (auto y = -2; y < 3; y++)
 	{
 		for (auto x = -2; x < 3; x++)
 		{
-			auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>(L"Game/Assets/Shaders/Basic.hlsl");
+			auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>(L"Assets/Shaders/Basic.hlsl");
 			if (basicMat)
 			{
-				auto r = (rand() % 255) / 255.0f;
-				auto g = (rand() % 255) / 255.0f;
-				auto b = (rand() % 255) / 255.0f;
-				auto matData = dx3d::Vec3(r, g, b);
+				auto matData = dx3d::Vec3(1, 1, 1);
 				basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
+				basicMat->setTexture(0, woodTex);
 			}
 
 			auto cube = world.createGameObject<dx3d::GameObject>();
 			auto comp = cube->createOrGetComponent<dx3d::MeshComponent>();
 			comp->setMaterial(basicMat);
+			comp->setMesh(cubeMesh);
 			auto roty = (rand() % 628) / 100.0f;
-
-			auto cube_meshComp = cube->createOrGetComponent<dx3d::MeshComponent>();
-			cube_meshComp->setMesh(cubeMesh);
-
 			cube->getTransform().setScale({ 0.5,0.5,0.5 });
 			cube->getTransform().setPosition({ x * 1.4f, 0.25f + 0.05f, y * 1.4f });
 			cube->getTransform().setRotation({ 0,roty,0 });
 		}
 	}
+
 
 	// Create cubes
 	/*for (auto y = -2; y < 3; y++)

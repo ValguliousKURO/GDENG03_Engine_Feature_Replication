@@ -1,12 +1,16 @@
 struct VSInput
 {
     float3 position : POSITION0;
+    float2 texcoord : TEXCOORD0;
 };
 
 struct VSOutput
 {
     float4 position : SV_POSITION;
+    float2 texcoord : TEXCOORD0;
 };
+
+sampler DefaultSampler : register(s0);
 
 cbuffer ObjectData : register(b0)
 {

@@ -16,7 +16,6 @@ namespace dx3d
 		void setMaterial(const RefPtr<MaterialResource>& material);
 		MaterialResource* getMaterial();
 
-
 		void setMesh(const RefPtr<Mesh>& mesh) noexcept;
 		const RefPtr<Mesh>& getMesh() const noexcept;
 

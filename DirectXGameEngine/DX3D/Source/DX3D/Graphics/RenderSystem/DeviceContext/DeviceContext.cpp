@@ -4,6 +4,9 @@
 #include <DX3D/Graphics/RenderSystem/VertexBuffer/VertexBuffer.h>
 #include <DX3D/Graphics/RenderSystem/IndexBuffer/IndexBuffer.h>
 #include <DX3D/Graphics/RenderSystem/ConstantBuffer/ConstantBuffer.h>
+#include <DX3D/Graphics/Texture.h>
+#include <DX3D/Graphics/Sampler.h>
+#include <ranges>
 
 dx3d::DeviceContext::DeviceContext(const GraphicsResourceDesc& gDesc): GraphicsResource(gDesc)
 {
@@ -59,25 +62,52 @@ void dx3d::DeviceContext::setViewportSize(const Rect& size)
 
 void dx3d::DeviceContext::setConstantBuffers(const std::span<ConstantBuffer*>& buffers)
 {
-	if (!buffers.size())
-	{
-		DX3DLogError("No buffer passed to setConstantBuffers.");
-		return;
-	}
 	if (buffers.size() > MaxConstantBuffersPerStage)
 	{
 		DX3DLogWarning("Number of buffers exceeds {}. Extra buffers will be ignored.", MaxConstantBuffersPerStage)
 	}
-
-	auto buffSize = static_cast<UINT>(std::min(buffers.size(), MaxConstantBuffersPerStage));
-	for (auto i = 0u; i < buffSize; i++)
+	auto numBuffers = static_cast<UINT>(std::min(buffers.size(), MaxConstantBuffersPerStage));
+	for (auto i : std::views::iota(0u, numBuffers))
 	{
-		m_constantBuffers[i] = (buffers[i]->m_buffer.Get());
+		if (buffers[i]) m_constantBuffers[i] = (buffers[i]->m_buffer.Get());
+		else  m_constantBuffers[i] = {};
 	}
-
-	m_context->VSSetConstantBuffers(0, buffSize, m_constantBuffers);
-	m_context->PSSetConstantBuffers(0, buffSize, m_constantBuffers);
+	m_context->VSSetConstantBuffers(0, numBuffers, m_constantBuffers.data());
+	m_context->PSSetConstantBuffers(0, numBuffers, m_constantBuffers.data());
 }
+
+void dx3d::DeviceContext::setTextures(const std::span<Texture*>& textures)
+{
+	if (textures.size() > MaxTexturesPerStage)
+	{
+		DX3DLogWarning("Number of textures exceeds {}. Extra textures will be ignored.", MaxTexturesPerStage)
+	}
+	auto numTextures = static_cast<UINT>(std::min(textures.size(), MaxTexturesPerStage));
+	for (auto i : std::views::iota(0u, numTextures))
+	{
+		if (textures[i]) m_srv[i] = (textures[i]->m_srv.Get());
+		else m_srv[i] = {};
+	}
+	m_context->VSSetShaderResources(0, numTextures, m_srv.data());
+	m_context->PSSetShaderResources(0, numTextures, m_srv.data());
+}
+
+void dx3d::DeviceContext::setSamplers(const std::span<Sampler*>& samplers)
+{
+	if (samplers.size() > MaxSamplersPerStage)
+	{
+		DX3DLogWarning("Number of samplers exceeds {}. Extra samplers will be ignored.", MaxSamplersPerStage)
+	}
+	auto numSamplers = static_cast<UINT>(std::min(samplers.size(), MaxSamplersPerStage));
+	for (auto i : std::views::iota(0u, numSamplers))
+	{
+		if (samplers[i]) m_samplers[i] = (samplers[i]->m_sampler.Get());
+		else m_samplers[i] = {};
+	}
+	m_context->VSSetSamplers(0, numSamplers, m_samplers.data());
+	m_context->PSSetSamplers(0, numSamplers, m_samplers.data());
+}
+
 
 void dx3d::DeviceContext::updateConstantBuffer(const ConstantBuffer& buffer, const std::span<const std::byte>& data)
 {

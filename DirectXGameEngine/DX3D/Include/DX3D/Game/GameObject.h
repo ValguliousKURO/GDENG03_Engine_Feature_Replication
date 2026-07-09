@@ -21,7 +21,8 @@ namespace dx3d
 			UniquePtr<Component> cp = std::make_unique<T>(ComponentDesc{
 								{m_logger},
 								*this,
-								m_world
+								m_world,
+								m_gameContext
 				});
 			return static_cast<T*>(createComponentInternal(cp));
 		}

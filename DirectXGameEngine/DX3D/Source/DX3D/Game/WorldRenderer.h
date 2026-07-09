@@ -3,8 +3,9 @@
 #include <DX3D/Core/Base.h>
 #include <DX3D/Math/Vec3.h>
 #include <DX3D/Math/Vec4.h>
+#include <DX3D/Math/Vec2.h>
 #include <DX3D/Math/Mat4x4.h>
-
+#include <vector>
 namespace dx3d
 {
 	class WorldRenderer  final: public Base
@@ -29,8 +30,9 @@ namespace dx3d
 		RefPtr<ConstantBuffer> m_cameraCb{};
 		RefPtr<ConstantBuffer> m_objectCb{};
 		RefPtr<ConstantBuffer> m_materialCb{};
-		RefPtr<VertexBuffer> m_vb{};
-		RefPtr<IndexBuffer> m_ib{};
+		RefPtr<Sampler> m_sampler{};
+
+		std::vector<Texture*> m_textures{};
 	};
 
 }

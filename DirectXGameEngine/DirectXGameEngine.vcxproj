@@ -76,7 +76,7 @@
     <IncludePath>DX3D/Include;DX3D/Source;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>DX3D/Include;DX3D/Source;$(IncludePath)</IncludePath>
+    <IncludePath>DX3D/Include;DX3D/Source;DX3D/Vendor/stb-image/include/;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -159,7 +159,6 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\ShaderBinary.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineState.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\RenderSystem\VertexBuffer\VertexBuffer.cpp" />
-    <ClCompile Include="DX3D\Source\DX3D\Graphics\VertexShaderSignature.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\RenderSystem\IndexBuffer\IndexBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\World.cpp" />
     <ClCompile Include="Game\MainGame.cpp" />
@@ -172,6 +171,10 @@
     <ClCompile Include="DX3D\Source\DX3D\Resource\ResourceManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Resource\Resource.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Resource\MaterialResource.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Texture.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Resource\TextureResource.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineLayout.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Sampler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Component\CameraComponent.h" />
@@ -204,10 +207,10 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineState.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\RenderSystem\VertexBuffer\VertexBuffer.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ShaderInclude.h" />
-    <ClInclude Include="DX3D\Source\DX3D\Graphics\VertexShaderSignature.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\RenderSystem\IndexBuffer\IndexBuffer.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\World.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\GameObject.h" />
+    <ClInclude Include="DX3D\Vendor\stb-image\include\stb-image\stb_image.h" />
     <ClInclude Include="Game\MainGame.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\TransformComponent.h" />
     <ClInclude Include="DX3D\Include\DX3D\Input\InputSystem.h" />
@@ -218,8 +221,13 @@
     <ClInclude Include="DX3D\Include\DX3D\Resource\ResourceManager.h" />
     <ClInclude Include="DX3D\Include\DX3D\Resource\Resource.h" />
     <ClInclude Include="DX3D\Include\DX3D\Resource\MaterialResource.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Texture.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Resource\TextureResource.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineLayout.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Sampler.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="DX3D\Configs\shadertoolsconfig.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
