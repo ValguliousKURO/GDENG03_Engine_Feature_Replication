@@ -2,6 +2,7 @@
 #include "Objects/Player.h"
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
 #include <DX3D/Component/MeshComponent.h>
+#include <filesystem>
 
 
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
@@ -12,8 +13,9 @@ void MainGame::onCreate()
 {
 	Game::onCreate();
 	auto& world = getWorld();
-	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>(L"Assets/Textures/wood.jpg");
-	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>(L"Assets/Textures/floor.jpg");
+	std::filesystem::path base = std::filesystem::current_path().parent_path();
+	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
+	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
 	// Create mesh resources (reusable)
 	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
@@ -31,7 +33,7 @@ void MainGame::onCreate()
 	//floor->getTransform().setPosition({ 0.0f, -1.0f, 0.0f });
 
 	{
-		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>(L"Assets/Shaders/Basic.hlsl");
+		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base/"DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
 		if (basicMat)
 		{
 			auto matData = dx3d::Vec3(1, 1, 1);
@@ -55,7 +57,7 @@ void MainGame::onCreate()
 	{
 		for (auto x = -2; x < 3; x++)
 		{
-			auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>(L"Assets/Shaders/Basic.hlsl");
+			auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base/"DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
 			if (basicMat)
 			{
 				auto matData = dx3d::Vec3(1, 1, 1);

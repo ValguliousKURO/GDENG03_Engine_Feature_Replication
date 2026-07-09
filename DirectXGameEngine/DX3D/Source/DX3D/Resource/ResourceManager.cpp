@@ -12,6 +12,11 @@ dx3d::RefPtr<dx3d::Resource> dx3d::ResourceManager::createResourceFromFileConcre
 	std::filesystem::path resourcePath{ file_path };
 	auto ext = resourcePath.extension();
 
+	/*DX3DLogInfo("CWD: {}", std::filesystem::current_path().string().c_str());
+	DX3DLogInfo("Requested resource path: {}", resourcePath.string().c_str());
+	DX3DLogInfo("Absolute path: {}", std::filesystem::absolute(resourcePath).string().c_str());
+	DX3DLogInfo("Exists? {}", std::filesystem::exists(std::filesystem::absolute(resourcePath)));*/
+
 	auto it = m_resources.find(file_path);
 	if (it != m_resources.end())
 	{
