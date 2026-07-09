@@ -57,20 +57,42 @@ void dx3d::DeviceContext::setViewportSize(const Rect& size)
 	m_context->RSSetViewports(1, &vp);
 }
 
-void dx3d::DeviceContext::setConstantBuffer(const ConstantBuffer& buffer)
+void dx3d::DeviceContext::setConstantBuffers(const std::span<ConstantBuffer*>& buffers)
 {
-	auto buf = buffer.m_buffer.Get();
-	m_context->VSSetConstantBuffers(0, 1, &buf);
-	m_context->PSSetConstantBuffers(0, 1, &buf);
-}
-
-void dx3d::DeviceContext::updateConstantBuffer(const ConstantBuffer& buffer, const void* data)
-{
-	if (!data)
+	if (!buffers.size())
 	{
-		DX3DLogError("Null data pointer passed to updateConstantBuffer.");
+		DX3DLogError("No buffer passed to setConstantBuffers.");
 		return;
 	}
+	if (buffers.size() > MaxConstantBuffersPerStage)
+	{
+		DX3DLogWarning("Number of buffers exceeds {}. Extra buffers will be ignored.", MaxConstantBuffersPerStage)
+	}
+
+	auto buffSize = static_cast<UINT>(std::min(buffers.size(), MaxConstantBuffersPerStage));
+	for (auto i = 0u; i < buffSize; i++)
+	{
+		m_constantBuffers[i] = (buffers[i]->m_buffer.Get());
+	}
+
+	m_context->VSSetConstantBuffers(0, buffSize, m_constantBuffers);
+	m_context->PSSetConstantBuffers(0, buffSize, m_constantBuffers);
+}
+
+void dx3d::DeviceContext::updateConstantBuffer(const ConstantBuffer& buffer, const std::span<const std::byte>& data)
+{
+	auto dataSize = static_cast<ui32>(data.size());
+	if (!dataSize)
+	{
+		DX3DLogError("No data passed to updateConstantBuffer.");
+		return;
+	}
+	if (dataSize > buffer.m_size)
+	{
+		DX3DLogWarning("Buffer size ({} bytes) exceeds the constant buffer limit ({} bytes). Extra bytes will be ignored.", dataSize, buffer.m_size);
+	}
+
+	dataSize = std::min(dataSize, buffer.m_size);
 
 	auto buf = buffer.m_buffer.Get();
 	D3D11_MAPPED_SUBRESOURCE mapped{};
@@ -82,7 +104,7 @@ void dx3d::DeviceContext::updateConstantBuffer(const ConstantBuffer& buffer, con
 		return;
 	}
 
-	std::memcpy(mapped.pData, data, buffer.m_size);
+	std::memcpy(mapped.pData, data.data(), dataSize);
 	m_context->Unmap(buf, 0);
 }
 

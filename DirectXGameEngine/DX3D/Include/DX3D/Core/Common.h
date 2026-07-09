@@ -84,15 +84,41 @@ namespace dx3d
 		ui32 indexListSize{};
 	};
 
+	// Place all systems/managers here
 	struct GameContext
 	{
 		InputSystem& input;
+		ResourceManager& resourceManager;
 	};
 
 	struct GameDesc
 	{
 		Rect windowSize{ 1280, 720 };
 		Logger::LogLevel logLevel = Logger::LogLevel::Error;
+	};
+
+	struct ResourceDesc
+	{
+		BaseDesc base;
+		const wchar_t* path{};
+		ResourceManager& manager;
+	};
+
+	struct MaterialResourceDesc
+	{
+		ResourceDesc base;
+		GraphicsDevice& graphicsDevice;
+	};
+
+	struct SystemContext
+	{
+		GraphicsDevice& graphicsDevice;
+	};
+
+	struct ResourceManagerDesc
+	{
+		BaseDesc base;
+		SystemContext context;
 	};
 
 	struct WorldDesc

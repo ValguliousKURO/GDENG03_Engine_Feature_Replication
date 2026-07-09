@@ -9,7 +9,6 @@ namespace dx3d
 	struct Vertex
 	{
 		Vec3 position;
-		Vec4 color;
 	};
 
 	class Mesh

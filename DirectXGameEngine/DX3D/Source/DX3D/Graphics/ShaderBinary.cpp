@@ -2,6 +2,7 @@
 #include <DX3D/Graphics/GraphicsUtils.h>
 #include <DX3D/Core/Base.h>
 #include <d3dcompiler.h>
+#include <DX3D/Graphics/ShaderInclude.h>
 
 dx3d::ShaderBinary::ShaderBinary(const ShaderCompileDesc& desc, const GraphicsResourceDesc& gDesc): 
 	GraphicsResource(gDesc), m_type(desc.shaderType)
@@ -16,7 +17,9 @@ dx3d::ShaderBinary::ShaderBinary(const ShaderCompileDesc& desc, const GraphicsRe
 #ifdef _DEBUG
 	compileFlags |= D3DCOMPILE_DEBUG;
 #endif
-	
+
+	ShaderInclude shaderInclude{};
+
 	Microsoft::WRL::ComPtr<ID3DBlob> errorBlob{};
 	DX3DGraphicsCheckShaderCompile(
 		D3DCompile(
@@ -24,7 +27,7 @@ dx3d::ShaderBinary::ShaderBinary(const ShaderCompileDesc& desc, const GraphicsRe
 			desc.shaderSourceCodeSize,
 			desc.shaderSourceName,
 			nullptr,
-			nullptr,
+			&shaderInclude,
 			desc.shaderEntryPoint,
 			dx3d::GraphicsUtils::GetShaderModelTarget(desc.shaderType),
 			compileFlags,

@@ -43,6 +43,15 @@ dx3d::RefPtr<dx3d::IndexBuffer> dx3d::MeshComponent::getOrCreateIndexBuffer(Grap
 	return m_indexBuffer;
 }
 
+void dx3d::MeshComponent::setMaterial(const RefPtr<MaterialResource>& material)
+{
+	m_material = material;
+}
+
+dx3d::MaterialResource* dx3d::MeshComponent::getMaterial()
+{
+	return m_material.get();
+}
 
 // Create temporary buffers (ideally cache these)
 			/*auto vb = m_graphicsDevice.createVertexBuffer({

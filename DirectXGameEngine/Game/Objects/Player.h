@@ -9,7 +9,4 @@ public:
 protected:
 	virtual void onCreate();
 	virtual void onUpdate(dx3d::f32 deltaTime);
-
-private:
-	GameObject* m_cam{};
 };

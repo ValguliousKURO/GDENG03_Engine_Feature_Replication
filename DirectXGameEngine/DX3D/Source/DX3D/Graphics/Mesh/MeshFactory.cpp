@@ -5,15 +5,15 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()
 {
 	std::vector<Vertex> vertices =
 	{
-		{{-0.5f,-0.5f,-0.5f}, {1,0,0,1}},
-		{{-0.5f,0.5f,-0.5f}, {0,1,0,1} },
-		{{0.5f,0.5f,-0.5f},  {0,0,1,1}},
-		{{0.5f,-0.5f,-0.5f}, {1,0,1,1}},
+		{{-0.5f,-0.5f,-0.5f}},
+		{{-0.5f,0.5f,-0.5f} },
+		{{0.5f,0.5f,-0.5f}},
+		{{0.5f,-0.5f,-0.5f}},
 
-		{{0.5f,-0.5f,0.5f}, {1,0,1,1}},
-		{{0.5f,0.5f,0.5f}, {0,0,1,1}},
-		{{-0.5f,0.5f,0.5f}, {0,1,0,1}},
-		{{-0.5f,-0.5f,0.5f}, {1,0,0,1}}
+		{{0.5f,-0.5f,0.5f}},
+		{{0.5f,0.5f,0.5f}},
+		{{-0.5f,0.5f,0.5f}},
+		{{-0.5f,-0.5f,0.5f}}
 	};
 
 	std::vector<ui32> indices =
@@ -61,12 +61,13 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createSphereMesh(ui32 stacks, ui32 s
 			f32 x = xy * cosf(sliceAngle);
 			f32 y = xy * sinf(sliceAngle);
 
-			// Alternate colors for visual interest
-			f32 colorR = (i % 2 == 0) ? 1.0f : 0.5f;
-			f32 colorG = (j % 2 == 0) ? 1.0f : 0.5f;
-			f32 colorB = ((i + j) % 2 == 0) ? 1.0f : 0.5f;
+			//// Alternate colors for visual interest
+			//f32 colorR = (i % 2 == 0) ? 1.0f : 0.5f;
+			//f32 colorG = (j % 2 == 0) ? 1.0f : 0.5f;
+			//f32 colorB = ((i + j) % 2 == 0) ? 1.0f : 0.5f;
 
-			vertices.push_back({ {x, y, z}, {colorR, colorG, colorB, 1.0f} });
+			//vertices.push_back({ {x, y, z}, {colorR, colorG, colorB, 1.0f} });
+			vertices.push_back({ {x, y, z} });
 		}
 	}
 
@@ -109,7 +110,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 	constexpr f32 TWO_PI = 2.0f * PI;
 
 	f32 halfHeight = height / 2.0f;
-	f32 colorValue = 0.7f;
+	//f32 colorValue = 0.7f;
 
 	// Top hemisphere
 	for (ui32 i = 0; i <= rings; ++i)
@@ -124,7 +125,8 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 			f32 x = r * cosf(theta);
 			f32 y = r * sinf(theta);
 
-			vertices.push_back({ {x, y, z_offset}, {colorValue, colorValue + 0.3f, colorValue, 1.0f} });
+			//vertices.push_back({ {x, y, z_offset}, {colorValue, colorValue + 0.3f, colorValue, 1.0f} });
+			vertices.push_back({ {x, y, z_offset} });
 		}
 	}
 
@@ -139,7 +141,8 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 			f32 x = radius * cosf(theta);
 			f32 y = radius * sinf(theta);
 
-			vertices.push_back({ {x, y, z_offset}, {colorValue, colorValue, colorValue, 1.0f} });
+			//vertices.push_back({ {x, y, z_offset}, {colorValue, colorValue, colorValue, 1.0f} });
+			vertices.push_back({ {x, y, z_offset} });
 		}
 	}
 
@@ -156,7 +159,8 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 he
 			f32 x = r * cosf(theta);
 			f32 y = r * sinf(theta);
 
-			vertices.push_back({ {x, y, z_offset}, {colorValue + 0.2f, colorValue, colorValue, 1.0f} });
+			//vertices.push_back({ {x, y, z_offset}, {colorValue + 0.2f, colorValue, colorValue, 1.0f} });
+			vertices.push_back({ {x, y, z_offset} });
 		}
 	}
 
@@ -232,29 +236,33 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
 	constexpr f32 PI = 3.14159265359f;
 	constexpr f32 TWO_PI = 2.0f * PI;
 
-	const Vec4 cyclinderColor = {1.0f, 1.0f, 1.0f, 1.0f};
+	//const Vec4 cyclinderColor = {1.0f, 1.0f, 1.0f, 1.0f};
 
 	f32 halfHeight = height / 2.0f;
 
 	// Top circle
-	vertices.push_back({ {0.0f, halfHeight, 0.0f}, cyclinderColor }); // center
+	//vertices.push_back({ {0.0f, halfHeight, 0.0f}, cyclinderColor }); // center
+	vertices.push_back({ {0.0f, halfHeight, 0.0f} }); // center
 	for (ui32 i = 0; i < segments; ++i)
 	{
 		f32 theta = TWO_PI * (i / static_cast<f32>(segments));
 		f32 x = radius * cosf(theta);
 		f32 z = radius * sinf(theta);
-		vertices.push_back({ {x, halfHeight, z}, cyclinderColor });
+		//vertices.push_back({ {x, halfHeight, z}, cyclinderColor });
+		vertices.push_back({ {x, halfHeight, z} });
 	}
 
 	// Bottom circle
 	ui32 bottomCenterIdx = static_cast<ui32>(vertices.size());
-	vertices.push_back({ {0.0f, -halfHeight, 0.0f}, cyclinderColor }); // center
+	//vertices.push_back({ {0.0f, -halfHeight, 0.0f}, cyclinderColor }); // center
+	vertices.push_back({ {0.0f, -halfHeight, 0.0f} }); // center
 	for (ui32 i = 0; i < segments; ++i)
 	{
 		f32 theta = TWO_PI * (i / static_cast<f32>(segments));
 		f32 x = radius * cosf(theta);
 		f32 z = radius * sinf(theta);
-		vertices.push_back({ {x, -halfHeight, z}, cyclinderColor });
+		//vertices.push_back({ {x, -halfHeight, z}, cyclinderColor });
+		vertices.push_back({ {x, -halfHeight, z} });
 	}
 
 	// Side vertices
@@ -265,8 +273,11 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
 		f32 x = radius * cosf(theta);
 		f32 z = radius * sinf(theta);
 
-		vertices.push_back({ {x, halfHeight, z}, cyclinderColor });
-		vertices.push_back({ {x, -halfHeight, z}, cyclinderColor });
+		/*vertices.push_back({ {x, halfHeight, z}, cyclinderColor });
+		vertices.push_back({ {x, -halfHeight, z}, cyclinderColor });*/
+
+		vertices.push_back({ {x, halfHeight, z} });
+		vertices.push_back({ {x, -halfHeight, z} });
 	}
 
 	// Top cap (outward)
@@ -353,8 +364,9 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createPlaneMesh(f32 width, f32 heigh
 			f32 posZ = -halfHeight + (y * heightStep);
 
 			// Checkerboard coloring
-			f32 colorValue = ((x + y) % 2 == 0) ? 0.8f : 0.5f;
-			vertices.push_back({ {posX, posY, posZ}, {colorValue, colorValue, colorValue, 1.0f} });
+			//f32 colorValue = ((x + y) % 2 == 0) ? 0.8f : 0.5f;
+			//vertices.push_back({ {posX, posY, posZ}, {colorValue, colorValue, colorValue, 1.0f} });
+			vertices.push_back({ {posX, posY, posZ} });
 		}
 	}
 
@@ -390,7 +402,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 se
 	constexpr f32 TWO_PI = 2.0f * PI;
 
 	// Center vertex
-	vertices.push_back({ {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f} });
+	vertices.push_back({ {0.0f, 0.0f, 0.0f} });
 
 	// Circumference vertices
 	for (ui32 i = 0; i <= segments; ++i)
@@ -400,8 +412,9 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 se
 		f32 z = radius * sinf(theta);
 
 		// Alternating colors around the circle
-		f32 colorValue = (i % 2 == 0) ? 0.9f : 0.6f;
-		vertices.push_back({ {x, 0.0f, z}, {colorValue, colorValue, 1.0f, 1.0f} });
+		//f32 colorValue = (i % 2 == 0) ? 0.9f : 0.6f;
+		//vertices.push_back({ {x, 0.0f, z}, {colorValue, colorValue, 1.0f, 1.0f} });
+		vertices.push_back({ {x, 0.0f, z} });
 	}
 
 	// Generate indices (fan triangulation from center)

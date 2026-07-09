@@ -35,6 +35,7 @@ namespace dx3d
 		TransformComponent& getTransform() noexcept;
 		World& getWorld() noexcept;
 		InputSystem& getInputSystem() noexcept;
+		ResourceManager& getResourceManager() noexcept;
 	protected:
 		virtual void onCreate() {}
 		virtual void onUpdate(f32 deltaTime) {}

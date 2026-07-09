@@ -16,6 +16,7 @@ namespace dx3d
 		virtual World& getWorld() noexcept final;
 		virtual Logger& getLogger() noexcept final;
 		virtual InputSystem& getInputSystem() noexcept final;
+		virtual ResourceManager& getResourceManager() noexcept final;
 		virtual void run() final;
 	protected:
 		virtual void onCreate() {}
@@ -27,6 +28,7 @@ namespace dx3d
 		UniquePtr<InputSystem> m_inputSystem{};
 		RefPtr<GraphicsDevice> m_graphicsDevice{};
 		UniquePtr<Display> m_display{};
+		UniquePtr<ResourceManager> m_resourceManager{};
 		UniquePtr<World> m_world{};
 
 		UniquePtr<WorldRenderer> m_worldRenderer{};

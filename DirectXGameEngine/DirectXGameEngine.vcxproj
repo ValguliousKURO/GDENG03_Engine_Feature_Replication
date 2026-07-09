@@ -169,6 +169,9 @@
     <ClCompile Include="DX3D\Source\DX3D\Component\MeshComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh\Mesh.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Mesh\MeshFactory.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Resource\ResourceManager.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Resource\Resource.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Resource\MaterialResource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Component\CameraComponent.h" />
@@ -200,6 +203,7 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\ShaderBinary.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineState.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\RenderSystem\VertexBuffer\VertexBuffer.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\ShaderInclude.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\VertexShaderSignature.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\RenderSystem\IndexBuffer\IndexBuffer.h" />
     <ClInclude Include="DX3D\Include\DX3D\Game\World.h" />
@@ -211,6 +215,12 @@
     <ClInclude Include="DX3D\Include\DX3D\Component\MeshComponent.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh\Mesh.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Mesh\MeshFactory.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Resource\ResourceManager.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Resource\Resource.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Resource\MaterialResource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DX3D\Configs\shadertoolsconfig.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

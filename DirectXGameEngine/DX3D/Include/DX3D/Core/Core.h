@@ -43,6 +43,10 @@ namespace dx3d
 
 	class WorldRenderer;
 
+	class ResourceManager;
+	class Resource;
+	class MaterialResource;
+
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

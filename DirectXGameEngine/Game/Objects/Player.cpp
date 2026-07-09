@@ -17,29 +17,28 @@ void Player::onUpdate(dx3d::f32 deltaTime)
 {
 	auto& input = getInputSystem();
 
-
-	//auto sensitivity = 0.001f;
-	//if (getInputSystem().isKeyDown(dx3d::KeyCode::MouseLeft))
-	//{
-	//	rot.x += getInputSystem().getMouseDelta().y * sensitivity;
-	//	rot.y += getInputSystem().getMouseDelta().x * sensitivity;
-	//	input.setCursorLocked(true);
-	//	input.setCursorVisible(false);
-	//}
-	//else
-	//{
-	//	input.setCursorLocked(false);
-	//	input.setCursorVisible(true);
-	//}
-
-	float rot_speed = 0.01f;
+	float rot_speed = 2.5f;
 	auto rot = getTransform().getRotation();
 
+	/*auto sensitivity = 0.001f;
+	if (getInputSystem().isKeyDown(dx3d::KeyCode::MouseLeft))
+	{
+		rot.x += getInputSystem().getMouseDelta().y * sensitivity;
+		rot.y += getInputSystem().getMouseDelta().x * sensitivity;
+		input.setCursorLocked(true);
+		input.setCursorVisible(false);
+	}
+	else
+	{
+		input.setCursorLocked(false);
+		input.setCursorVisible(true);
+	}*/
+
 	// Rotation via arrow keys
-	if (getInputSystem().isKeyDown(dx3d::KeyCode::Up)) rot.x -= rot_speed;
-	if (getInputSystem().isKeyDown(dx3d::KeyCode::Down)) rot.x += rot_speed;
-	if (getInputSystem().isKeyDown(dx3d::KeyCode::Left)) rot.y -= rot_speed;
-	if (getInputSystem().isKeyDown(dx3d::KeyCode::Right)) rot.y += rot_speed;
+	if (getInputSystem().isKeyDown(dx3d::KeyCode::Up)) rot.x -= rot_speed * deltaTime;
+	if (getInputSystem().isKeyDown(dx3d::KeyCode::Down)) rot.x += rot_speed * deltaTime;
+	if (getInputSystem().isKeyDown(dx3d::KeyCode::Left)) rot.y -= rot_speed * deltaTime;
+	if (getInputSystem().isKeyDown(dx3d::KeyCode::Right)) rot.y += rot_speed * deltaTime;
 
 	if (rot.x > 1.57f) rot.x = 1.57f;
 	else if (rot.x < -1.57f) rot.x = -1.57f;

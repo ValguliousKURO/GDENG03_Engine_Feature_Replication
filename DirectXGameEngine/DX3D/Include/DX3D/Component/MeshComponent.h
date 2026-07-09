@@ -13,6 +13,10 @@ namespace dx3d
 	public:
 		explicit MeshComponent(const ComponentDesc& data);
 
+		void setMaterial(const RefPtr<MaterialResource>& material);
+		MaterialResource* getMaterial();
+
+
 		void setMesh(const RefPtr<Mesh>& mesh) noexcept;
 		const RefPtr<Mesh>& getMesh() const noexcept;
 
@@ -20,6 +24,8 @@ namespace dx3d
 		RefPtr<IndexBuffer> getOrCreateIndexBuffer(GraphicsDevice& _gDevice);
 
 	private:
+		RefPtr<MaterialResource> m_material{};
+
 		RefPtr<Mesh> m_mesh;
 
 		RefPtr<VertexBuffer> m_vertexBuffer;
