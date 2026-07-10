@@ -1,4 +1,4 @@
-#include<DX3D/Game/GameObject.h>
+﻿#include<DX3D/Game/GameObject.h>
 #include<DX3D/Game/Component.h>
 #include<DX3D/Component/TransformComponent.h>
 #include<DX3D/Game/World.h>
@@ -6,7 +6,8 @@
 dx3d::GameObject::GameObject(const GameObjectDesc& desc) : 
 	Identifiable(desc.base),
 	m_world(desc.world), 
-	m_gameContext(desc.gameContext)
+	m_gameContext(desc.gameContext),
+	m_windowInput(desc.windowInput)
 {
 	m_transform = createOrGetComponent<TransformComponent>();
 }
@@ -34,6 +35,8 @@ dx3d::World& dx3d::GameObject::getWorld() noexcept
 
 dx3d::InputSystem& dx3d::GameObject::getInputSystem() noexcept
 {
+	// Prefer window‑specific input if available
+	if (m_windowInput) return *m_windowInput;
 	return m_gameContext.input;
 }
 

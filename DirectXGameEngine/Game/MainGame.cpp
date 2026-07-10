@@ -73,12 +73,13 @@ void MainGame::onCreate()
 	// Creating Camera/Player
 	/*for (auto& display : getDisplays())
 	{
-		auto camera = world.createGameObjectForWindow<Camera>(display->getID());
+		auto camera = world.createGameObjectForWindow<Camera>(display->getID(), display->getInputSystem());
 		camera->getTransform().setPosition({ 0, 1, -2 });
 	}*/
 	auto player = world.createGameObject<Player>();
 	player->getTransform().setPosition({ 0, 1, -2 });
-	auto camera = world.createGameObjectForWindow<Camera>(getDisplays()[0]->getID());
+	auto& display2 = getDisplays()[1];
+	auto camera = world.createGameObjectForWindow<Camera>(display2->getID(), display2->getInputSystem());
 	camera->getTransform().setPosition({ 0, 1, -2 });
 
 	for (auto& display : getDisplays())

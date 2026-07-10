@@ -45,6 +45,7 @@ namespace dx3d
 		Component* createComponentInternal(UniquePtr<Component>& component);
 		Component* getComponentInternal(size_t id);
 	private:
+		InputSystem* m_windowInput;
 		std::unordered_map<size_t, UniquePtr<Component>> m_components{};
 
 		TransformComponent* m_transform{};

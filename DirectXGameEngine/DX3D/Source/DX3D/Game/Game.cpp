@@ -67,7 +67,10 @@ void dx3d::Game::onInternalUpdate()
 	// Update each display’s input system separately
 	for (auto& display : m_displays)
 	{
-		display->getInputSystem().update();
+		if (display->hasFocus())
+		{
+			display->getInputSystem().update();
+		}
 	}
 
 	onUpdate(deltaTime);
