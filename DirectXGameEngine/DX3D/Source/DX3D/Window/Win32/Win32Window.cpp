@@ -1,87 +1,113 @@
 #include <DX3D/Window/Window.h>
 #include <Windows.h>
 #include <stdexcept>
+#include <atomic>
 
-using namespace dx3d;
+static std::atomic<uint32_t> g_windowCounter{ 0 };
 
-// In your main message loop
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	Window* pThis = nullptr;
+    dx3d::Window* pThis = nullptr;
 
-	if (msg == WM_CREATE)
-	{
-		CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lparam);
-		pThis = reinterpret_cast<Window*>(pCreate->lpCreateParams);
-		SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)pThis);
-	}
-	else
-	{
-		pThis = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
-	}
+    if (msg == WM_CREATE)
+    {
+        CREATESTRUCT* pCreate = reinterpret_cast<CREATESTRUCT*>(lparam);
+        pThis = reinterpret_cast<dx3d::Window*>(pCreate->lpCreateParams);
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)pThis);
+    }
+    else
+    {
+        pThis = reinterpret_cast<dx3d::Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    }
 
-	/*if (pThis)
-		return pThis->handleMessage(msg, wparam, lparam);*/
+    if (pThis)
+        return pThis->handleMessage(msg, wparam, lparam);
 
-	return DefWindowProc(hwnd, msg, wparam, lparam);
+    return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
-dx3d::Window::Window(const WindowDesc& desc): Base(desc.base), m_size(desc.size)
+dx3d::Window::Window(const WindowDesc& desc)
+    : Base(desc.base), m_size(desc.size)
 {
-	auto registerWindowClassFunction = []()
-		{
-			WNDCLASSEX wc{};
-			wc.cbSize = sizeof(WNDCLASSEX);
-			wc.lpszClassName = L"DX3DWindow";
-			wc.lpfnWndProc = &WindowProcedure;
-			return RegisterClassEx(&wc);
-		};
+    m_id = ++g_windowCounter;
 
-	static const auto windowClassId = std::invoke(registerWindowClassFunction);
+    auto registerWindowClassFunction = []()
+        {
+            WNDCLASSEX wc{};
+            wc.cbSize = sizeof(WNDCLASSEX);
+            wc.lpszClassName = L"DX3DWindow";
+            wc.lpfnWndProc = &WindowProcedure;
+            wc.hInstance = GetModuleHandle(nullptr);
+            wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+            wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+            return RegisterClassEx(&wc);
+        };
 
-	if (!windowClassId)
-	{
-		DX3DLogThrowError("RegisterClassEx failed!");
-	}
+    static const auto windowClassId = std::invoke(registerWindowClassFunction);
 
-	RECT rc{ 0,0,m_size.width,m_size.height };
-	AdjustWindowRect(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, false);
+    if (!windowClassId)
+    {
+        DX3DLogThrowError("RegisterClassEx failed!");
+    }
 
-	m_handle = CreateWindowEx(NULL, MAKEINTATOM(windowClassId), L"KenshinRR Engine | Based on PardCode C++ 3D Game Tutorial Series",
-		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, CW_USEDEFAULT, CW_USEDEFAULT,
-		rc.right - rc.left, rc.bottom - rc.top,
-		NULL, NULL, NULL, NULL);
+    RECT rc{ 0,0,m_size.width,m_size.height };
+    AdjustWindowRect(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, false);
 
-	if (!m_handle)
-	{
-		DX3DLogThrowError("CreateWindowEx failed!");
-	}
+    m_handle = CreateWindowEx(
+        0,
+        MAKEINTATOM(windowClassId),
+        L"C++ 3D Engine | Based on PardCode C++ 3D Game Tutorial Series",
+        WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
+        CW_USEDEFAULT, CW_USEDEFAULT,
+        rc.right - rc.left, rc.bottom - rc.top,
+        nullptr, nullptr, GetModuleHandle(nullptr),
+        this // Pass pointer to WM_CREATE
+    );
 
-	ShowWindow(static_cast<HWND>(m_handle), SW_SHOW);
+    if (!m_handle)
+    {
+        DX3DLogThrowError("CreateWindowEx failed!");
+    }
+
+    ShowWindow(static_cast<HWND>(m_handle), SW_SHOW);
 }
 
 dx3d::Rect dx3d::Window::getClientAreaInScreenSpace()
 {
-	auto hwnd = static_cast<HWND>(m_handle);
+    auto hwnd = static_cast<HWND>(m_handle);
 
-	RECT client{};
-	GetClientRect(hwnd, &client);
+    RECT client{};
+    GetClientRect(hwnd, &client);
 
-	POINT topLeft{ client.left, client.top };
-	POINT bottomRight{ client.right, client.bottom };
-	ClientToScreen(hwnd, &topLeft);
-	ClientToScreen(hwnd, &bottomRight);
+    POINT topLeft{ client.left, client.top };
+    POINT bottomRight{ client.right, client.bottom };
+    ClientToScreen(hwnd, &topLeft);
+    ClientToScreen(hwnd, &bottomRight);
 
-	return {
-		topLeft.x ,
-		topLeft.y ,
-		bottomRight.x - topLeft.x,
-		bottomRight.y - topLeft.y
-	};
+    return {
+        topLeft.x,
+        topLeft.y,
+        bottomRight.x - topLeft.x,
+        bottomRight.y - topLeft.y
+    };
 }
-
 
 dx3d::Window::~Window()
 {
-	DestroyWindow(static_cast<HWND>(m_handle));
+    DestroyWindow(static_cast<HWND>(m_handle));
+}
+
+// Default message handler
+LRESULT dx3d::Window::handleMessage(UINT msg, WPARAM wparam, LPARAM lparam)
+{
+    switch (msg)
+    {
+
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
+
+    default:
+        return DefWindowProc(static_cast<HWND>(m_handle), msg, wparam, lparam);
+    }
 }

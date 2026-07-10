@@ -14,18 +14,25 @@ dx3d::Game::Game(const GameDesc& desc)
 {
 	m_logger = std::make_unique<Logger>(desc.logLevel);
 
-	DX3DLogInfo("GDENG03 KenshinRR");
+	DX3DLogInfo("GDENG03");
 	DX3DLogInfo("-----------------");
 
-	m_inputSystem = std::make_unique<InputSystem>(InputSystemDesc{ *m_logger });
 	m_graphicsDevice = std::make_shared<GraphicsDevice>(GraphicsDeviceDesc{ *m_logger });
-	m_display = std::make_unique<Display>(DisplayDesc{ {*m_logger,desc.windowSize},*m_graphicsDevice }); auto context = SystemContext{ *m_graphicsDevice };
-	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger},context });
 
-	m_world = std::make_unique<World>(WorldDesc{ BaseDesc{*m_logger}, GameContext{*m_inputSystem, *m_resourceManager,*m_graphicsDevice} });
-	m_worldRenderer = std::make_unique<WorldRenderer>(WorldRendererDesc{ {*m_logger},*m_graphicsDevice });
+	// Create the primary display
+	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
+	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
 
-	m_inputSystem->setCursorLockArea(m_display->getClientAreaInScreenSpace());
+	auto context = SystemContext{ *m_graphicsDevice };
+	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger}, context });
+
+	// Set world for each display
+	for (auto& display : m_displays)
+	{
+		m_world = std::make_unique<World>(WorldDesc{ BaseDesc{*m_logger}, GameContext{display->getInputSystem(), *m_resourceManager, *m_graphicsDevice}});
+	}
+
+	m_worldRenderer = std::make_unique<WorldRenderer>(WorldRendererDesc{ {*m_logger}, *m_graphicsDevice });
 
 	DX3DLogInfo("Game Initialized!");
 }
@@ -45,11 +52,6 @@ dx3d::Game::~Game()
 	DX3DLogInfo("Game is shutting down...");
 }
 
-dx3d::InputSystem& dx3d::Game::getInputSystem() noexcept
-{
-	return *m_inputSystem;
-}
-
 dx3d::ResourceManager& dx3d::Game::getResourceManager() noexcept
 {
 	return *m_resourceManager;
@@ -62,11 +64,24 @@ void dx3d::Game::onInternalUpdate()
 	m_previousTime = currentTime;
 	auto deltaTime = delta.count();
 
-	m_inputSystem->update();
+	// Update each display’s input system separately
+	for (auto& display : m_displays)
+	{
+		display->getInputSystem().update();
+	}
 
 	onUpdate(deltaTime);
-
 	m_world->update(deltaTime);
 
-	m_worldRenderer->render(*m_world, m_display->getSwapChain(), deltaTime);
+	// Render to all displays
+	for (auto& display : m_displays)
+	{
+		m_worldRenderer->render(*m_world, display->getSwapChain(), deltaTime);
+	}
+}
+
+void dx3d::Game::addDisplay(const DisplayDesc& desc)
+{
+	auto display = std::make_unique<Display>(desc);
+	m_displays.push_back(std::move(display));
 }
