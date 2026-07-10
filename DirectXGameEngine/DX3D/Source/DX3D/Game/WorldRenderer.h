@@ -14,6 +14,8 @@ namespace dx3d
 		explicit WorldRenderer(const WorldRendererDesc& desc);
 
 		void render(const World& world, SwapChain& swapChain, f32 deltaTime);
+		void renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays,f32 deltaTime);
+
 	private:
 		struct alignas(16) ObjectData
 		{

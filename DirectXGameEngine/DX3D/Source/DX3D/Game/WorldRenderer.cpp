@@ -1,4 +1,6 @@
 #include <DX3D/Game/WorldRenderer.h>
+#include <DX3D/Game/Display.h>
+
 #include <DX3D/Graphics/GraphicsDevice.h>
 #include <DX3D/Graphics/RenderSystem/DeviceContext/DeviceContext.h>
 #include <DX3D/Graphics/RenderSystem/SwapChain/SwapChain.h>
@@ -99,6 +101,78 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 				/*context.setVertexBuffer(*vb);
 				context.setIndexBuffer(*ib);
 				context.drawIndexedTriangleList(mesh->getIndexCount(), 0u, 0u);*/
+
+				m_textures.clear();
+				m_textures.resize(material->getNumTextures());
+				for (auto t : std::views::iota(0u, m_textures.size()))
+				{
+					auto tex = material->getTexture(t);
+					if (tex) m_textures[t] = &tex->getTexture();
+				}
+				context.setTextures(std::span<Texture*>{m_textures});
+
+				context.setVertexBuffer(*vb);
+				context.setIndexBuffer(*ib);
+				context.drawIndexedTriangleList(mesh->getIndexCount(), 0u, 0u);
+			}
+		}
+
+		m_graphicsDevice.executeCommandList(context);
+		swapChain.present();
+	}
+}
+
+void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime)
+{
+	for (auto& display : displays)
+	{
+		HWND hwnd = static_cast<HWND>(display->getHandle());
+		if (IsIconic(hwnd)) // skip minimized windows
+			continue;
+
+		auto& swapChain = display->getSwapChain();
+		auto size = swapChain.getSize();
+
+		auto& context = *m_deviceContext;
+		context.clearAndSetBackBuffer(swapChain, { 0.27f, 0.39f, 0.55f, 1.0f });
+		context.setViewportSize(size);
+
+		Sampler* samplers[] = { m_sampler.get() };
+		context.setSamplers(std::span<Sampler*>{samplers});
+
+		// Use this display’s camera
+		if (auto* camera = display->getCamera())
+		{
+			CameraData cameraData{};
+			cameraData.view = camera->getViewMatrix();
+			camera->setViewportSize(size);
+			cameraData.proj = camera->getProjectionMatrix();
+			context.updateConstantBuffer(*m_cameraCb, std::as_bytes(std::span{ &cameraData, 1 }));
+		}
+
+		// Render meshes (same as your existing render code)
+		ui32 numComponents = 0;
+		auto components = world.getComponents<MeshComponent>(numComponents);
+		for (auto i : std::views::iota(0u, numComponents))
+		{
+			auto component = components[i];
+			auto& transform = component->getGameObject().getTransform();
+			auto mesh = component->getMesh();
+			auto material = component->getMaterial();
+
+			if (material)
+			{
+				ObjectData objectData{};
+				objectData.world = transform.getAffineWorldMatrix();
+
+				context.setGraphicsPipelineState(material->getGraphicsPipelineState());
+				context.updateConstantBuffer(*m_objectCb, std::as_bytes(std::span{ &objectData, 1 }));
+				context.updateConstantBuffer(*m_materialCb, material->getData());
+				ConstantBuffer* cbs[] = { m_objectCb.get(), m_cameraCb.get(), m_materialCb.get() };
+				context.setConstantBuffers(std::span<ConstantBuffer*>{cbs});
+
+				auto vb = component->getOrCreateVertexBuffer(m_graphicsDevice);
+				auto ib = component->getOrCreateIndexBuffer(m_graphicsDevice);
 
 				m_textures.clear();
 				m_textures.resize(material->getNumTextures());
