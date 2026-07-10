@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <DX3D/Core/Common.h>
 #include <DX3D/Core/Base.h>
 #include <DX3D/Core/Identifiable.h>
@@ -25,6 +25,27 @@ namespace dx3d
 				});
 			return static_cast<T*>(createGameObjectInternal(e));
 		}
+
+		// Game Object for a specific window
+		template <typename T>
+		T* createGameObjectForWindow(uint32_t windowId) requires IsRegistered<GameObject, T>
+		{
+			UniquePtr<GameObject> e = std::make_unique<T>(GameObjectDesc{
+				{m_logger},
+				m_gameContext,
+				*this
+				});
+
+			// Register components just like global objects
+			auto* obj = static_cast<T*>(createGameObjectInternal(e));
+
+			// Store in per‑window bucket
+			auto typeId = T::GetTypeId();
+			m_windowObjects[windowId][typeId].push_back(std::move(e));
+
+			return obj;
+		}
+
 
 		template <typename T> requires IsRegistered<Component, T>
 		T* const* getComponents(ui32& numComponents) const noexcept
@@ -53,8 +74,12 @@ namespace dx3d
 
 	private:
 		GameContext m_gameContext;
-
+		// Shared Game objects
 		std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>> m_objects{};
+
+		// Game objects bound to a specific window ID
+		std::unordered_map<uint32_t, std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>> m_windowObjects{};
+
 		std::unordered_map<size_t, std::vector<Component*>> m_components{};
 
 		std::vector<TransformComponent*> m_dirtyTransforms{};

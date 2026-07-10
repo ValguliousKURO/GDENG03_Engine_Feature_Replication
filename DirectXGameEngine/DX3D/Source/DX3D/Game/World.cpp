@@ -1,4 +1,4 @@
-#include <DX3D/Game/World.h>
+﻿#include <DX3D/Game/World.h>
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/Component.h>
 #include <DX3D/Component/TransformComponent.h>
@@ -25,14 +25,23 @@ void dx3d::World::update(f32 deltaTime)
 
         m_eventsSwapBuffer.clear();
     }
-
-    for (auto&& [typeId, objects] : m_objects)
+    
+    // Update global objects
+    for (auto& [typeId, objects] : m_objects)
     {
-        for (auto& object : objects)
-        {
-            object->onUpdate(deltaTime);
-        }
+        for (auto& obj : objects)
+            obj->onUpdate(deltaTime);
     }
+
+    //// Update per‑window objects
+    //for (auto& [windowId, typeMap] : m_windowObjects)
+    //{
+    //    for (auto& [typeId, objects] : typeMap)
+    //    {
+    //        for (auto& obj : objects)
+    //            obj->onUpdate(deltaTime);
+    //    }
+    //}
 
     for (auto& comp : m_dirtyTransforms)
     {

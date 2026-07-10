@@ -1,39 +1,41 @@
 #pragma once
 #include <DX3D/Core/Base.h>
 #include <DX3D/Core/Core.h>
-
+#include <DX3D/Game/Display.h>
 #include <chrono>
+#include <vector>
 
 namespace dx3d
 {
-	class Game
-	{
-		dx3d_disable_copy_and_move(Game)
-	public:
-		explicit Game(const GameDesc& desc);
-		virtual ~Game();
+    class Game
+    {
+        dx3d_disable_copy_and_move(Game)
+    public:
+        explicit Game(const GameDesc& desc);
+        virtual ~Game();
 
-		virtual World& getWorld() noexcept final;
-		virtual Logger& getLogger() noexcept final;
-		virtual InputSystem& getInputSystem() noexcept final;
-		virtual ResourceManager& getResourceManager() noexcept final;
-		virtual void run() final;
-	protected:
-		virtual void onCreate() {}
-		virtual void onUpdate(f32 deltaTime) {}
-	private:
-		void onInternalUpdate();
-	private:
-		UniquePtr<Logger> m_logger{};
-		UniquePtr<InputSystem> m_inputSystem{};
-		RefPtr<GraphicsDevice> m_graphicsDevice{};
-		UniquePtr<Display> m_display{};
-		UniquePtr<ResourceManager> m_resourceManager{};
-		UniquePtr<World> m_world{};
+        virtual World& getWorld() noexcept final;
+        virtual Logger& getLogger() noexcept final;
+        virtual ResourceManager& getResourceManager() noexcept final;
+        virtual void run() final;
 
-		UniquePtr<WorldRenderer> m_worldRenderer{};
-		bool m_isRunning{ true };
+        // New: add/remove displays
+        void addDisplay(const DisplayDesc& desc);
+        const std::vector<UniquePtr<Display>>& getDisplays() const noexcept { return m_displays; }
 
-		std::chrono::steady_clock::time_point m_previousTime{};
-	};
+    protected:
+        virtual void onCreate() {}
+        virtual void onUpdate(f32 deltaTime) {}
+    private:
+        void onInternalUpdate();
+
+        UniquePtr<Logger> m_logger{};
+        RefPtr<GraphicsDevice> m_graphicsDevice{};
+        std::vector<UniquePtr<Display>> m_displays{};   // multiple displays
+        UniquePtr<ResourceManager> m_resourceManager{};
+        UniquePtr<World> m_world{};
+        UniquePtr<WorldRenderer> m_worldRenderer{};
+        bool m_isRunning{ true };
+        std::chrono::steady_clock::time_point m_previousTime{};
+    };
 }
