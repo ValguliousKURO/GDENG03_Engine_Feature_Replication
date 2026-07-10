@@ -67,7 +67,10 @@ void dx3d::Game::onInternalUpdate()
 	// Update each display’s input system separately
 	for (auto& display : m_displays)
 	{
-		display->getInputSystem().update();
+		if (display->hasFocus())
+		{
+			display->getInputSystem().update();
+		}
 	}
 
 	onUpdate(deltaTime);
@@ -76,7 +79,7 @@ void dx3d::Game::onInternalUpdate()
 	// Render to all displays
 	for (auto& display : m_displays)
 	{
-		m_worldRenderer->render(*m_world, display->getSwapChain(), deltaTime);
+		m_worldRenderer->renderForDisplays(*m_world, m_displays, deltaTime);
 	}
 }
 

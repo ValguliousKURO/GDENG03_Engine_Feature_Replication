@@ -102,12 +102,17 @@ LRESULT dx3d::Window::handleMessage(UINT msg, WPARAM wparam, LPARAM lparam)
 {
     switch (msg)
     {
+    case WM_SETFOCUS:
+        m_hasFocus = true;
+        break;
 
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
+    case WM_KILLFOCUS:
+        m_hasFocus = false;
+        break;
 
     default:
         return DefWindowProc(static_cast<HWND>(m_handle), msg, wparam, lparam);
     }
+    return 0;
 }
+

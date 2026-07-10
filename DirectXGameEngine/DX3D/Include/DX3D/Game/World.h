@@ -28,12 +28,13 @@ namespace dx3d
 
 		// Game Object for a specific window
 		template <typename T>
-		T* createGameObjectForWindow(uint32_t windowId) requires IsRegistered<GameObject, T>
+		T* createGameObjectForWindow(uint32_t windowId, InputSystem& inputSystem) requires IsRegistered<GameObject, T>
 		{
 			UniquePtr<GameObject> e = std::make_unique<T>(GameObjectDesc{
 				{m_logger},
 				m_gameContext,
-				*this
+				*this,
+				&inputSystem // pass per‑window input
 				});
 
 			// Register components just like global objects

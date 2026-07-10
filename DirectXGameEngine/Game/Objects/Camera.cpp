@@ -58,6 +58,4 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 	auto direction = dx3d::Vec3::normalize(forwardDir + rightDir);
 	pos = pos + direction * speed * deltaTime;
 	getTransform().setPosition(pos);
-
-	if (getInputSystem().isKeyPressed(dx3d::KeyCode::E)) std::cout << "Hallo ";
 }

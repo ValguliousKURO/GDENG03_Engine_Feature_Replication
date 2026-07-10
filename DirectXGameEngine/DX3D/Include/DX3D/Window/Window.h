@@ -17,10 +17,13 @@ namespace dx3d
         const Rect& getSize() const { return m_size; }
 
         virtual LRESULT handleMessage(UINT msg, WPARAM wparam, LPARAM lparam);
+        bool hasFocus() const noexcept { return m_hasFocus; }
 
     protected:
         uint32_t m_id{};  // Unique window identifier
         void* m_handle{};
         Rect m_size{};
+        bool m_hasFocus{ false };
+
     };
 }

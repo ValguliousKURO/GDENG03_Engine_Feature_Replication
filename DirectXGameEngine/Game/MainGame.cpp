@@ -3,6 +3,7 @@
 #include "Objects/Camera.h"
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
 #include <DX3D/Component/MeshComponent.h>
+#include <DX3D/Component/CameraComponent.h>
 #include <filesystem>
 
 
@@ -71,15 +72,17 @@ void MainGame::onCreate()
 	}
 
 	// Creating Camera/Player
-	/*for (auto& display : getDisplays())
+	for (auto& display : getDisplays())
 	{
-		auto camera = world.createGameObjectForWindow<Camera>(display->getID());
+		auto camera = world.createGameObjectForWindow<Camera>(display->getID(), display->getInputSystem());
 		camera->getTransform().setPosition({ 0, 1, -2 });
-	}*/
-	auto player = world.createGameObject<Player>();
+		display->setCamera(camera->createOrGetComponent<dx3d::CameraComponent>());
+	}
+	/*auto player = world.createGameObject<Player>();
 	player->getTransform().setPosition({ 0, 1, -2 });
-	auto camera = world.createGameObjectForWindow<Camera>(getDisplays()[0]->getID());
-	camera->getTransform().setPosition({ 0, 1, -2 });
+	auto& display2 = getDisplays()[1];
+	auto camera = world.createGameObjectForWindow<Camera>(display2->getID(), display2->getInputSystem());
+	camera->getTransform().setPosition({ 0, 1, -2 });*/
 
 	for (auto& display : getDisplays())
 	{
