@@ -23,6 +23,9 @@
 #include <fstream>
 #include <ranges>
 
+// ADDED: DirectX 11 backend renders ImGui after the engine command list has been executed.
+#include <imgui_impl_dx11.h>
+
 
 dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.base), m_graphicsDevice(desc.engine)
 {
@@ -122,7 +125,7 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 	}
 }
 
-void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime)
+void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime, ImDrawData* uiDrawData, const Display* uiDisplay)
 {
 	for (auto& display : displays)
 	{
@@ -140,7 +143,7 @@ void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vecto
 		Sampler* samplers[] = { m_sampler.get() };
 		context.setSamplers(std::span<Sampler*>{samplers});
 
-		// Use this display’s camera
+		// Use this displayç—´ camera
 		if (auto* camera = display->getCamera())
 		{
 			CameraData cameraData{};
@@ -190,6 +193,17 @@ void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vecto
 		}
 
 		m_graphicsDevice.executeCommandList(context);
+		if (uiDrawData && display.get() == uiDisplay)
+		{
+			// Scene rendering uses a deferred context. ImGui renders through the
+			// immediate context, so bind this swap chain's target there explicitly
+			// before submitting the UI draw data.
+			auto* renderTarget = swapChain.getRenderTargetView();
+			m_graphicsDevice.getNativeContext()->OMSetRenderTargets(1, &renderTarget, nullptr);
+		
+			// render UI data
+			ImGui_ImplDX11_RenderDrawData(uiDrawData);
+		}
 		swapChain.present();
 	}
 }

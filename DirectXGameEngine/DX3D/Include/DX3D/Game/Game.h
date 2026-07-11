@@ -23,9 +23,10 @@ namespace dx3d
         void addDisplay(const DisplayDesc& desc);
         const std::vector<UniquePtr<Display>>& getDisplays() const noexcept { return m_displays; }
 
-    protected:
-        virtual void onCreate() {}
-        virtual void onUpdate(f32 deltaTime) {}
+	protected:
+		virtual void onCreate() {}
+		virtual void onUpdate(f32 deltaTime) {}
+		virtual void onDrawUi() {} // ADDED: Derived games submit their ImGui widgets here every frame.
     private:
         void onInternalUpdate();
 
@@ -35,7 +36,8 @@ namespace dx3d
         UniquePtr<ResourceManager> m_resourceManager{};
         UniquePtr<World> m_world{};
         UniquePtr<WorldRenderer> m_worldRenderer{};
-        bool m_isRunning{ true };
+		bool m_isRunning{ true };
+		bool m_imguiInitialized{ false }; // ADDED: Tracks ownership of the shared ImGui context and backends.
         std::chrono::steady_clock::time_point m_previousTime{};
     };
 }

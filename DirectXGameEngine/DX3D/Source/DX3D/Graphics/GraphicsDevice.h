@@ -9,6 +9,17 @@ namespace dx3d
 {
 	class GraphicsDevice final: public Base, public std::enable_shared_from_this<GraphicsDevice>
 	{
+	public: // getters for native device and context
+		ID3D11Device* getNativeDevice() const noexcept
+		{
+			return m_d3dDevice.Get();
+		}
+		ID3D11DeviceContext* getNativeContext() const noexcept
+		{
+			return m_d3dContext.Get();
+		}
+
+
 	public:
 		explicit GraphicsDevice(const GraphicsDeviceDesc& desc);
 		virtual ~GraphicsDevice() override;

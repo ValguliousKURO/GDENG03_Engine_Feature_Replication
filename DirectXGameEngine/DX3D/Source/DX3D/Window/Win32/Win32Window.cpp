@@ -3,10 +3,20 @@
 #include <stdexcept>
 #include <atomic>
 
+//include window impl
+#include <imgui_impl_win32.h>
+
+// backend header implement for ui
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+
+
 static std::atomic<uint32_t> g_windowCounter{ 0 };
 
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+	
+	ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam);
+
     dx3d::Window* pThis = nullptr;
 
     if (msg == WM_CREATE)
@@ -100,7 +110,8 @@ dx3d::Window::~Window()
 // Default message handler
 LRESULT dx3d::Window::handleMessage(UINT msg, WPARAM wparam, LPARAM lparam)
 {
-    switch (msg)
+
+	switch (msg)
     {
     case WM_SETFOCUS:
         m_hasFocus = true;

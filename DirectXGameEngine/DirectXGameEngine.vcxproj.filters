@@ -15,6 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+	<!-- ADDED: Dear ImGui source files compiled for the TestUi overlay. -->
+    <ClCompile Include="IMGUI\imgui.cpp"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="IMGUI\imgui_draw.cpp"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="IMGUI\imgui_tables.cpp"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="IMGUI\imgui_widgets.cpp"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="IMGUI\imgui_impl_dx11.cpp"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="IMGUI\imgui_impl_win32.cpp"><Filter>Source Files</Filter></ClCompile>
+	<!-- ADDED: Test UI implementation. -->
+    <ClCompile Include="Game\TestUi.cpp"><Filter>Source Files</Filter></ClCompile>
     <ClCompile Include="Game\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -122,6 +131,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+	<!-- ADDED: Test UI declaration. -->
+    <ClInclude Include="Game\TestUi.h"><Filter>Header Files</Filter></ClInclude>
     <ClInclude Include="DX3D\Include\DX3D\Core\Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
