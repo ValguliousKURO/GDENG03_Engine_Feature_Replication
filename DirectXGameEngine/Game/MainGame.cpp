@@ -19,6 +19,10 @@ void MainGame::onCreate()
 	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
+	// UI testing implemn
+	m_testUi = std::make_unique<dx3d::TestUI>(dx3d::BaseDesc{ getLogger() });
+	
+	
 	// Create mesh resources (reusable)
 	auto cubeMesh = dx3d::MeshFactory::createCubeMesh();
 	auto sphereMesh = dx3d::MeshFactory::createSphereMesh(20, 20);
@@ -68,6 +72,7 @@ void MainGame::onCreate()
 			cube->getTransform().setScale({ 0.5,0.5,0.5 });
 			cube->getTransform().setPosition({ x * 1.4f, 0.25f + 0.05f, y * 1.4f });
 			cube->getTransform().setRotation({ 0,roty,0 });
+			if (x == 0 && y == 0) m_testObject = cube; // add the cubes.
 		}
 	}
 
@@ -95,4 +100,10 @@ void MainGame::onCreate()
 void MainGame::onUpdate(dx3d::f32 deltaTime)
 {
 	Game::onUpdate(deltaTime);
+}
+
+void MainGame::onDrawUi()
+{
+	if (m_testObject)
+		m_testUi->draw(*m_testObject); // ADDED: Draw controls for the centre cube once ImGui begins a frame.
 }
