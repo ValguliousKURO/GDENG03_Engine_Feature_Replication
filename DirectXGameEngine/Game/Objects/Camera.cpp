@@ -63,7 +63,7 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 			input.setCursorVisible(true);
 		}
 	}
-	else if (getInputSystem().isKeyDown(dx3d::KeyCode::W)) PostQuitMessage(0);	
+	else if (getInputSystem().isKeyDown(dx3d::KeyCode::W)) PostQuitMessage(0);
 
 
 	//Movement and rotation controls for Perspective Mode
