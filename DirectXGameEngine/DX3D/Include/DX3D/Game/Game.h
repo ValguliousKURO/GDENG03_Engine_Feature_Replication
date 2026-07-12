@@ -37,7 +37,9 @@ namespace dx3d
         UniquePtr<World> m_world{};
         UniquePtr<WorldRenderer> m_worldRenderer{};
 		bool m_isRunning{ true };
+
 		bool m_imguiInitialized{ false }; // ADDED: Tracks ownership of the shared ImGui context and backends.
+
         std::chrono::steady_clock::time_point m_previousTime{};
     };
 }

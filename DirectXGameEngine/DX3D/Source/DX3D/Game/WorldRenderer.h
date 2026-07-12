@@ -16,7 +16,9 @@ namespace dx3d
 		explicit WorldRenderer(const WorldRendererDesc& desc);
 
 		void render(const World& world, SwapChain& swapChain, f32 deltaTime);
-		void renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime, ImDrawData* uiDrawData, const Display* uiDisplay);
+		// uiDrawData is rendered into every display.  Each display owns a distinct
+	// add display render here to render ui for multiple displays 
+		void renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime, ImDrawData* uiDrawData);
 
 	private:
 		struct alignas(16) ObjectData
