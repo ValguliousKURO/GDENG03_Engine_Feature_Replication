@@ -83,9 +83,10 @@ void MainGame::onCreate()
 		camera->getTransform().setPosition({ 0, 1, -2 });
 		display->setCamera(camera->createOrGetComponent<dx3d::CameraComponent>());
 	}
-	/*auto player = world.createGameObject<Player>();
+	auto player = world.createGameObject<Player>();
 	player->getTransform().setPosition({ 0, 1, -2 });
-	auto& display2 = getDisplays()[1];
+
+	/*auto& display2 = getDisplays()[1];
 	auto camera = world.createGameObjectForWindow<Camera>(display2->getID(), display2->getInputSystem());
 	camera->getTransform().setPosition({ 0, 1, -2 });*/
 
