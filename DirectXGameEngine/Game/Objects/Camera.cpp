@@ -10,21 +10,53 @@ Camera::Camera(const dx3d::GameObjectDesc& desc) : dx3d::GameObject(desc)
 
 Camera::~Camera()
 {
+	dx3d::EventBroadcastManager::getInstance().RemoveObserver(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE);
+	dx3d::EventBroadcastManager::getInstance().RemoveObserver(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE);
 }
 
-void Camera::TestHi()
+void Camera::SetPerspective()
 {
-	std::cout << "Hallo";
+	std::cout << "Hallo Perspective";
+	auto& input = getInputSystem();
+	auto* m_camera = getComponent<dx3d::CameraComponent>();
+
+	if (m_camera->getProjectionMode() != dx3d::ProjectionMode::Perspective)
+	{
+		m_camera->setProjectionMode(dx3d::ProjectionMode::Perspective);
+
+		getTransform().setPosition({ 0, 1, -2 });
+		getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+
+		input.setCursorLocked(false); //change it for now
+		input.setCursorVisible(true); //change it for now
+	}
+}
+
+void Camera::SetOrthographic()
+{
+	std::cout << "Hallo Orthographic";
+
+	auto& input = getInputSystem();
+	auto* m_camera = getComponent<dx3d::CameraComponent>();
+
+	if (m_camera->getProjectionMode() != dx3d::ProjectionMode::Orthographic)
+	{
+		m_camera->setProjectionMode(dx3d::ProjectionMode::Orthographic);
+
+		// Safely move back to original distance and unlock cursor for ortho viewing
+		getTransform().setPosition({ 0.0f, 10.0f, 0.0f });
+		getTransform().setRotation({ 1.5708f, 0.0f, 0.0f });
+		input.setCursorLocked(false);
+		input.setCursorVisible(true);
+	}
 }
 
 void Camera::onCreate()
 {
 	createOrGetComponent<dx3d::CameraComponent>();
 
-	dx3d::EventBroadcastManager::getInstance().addObserver(
-		dx3d::EventNames::TEST_EVENT, 
-		[this]() { this->TestHi(); }
-	);
+	dx3d::EventBroadcastManager::getInstance().addObserver(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE, [this]() { this->SetPerspective(); });
+	dx3d::EventBroadcastManager::getInstance().addObserver(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE, [this]() { this->SetOrthographic(); });
 }
 
 void Camera::onUpdate(dx3d::f32 deltaTime)
@@ -35,36 +67,10 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 	if (!m_camera) return;
 
 	//Toggle for Perspective Mode
-	if (input.isKeyDown(dx3d::KeyCode::P))
-	{
-		if (m_camera->getProjectionMode() != dx3d::ProjectionMode::Perspective)
-		{
-			m_camera->setProjectionMode(dx3d::ProjectionMode::Perspective);
-
-			getTransform().setPosition({ 0, 1, -2 });
-			getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
-
-			input.setCursorLocked(false); //change it for now
-			input.setCursorVisible(true); //change it for now
-		}
-	}
+	if (input.isKeyPressed(dx3d::KeyCode::P)) dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE);
 
 	//Toggle for Orthographic Mode/Top Down View
-	else if (input.isKeyDown(dx3d::KeyCode::O))
-	{
-		if (m_camera->getProjectionMode() != dx3d::ProjectionMode::Orthographic)
-		{
-			m_camera->setProjectionMode(dx3d::ProjectionMode::Orthographic);
-
-			// Safely move back to original distance and unlock cursor for ortho viewing
-			getTransform().setPosition({ 0.0f, 10.0f, 0.0f });
-			getTransform().setRotation({ 1.5708f, 0.0f, 0.0f });
-			input.setCursorLocked(false);
-			input.setCursorVisible(true);
-		}
-	}
-	else if (getInputSystem().isKeyDown(dx3d::KeyCode::W)) PostQuitMessage(0);
-
+	else if (input.isKeyPressed(dx3d::KeyCode::O)) dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE);
 
 	//Movement and rotation controls for Perspective Mode
 	if (m_camera->getProjectionMode() == dx3d::ProjectionMode::Perspective)
@@ -111,7 +117,7 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 		auto forwardDir = getTransform().forward() * forward;
 		auto rightDir = getTransform().right() * right;
 		auto upDir = getTransform().up() * up;
-		auto direction = dx3d::Vec3::normalize(forwardDir + rightDir + upDir	);
+		auto direction = dx3d::Vec3::normalize(forwardDir + rightDir + upDir);
 		pos = pos + direction * speed * deltaTime;
 		getTransform().setPosition(pos);
 	}
