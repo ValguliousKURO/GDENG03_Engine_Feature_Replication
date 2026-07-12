@@ -140,25 +140,27 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 	}
 }
 
-void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime, ImDrawData* uiDrawData, const Display* uiDisplay)
+void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime, ImDrawData* uiDrawData)
 {
-	for (auto& display : displays)
+	for (auto& display : displays) // get all displats here
 	{
 		HWND hwnd = static_cast<HWND>(display->getHandle());
 		if (IsIconic(hwnd)) // skip minimized windows
 			continue;
-
+		// get the swap chain for this display and its size a
 		auto& swapChain = display->getSwapChain();
 		auto size = swapChain.getSize();
 
+		// get dev context
 		auto& context = *m_deviceContext;
 		context.clearAndSetBackBuffer(swapChain, { 0.27f, 0.39f, 0.55f, 1.0f });
 		context.setViewportSize(size);
 
+
 		Sampler* samplers[] = { m_sampler.get() };
 		context.setSamplers(std::span<Sampler*>{samplers});
 
-		// Use this display's camera
+		// Use and set display camera
 		if (auto* camera = display->getCamera())
 		{
 			CameraData cameraData{};
@@ -222,15 +224,15 @@ void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vecto
 		}
 
 		m_graphicsDevice.executeCommandList(context);
-		if (uiDrawData && display.get() == uiDisplay)
+		if (uiDrawData)
 		{
-			// Scene rendering uses a deferred context. ImGui renders through the
-			// immediate context, so bind this swap chain's target there explicitly
-			// before submitting the UI draw data.
+			// Scene rendering uses a deferred context; ImGui uses the immediate
+			// context. Bind *this* display's target before every ImGui submission.
+			// Replaying the same draw data here makes the UI visible in every engine
+			// display instead of only the display that created the ImGui frame.
 			auto* renderTarget = swapChain.getRenderTargetView();
 			m_graphicsDevice.getNativeContext()->OMSetRenderTargets(1, &renderTarget, nullptr);
-		
-			// render UI data
+
 			ImGui_ImplDX11_RenderDrawData(uiDrawData);
 		}
 		swapChain.present();

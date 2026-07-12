@@ -26,6 +26,7 @@ dx3d::Game::Game(const GameDesc& desc)
 
 	// Create the primary display
 	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
+	//secondary display
 	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
 
 	auto context = SystemContext{ *m_graphicsDevice };
@@ -62,11 +63,11 @@ dx3d::Logger& dx3d::Game::getLogger() noexcept
 
 dx3d::Game::~Game()
 {
-	if (m_imguiInitialized)
+	if (m_imguiInitialized) // for disabling ui on shutdown
 	{
-		ImGui_ImplDX11_Shutdown(); // ADDED: Release ImGui's DirectX resources before the graphics device is destroyed.
-		ImGui_ImplWin32_Shutdown(); // ADDED: Remove ImGui's Win32 backend data.
-		ImGui::DestroyContext(); // ADDED: Release the shared ImGui context.
+		ImGui_ImplDX11_Shutdown(); 
+		ImGui_ImplWin32_Shutdown(); 
+		ImGui::DestroyContext(); 
 	}
 
 	DX3DLogInfo("Game is shutting down...");
@@ -96,15 +97,15 @@ void dx3d::Game::onInternalUpdate()
 	onUpdate(deltaTime);
 	m_world->update(deltaTime);
 
-	// ADDED: Start one UI frame after normal update work so derived games can submit widgets.
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	onDrawUi();
 	ImGui::Render();
 
-	// ADDED: Render the world once for all displays, placing ImGui over the primary display before it presents.
-	m_worldRenderer->renderForDisplays(*m_world, m_displays, deltaTime, ImGui::GetDrawData(), m_displays.front().get());
+	// Render the same completed ImGui frame into every display's swap-chain.
+	// The renderer binds each display's back buffer before drawing the UI.
+	m_worldRenderer->renderForDisplays(*m_world, m_displays, deltaTime, ImGui::GetDrawData());
 }
 
 void dx3d::Game::addDisplay(const DisplayDesc& desc)
