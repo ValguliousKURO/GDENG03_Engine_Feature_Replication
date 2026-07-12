@@ -146,6 +146,9 @@
     <ClCompile Include="Game\Objects\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\EventBroadcastManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <!-- ADDED: Test UI declaration. -->
@@ -297,6 +300,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Game\Objects\Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventBroadcastManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventNames.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

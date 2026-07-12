@@ -1,6 +1,8 @@
 #include "Camera.h"
 #include "iostream"
 #include <algorithm>
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
 
 Camera::Camera(const dx3d::GameObjectDesc& desc) : dx3d::GameObject(desc)
 {
@@ -10,9 +12,19 @@ Camera::~Camera()
 {
 }
 
+void Camera::TestHi()
+{
+	std::cout << "Hallo";
+}
+
 void Camera::onCreate()
 {
 	createOrGetComponent<dx3d::CameraComponent>();
+
+	dx3d::EventBroadcastManager::getInstance().addObserver(
+		dx3d::EventNames::TEST_EVENT, 
+		[this]() { this->TestHi(); }
+	);
 }
 
 void Camera::onUpdate(dx3d::f32 deltaTime)

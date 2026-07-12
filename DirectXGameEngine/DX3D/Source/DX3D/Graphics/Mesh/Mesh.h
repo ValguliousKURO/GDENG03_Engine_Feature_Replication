@@ -2,6 +2,7 @@
 #include <DX3D/Core/Core.h>
 #include <DX3D/Math/Vec3.h>
 #include <DX3D/Math/Vec4.h>
+#include <DX3D/Math/Vec2.h>
 #include <vector>
 
 namespace dx3d
@@ -9,6 +10,8 @@ namespace dx3d
 	struct Vertex
 	{
 		Vec3 position;
+		Vec2 texcoord;
+		Vec3 normal;
 	};
 
 	class Mesh
