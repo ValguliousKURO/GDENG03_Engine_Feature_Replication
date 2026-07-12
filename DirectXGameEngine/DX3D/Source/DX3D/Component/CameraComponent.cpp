@@ -61,7 +61,8 @@ dx3d::f32 dx3d::CameraComponent::getFieldOfView() const noexcept
 void dx3d::CameraComponent::setViewportSize(const Rect& area) noexcept
 {
 	if (m_viewportSize == area) return;
-	if (m_viewportSize.width == 0 || m_viewportSize.height == 0) return;
+	//if (m_viewportSize.width == 0 || m_viewportSize.height == 0) return;
+	if (area.width == 0 || area.height == 0) return;
 
 	m_viewportSize = area;
 	computeProjectionMatrix();
@@ -72,8 +73,41 @@ dx3d::Rect dx3d::CameraComponent::getViewportSize() const noexcept
 	return m_viewportSize;
 }
 
+void dx3d::CameraComponent::setProjectionMode(ProjectionMode mode) noexcept
+{
+	if (m_projectionMode == mode) return;
+	m_projectionMode = mode;
+	computeProjectionMatrix();
+}
+
+dx3d::ProjectionMode dx3d::CameraComponent::getProjectionMode() const noexcept
+{
+	return m_projectionMode;
+}
+
+void dx3d::CameraComponent::setOrthoZoom(f32 zoom) noexcept
+{
+	if (zoom <= 0.0001f) return;
+	m_orthoZoom = zoom;
+	computeProjectionMatrix();
+}
+
+dx3d::f32 dx3d::CameraComponent::getOrthoZoom() const noexcept
+{
+	return m_orthoZoom;
+}
+
 void dx3d::CameraComponent::computeProjectionMatrix() noexcept
 {
-	m_projection = Mat4x4::perspectiveFovLH(m_fieldOfView, (f32)m_viewportSize.width / (f32)m_viewportSize.height,
-		m_nearPlane, m_farPlane);
+	if (m_projectionMode == ProjectionMode::Perspective)
+	{
+		m_projection = Mat4x4::perspectiveFovLH(m_fieldOfView, (f32)m_viewportSize.width / (f32)m_viewportSize.height, m_nearPlane, m_farPlane);
+	}
+	else
+	{
+		f32 scaledWidth = (f32)m_viewportSize.width * m_orthoZoom;
+		f32 scaledHeight = (f32)m_viewportSize.height * m_orthoZoom;
+
+		m_projection = Mat4x4::orthoLH(scaledWidth, scaledHeight, m_nearPlane, m_farPlane);
+	}
 }
