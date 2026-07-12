@@ -39,6 +39,7 @@ dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.ba
 	m_objectCb = device.createConstantBuffer({ {}, sizeof(ObjectData) });
 	m_cameraCb = device.createConstantBuffer({ {}, sizeof(CameraData) });
 	m_materialCb = device.createConstantBuffer({ {}, dx3d::MaterialResource::MaxDataSize });
+	m_lightCb = device.createConstantBuffer({ {}, sizeof(LightData) });
 
 	m_sampler = device.createSampler({});
 }
@@ -70,9 +71,23 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 			cameraData.view = component->getViewMatrix();
 			component->setViewportSize(size);
 			cameraData.proj = component->getProjectionMatrix();
+			cameraData.cameraPosition = Vec4(
+				component->getGameObject().getTransform().getPosition().x,
+				component->getGameObject().getTransform().getPosition().y,
+				component->getGameObject().getTransform().getPosition().z,
+				1.0f
+			);
 			context.updateConstantBuffer(cameraCb, std::as_bytes(std::span{ &cameraData, 1 }));
 			break;
 		}
+	}
+
+	{
+		LightData lightData{};
+		lightData.lightDirection = Vec4(0.577f, -0.577f, 0.577f, 0.0f);
+		lightData.lightColor = Vec4(1.0f, 0.95f, 0.9f, 1.0f);
+		lightData.ambientColor = Vec4(0.2f, 0.22f, 0.25f, 1.0f);
+		context.updateConstantBuffer(*m_lightCb, std::as_bytes(std::span{ &lightData, 1 }));
 	}
 
 	// Render all MeshComponents
@@ -95,7 +110,7 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 				context.setGraphicsPipelineState(material->getGraphicsPipelineState());
 				context.updateConstantBuffer(objectCb, std::as_bytes(std::span{ &objectData, 1 }));
 				context.updateConstantBuffer(materialCb, material->getData());
-				ConstantBuffer* cbs[] = { &objectCb, &cameraCb, &materialCb };
+				ConstantBuffer* cbs[] = { &objectCb, &cameraCb, &materialCb, m_lightCb.get() };
 				context.setConstantBuffers(std::span<ConstantBuffer*>{cbs});
 
 				auto vb = component->getOrCreateVertexBuffer(m_graphicsDevice);
@@ -143,14 +158,28 @@ void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vecto
 		Sampler* samplers[] = { m_sampler.get() };
 		context.setSamplers(std::span<Sampler*>{samplers});
 
-		// Use this display痴 camera
+		// Use this display's camera
 		if (auto* camera = display->getCamera())
 		{
 			CameraData cameraData{};
 			cameraData.view = camera->getViewMatrix();
 			camera->setViewportSize(size);
 			cameraData.proj = camera->getProjectionMatrix();
+			cameraData.cameraPosition = Vec4(
+				camera->getGameObject().getTransform().getPosition().x,
+				camera->getGameObject().getTransform().getPosition().y,
+				camera->getGameObject().getTransform().getPosition().z,
+				1.0f
+			);
 			context.updateConstantBuffer(*m_cameraCb, std::as_bytes(std::span{ &cameraData, 1 }));
+		}
+
+		{
+			LightData lightData{};
+			lightData.lightDirection = Vec4(0.577f, -0.577f, 0.577f, 0.0f);
+			lightData.lightColor = Vec4(1.0f, 0.95f, 0.9f, 1.0f);
+			lightData.ambientColor = Vec4(0.2f, 0.22f, 0.25f, 1.0f);
+			context.updateConstantBuffer(*m_lightCb, std::as_bytes(std::span{ &lightData, 1 }));
 		}
 
 		// Render meshes (same as your existing render code)
@@ -171,7 +200,7 @@ void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vecto
 				context.setGraphicsPipelineState(material->getGraphicsPipelineState());
 				context.updateConstantBuffer(*m_objectCb, std::as_bytes(std::span{ &objectData, 1 }));
 				context.updateConstantBuffer(*m_materialCb, material->getData());
-				ConstantBuffer* cbs[] = { m_objectCb.get(), m_cameraCb.get(), m_materialCb.get() };
+				ConstantBuffer* cbs[] = { m_objectCb.get(), m_cameraCb.get(), m_materialCb.get(), m_lightCb.get() };
 				context.setConstantBuffers(std::span<ConstantBuffer*>{cbs});
 
 				auto vb = component->getOrCreateVertexBuffer(m_graphicsDevice);
