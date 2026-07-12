@@ -7,6 +7,9 @@ public:
 	explicit Camera(const dx3d::GameObjectDesc& desc);
 	virtual ~Camera() override;
 
+	void SetPerspective();
+	void SetOrthographic();
+
 	void TestHi();
 protected:
 	virtual void onCreate();
