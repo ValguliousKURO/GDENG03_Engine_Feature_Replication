@@ -1,4 +1,6 @@
 #include "Player.h"
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
 
 Player::Player(const dx3d::GameObjectDesc& desc) : dx3d::GameObject(desc)
 {
@@ -63,4 +65,6 @@ void Player::onUpdate(dx3d::f32 deltaTime)
 	auto direction = dx3d::Vec3::normalize(forwardDir + rightDir );
 	pos = pos + direction * speed * deltaTime;
 	getTransform().setPosition(pos);
+
+	if (getInputSystem().isKeyPressed(dx3d::KeyCode::E)) dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::TEST_EVENT);
 }
