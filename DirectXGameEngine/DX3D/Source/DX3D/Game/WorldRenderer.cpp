@@ -207,7 +207,7 @@ void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vecto
 
 		// IMPORTANT: renderForDisplays is the active display path, so bind the
 		// selected rasterizer here before submitting any mesh draw calls.
-		if (wireToggle && m_rasterizer) context.setRasterizerState(*m_rasterizer);
+		if (display->getRenderMode() == Display::RenderMode::Wireframe && m_rasterizer) context.setRasterizerState(*m_rasterizer);
 		else context.clearRaster();
 
 		{

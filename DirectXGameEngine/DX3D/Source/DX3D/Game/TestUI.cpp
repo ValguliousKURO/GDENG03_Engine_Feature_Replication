@@ -133,10 +133,10 @@ void dx3d::TestUI::drawViewportPanel(const std::vector<std::unique_ptr<Display>>
 				}
 			}
 			
-			// Show info warning that Wireframe is handled on another branch
+			// Show info warning that Wireframe is active
 			if (renderModeIndex == 1)
 			{
-				ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "Note: Wireframe rasterizer state is being implemented on 'wireframe-view' branch.");
+				ImGui::TextColored(ImVec4(0.2f, 0.8f, 0.2f, 1.0f), "Note: Wireframe mode is active.");
 			}
 		}
 
