@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <DX3D/Core/Common.h>
 #include <DX3D/Core/Base.h>
 #include <DX3D/Core/Identifiable.h>
@@ -39,6 +39,10 @@ namespace dx3d
 
 			// Register components just like global objects
 			auto* obj = static_cast<T*>(createGameObjectInternal(e));
+			if (obj)
+			{
+				obj->setWindowId(windowId);
+			}
 
 			// Store in per‑window bucket
 			auto typeId = T::GetTypeId();

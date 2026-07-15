@@ -10,13 +10,14 @@ Camera::Camera(const dx3d::GameObjectDesc& desc) : dx3d::GameObject(desc)
 
 Camera::~Camera()
 {
-	dx3d::EventBroadcastManager::getInstance().RemoveObserver(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE);
-	dx3d::EventBroadcastManager::getInstance().RemoveObserver(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE);
+	uint32_t windowId = getWindowId();
+	dx3d::EventBroadcastManager::getInstance().RemoveObserver(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE + "_" + std::to_string(windowId));
+	dx3d::EventBroadcastManager::getInstance().RemoveObserver(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE + "_" + std::to_string(windowId));
 }
 
 void Camera::SetPerspective()
 {
-	std::cout << "Hallo Perspective";
+	std::cout << "Perspective";
 	auto& input = getInputSystem();
 	auto* m_camera = getComponent<dx3d::CameraComponent>();
 
@@ -34,7 +35,7 @@ void Camera::SetPerspective()
 
 void Camera::SetOrthographic()
 {
-	std::cout << "Hallo Orthographic";
+	std::cout << "Orthographic";
 
 	auto& input = getInputSystem();
 	auto* m_camera = getComponent<dx3d::CameraComponent>();
@@ -54,11 +55,10 @@ void Camera::SetOrthographic()
 void Camera::onCreate()
 {
 	createOrGetComponent<dx3d::CameraComponent>();
-// set events here
-	dx3d::EventBroadcastManager::getInstance().addObserver(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE, [this]() { this->SetPerspective(); });
-	dx3d::EventBroadcastManager::getInstance().addObserver(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE, [this]() { this->SetOrthographic(); });
 
-
+	uint32_t windowId = getWindowId();
+	dx3d::EventBroadcastManager::getInstance().addObserver(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE + "_" + std::to_string(windowId), [this]() { this->SetPerspective(); });
+	dx3d::EventBroadcastManager::getInstance().addObserver(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE + "_" + std::to_string(windowId), [this]() { this->SetOrthographic(); });
 }
 
 void Camera::onUpdate(dx3d::f32 deltaTime)
@@ -69,10 +69,10 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 	if (!m_camera) return;
 
 	//Toggle for Perspective Mode
-	if (input.isKeyPressed(dx3d::KeyCode::P)) dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE);
+	if (input.isKeyPressed(dx3d::KeyCode::P)) dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE + "_" + std::to_string(getWindowId()));
 
 	//Toggle for Orthographic Mode/Top Down View
-	else if (input.isKeyPressed(dx3d::KeyCode::O)) dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE);
+	else if (input.isKeyPressed(dx3d::KeyCode::O)) dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE + "_" + std::to_string(getWindowId()));
 
 
 	//Movement and rotation controls for Perspective Mode
