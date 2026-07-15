@@ -166,7 +166,7 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 	if(input.isKeyPressed(dx3d::KeyCode::N))
 	{
 		// Post once per press so the renderer does not flip wireframe state every frame N is held.
-		dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::WIREFRAME_TOGGLE);
+		dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::WIREFRAME_TOGGLE + "_" + std::to_string(getWindowId()));
 
 	}
 	

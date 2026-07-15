@@ -19,12 +19,17 @@ dx3d::Display::Display(const DisplayDesc& desc): Window(desc.window)
 		dx3d::EventNames::WIREFRAME_MODE_TOGGLE + "_" + std::to_string(getID()),
 		[this]() { this->setRenderMode(RenderMode::Wireframe); }
 	);
+	dx3d::EventBroadcastManager::getInstance().addObserver(
+		dx3d::EventNames::WIREFRAME_TOGGLE + "_" + std::to_string(getID()),
+		[this]() { this->setRenderMode(this->getRenderMode() == RenderMode::Lit ? RenderMode::Wireframe : RenderMode::Lit); }
+	);
 }
 
 dx3d::Display::~Display()
 {
 	dx3d::EventBroadcastManager::getInstance().RemoveObserver(dx3d::EventNames::LIT_MODE_TOGGLE + "_" + std::to_string(getID()));
 	dx3d::EventBroadcastManager::getInstance().RemoveObserver(dx3d::EventNames::WIREFRAME_MODE_TOGGLE + "_" + std::to_string(getID()));
+	dx3d::EventBroadcastManager::getInstance().RemoveObserver(dx3d::EventNames::WIREFRAME_TOGGLE + "_" + std::to_string(getID()));
 }
 
 dx3d::SwapChain& dx3d::Display::getSwapChain() noexcept
