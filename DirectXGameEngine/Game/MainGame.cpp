@@ -77,11 +77,38 @@ void MainGame::onCreate()
 	}
 
 	// Creating Camera/Player
+	int displayIndex = 0;
 	for (auto& display : getDisplays())
 	{
 		auto camera = world.createGameObjectForWindow<Camera>(display->getID(), display->getInputSystem());
-		camera->getTransform().setPosition({ 0, 1, -2 });
-		display->setCamera(camera->createOrGetComponent<dx3d::CameraComponent>());
+		auto* camComp = camera->createOrGetComponent<dx3d::CameraComponent>();
+		display->setCamera(camComp);
+
+		if (displayIndex == 0)
+		{
+			// Viewport 1 (Perspective, Lit)
+			camera->getTransform().setPosition({ 0.0f, 1.0f, -2.0f });
+			camera->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+			camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
+			display->setRenderMode(dx3d::Display::RenderMode::Lit);
+		}
+		else if (displayIndex == 1)
+		{
+			// Viewport 2 (Top Down, Lit)
+			camera->getTransform().setPosition({ 0.0f, 10.0f, 0.0f });
+			camera->getTransform().setRotation({ 1.5708f, 0.0f, 0.0f });
+			camComp->setProjectionMode(dx3d::ProjectionMode::Orthographic);
+			display->setRenderMode(dx3d::Display::RenderMode::Lit);
+		}
+		else if (displayIndex == 2)
+		{
+			// Viewport 3 (Perspective, Wireframe)
+			camera->getTransform().setPosition({ 0.0f, 1.0f, -2.0f });
+			camera->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+			camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
+			display->setRenderMode(dx3d::Display::RenderMode::Wireframe);
+		}
+		displayIndex++;
 	}
 	auto player = world.createGameObject<Player>();
 	player->getTransform().setPosition({ 0, 1, -2 });
@@ -106,5 +133,5 @@ void MainGame::onUpdate(dx3d::f32 deltaTime)
 void MainGame::onDrawUi()
 {
 	if (m_testObject)
-		m_testUi->draw(*m_testObject); // ADDED: Draw controls for the centre cube once ImGui begins a frame.
+		m_testUi->draw(*m_testObject, getDisplays()); // ADDED: Draw controls for the centre cube once ImGui begins a frame.
 }
