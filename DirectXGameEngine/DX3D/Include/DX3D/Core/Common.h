@@ -83,6 +83,12 @@ namespace dx3d
 		const ui32* indexList{};
 		ui32 indexListSize{};
 	};
+	//newstuff here
+
+	struct RasterizerDesc
+	{
+		bool isWire{ false }; // false = solid, true = wireframe
+	};
 
 	// Place all systems/managers here
 	struct GameContext

@@ -55,6 +55,7 @@ namespace dx3d
 	// new stuff here
 
 	class TestUI;
+	class Rasterizer;
 
 	using i32 = int;
 	using ui32 = unsigned int;

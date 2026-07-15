@@ -74,6 +74,7 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 	//Toggle for Orthographic Mode/Top Down View
 	else if (input.isKeyPressed(dx3d::KeyCode::O)) dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE + "_" + std::to_string(getWindowId()));
 
+
 	//Movement and rotation controls for Perspective Mode
 	if (m_camera->getProjectionMode() == dx3d::ProjectionMode::Perspective)
 	{
@@ -157,5 +158,17 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 
 		m_camera->setOrthoZoom(currentZoom);
 	}
+
+	if(input.isKeyPressed(dx3d::KeyCode::Escape))
+	{
+		PostQuitMessage(0);
+	}
+	if(input.isKeyPressed(dx3d::KeyCode::N))
+	{
+		// Post once per press so the renderer does not flip wireframe state every frame N is held.
+		dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::WIREFRAME_TOGGLE);
+
+	}
+	
 	
 }

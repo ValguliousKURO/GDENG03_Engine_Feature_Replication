@@ -12,6 +12,8 @@
 #include <DX3D/Graphics/Sampler.h>
 #include <DX3D/Graphics/GraphicsPipelineLayout.h>
 
+#include <DX3D/Graphics/Rasterizer.h>
+
 dx3d::GraphicsDevice::GraphicsDevice(const GraphicsDeviceDesc& desc) : Base(desc.base)
 {
 	D3D_FEATURE_LEVEL featureLevel{};
@@ -93,6 +95,11 @@ dx3d::RefPtr<dx3d::Texture> dx3d::GraphicsDevice::createTexture(const TextureDes
 dx3d::RefPtr<dx3d::Sampler> dx3d::GraphicsDevice::createSampler(const SamplerDesc& desc)
 {
 	return std::make_shared<Sampler>(desc, getGraphicsResourceDesc());
+}
+
+dx3d::RefPtr<dx3d::Rasterizer> dx3d::GraphicsDevice::createRasterizer(const RasterizerDesc& desc)
+{
+	return std::make_shared<Rasterizer>(desc, getGraphicsResourceDesc());
 }
 
 void dx3d::GraphicsDevice::executeCommandList(DeviceContext& context)
