@@ -17,7 +17,7 @@ Camera::~Camera()
 
 void Camera::SetPerspective()
 {
-	std::cout << "Hallo Perspective";
+	std::cout << "Perspective";
 	auto& input = getInputSystem();
 	auto* m_camera = getComponent<dx3d::CameraComponent>();
 
@@ -35,7 +35,7 @@ void Camera::SetPerspective()
 
 void Camera::SetOrthographic()
 {
-	std::cout << "Hallo Orthographic";
+	std::cout << "Orthographic";
 
 	auto& input = getInputSystem();
 	auto* m_camera = getComponent<dx3d::CameraComponent>();
