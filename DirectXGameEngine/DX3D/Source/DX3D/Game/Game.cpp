@@ -28,6 +28,8 @@ dx3d::Game::Game(const GameDesc& desc)
 	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
 	//secondary display
 	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
+	//third display
+	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
 
 	auto context = SystemContext{ *m_graphicsDevice };
 	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger}, context });

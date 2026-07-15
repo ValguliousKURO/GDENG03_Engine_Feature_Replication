@@ -37,6 +37,9 @@ namespace dx3d
 		World& getWorld() noexcept;
 		InputSystem& getInputSystem() noexcept;
 		ResourceManager& getResourceManager() noexcept;
+
+		uint32_t getWindowId() const noexcept { return m_windowId; }
+		void setWindowId(uint32_t id) noexcept { m_windowId = id; }
 	protected:
 		virtual void onCreate() {}
 		virtual void onUpdate(f32 deltaTime) {}
@@ -52,6 +55,7 @@ namespace dx3d
 		
 		GameContext m_gameContext;
 		World& m_world;
+		uint32_t m_windowId{ 0 };
 
 		friend class World;
 	};

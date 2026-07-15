@@ -7,6 +7,10 @@
 
 #include <DX3D/Component/CameraComponent.h>
 #include <DX3D/Graphics/GraphicsDevice.h>
+#include <DX3D/Game/Display.h>
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
+#include <string>
 
 // ImGui's DragFloat3 range uses FLT_MAX.
 #include <cfloat>
@@ -18,7 +22,7 @@ dx3d::TestUI::TestUI(const BaseDesc& desc) :Base(desc)
 
 }
 
-void dx3d::TestUI::draw(GameObject& object)
+void dx3d::TestUI::draw(GameObject& object, const std::vector<std::unique_ptr<Display>>& displays)
 {
 
 	if (ImGui::Begin("Test UI"))
@@ -34,6 +38,12 @@ void dx3d::TestUI::draw(GameObject& object)
 			if (ImGui::BeginTabItem("Components"))
 			{
 				drawComponentInspector(object);
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("Viewports"))
+			{
+				drawViewportPanel(displays);
 				ImGui::EndTabItem();
 			}
 
@@ -56,6 +66,84 @@ dx3d::TestUI::~TestUI()
 {
 
 
+}
+
+void dx3d::TestUI::drawViewportPanel(const std::vector<std::unique_ptr<Display>>& displays)
+{
+	ImGui::TextColored(ImVec4(0.2f, 0.7f, 1.0f, 1.0f), "Active Viewports: %zu", displays.size());
+	ImGui::Separator();
+
+	int index = 1;
+	for (auto& display : displays)
+	{
+		ImGui::PushID(display->getID());
+		
+		std::string label = "Viewport " + std::to_string(index) + " (Window ID: " + std::to_string(display->getID()) + ")";
+		if (ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// View Mode: Perspective vs. Top Down
+			auto* camera = display->getCamera();
+			if (camera)
+			{
+				auto mode = camera->getProjectionMode();
+				const char* modeNames[] = { "Perspective View", "Top Down View" };
+				int currentModeIndex = (mode == ProjectionMode::Perspective) ? 0 : 1;
+				
+				ImGui::Text("Camera Settings:");
+				if (ImGui::Combo("View Mode", &currentModeIndex, modeNames, IM_ARRAYSIZE(modeNames)))
+				{
+					if (currentModeIndex == 0)
+					{
+						EventBroadcastManager::getInstance().postEvent(EventNames::PERSPECTIVE_MODE_TOGGLE + "_" + std::to_string(display->getID()));
+					}
+					else
+					{
+						EventBroadcastManager::getInstance().postEvent(EventNames::ORTHOGRAPHIC_MODE_TOGGLE + "_" + std::to_string(display->getID()));
+					}
+				}
+
+				if (mode == ProjectionMode::Orthographic)
+				{
+					float zoom = camera->getOrthoZoom();
+					if (ImGui::DragFloat("Orthographic Zoom", &zoom, 0.001f, 0.005f, 0.1f, "%.4f"))
+					{
+						camera->setOrthoZoom(zoom);
+					}
+				}
+			}
+			else
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.4f, 0.4f, 1.0f), "No camera attached to this viewport.");
+			}
+
+			ImGui::Spacing();
+			// Render Mode: Lit vs. Wireframe
+			ImGui::Text("Render Settings:");
+			int renderModeIndex = (display->getRenderMode() == Display::RenderMode::Lit) ? 0 : 1;
+			const char* renderModes[] = { "Lit (Default)", "Wireframe" };
+			if (ImGui::Combo("Render Mode", &renderModeIndex, renderModes, IM_ARRAYSIZE(renderModes)))
+			{
+				if (renderModeIndex == 0)
+				{
+					EventBroadcastManager::getInstance().postEvent(EventNames::LIT_MODE_TOGGLE + "_" + std::to_string(display->getID()));
+				}
+				else
+				{
+					EventBroadcastManager::getInstance().postEvent(EventNames::WIREFRAME_MODE_TOGGLE + "_" + std::to_string(display->getID()));
+				}
+			}
+			
+			// Show info warning that Wireframe is handled on another branch
+			if (renderModeIndex == 1)
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.8f, 0.2f, 1.0f), "Note: Wireframe rasterizer state is being implemented on 'wireframe-view' branch.");
+			}
+		}
+
+		ImGui::PopID();
+		ImGui::Separator();
+		index++;
+	}
 }
 
 void dx3d::TestUI::render(World& world, GraphicsDevice& graphicsDevice, SwapChain& swapChain)
