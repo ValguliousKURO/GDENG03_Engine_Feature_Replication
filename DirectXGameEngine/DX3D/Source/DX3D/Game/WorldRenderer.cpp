@@ -205,6 +205,11 @@ void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vecto
 			context.updateConstantBuffer(*m_cameraCb, std::as_bytes(std::span{ &cameraData, 1 }));
 		}
 
+		// IMPORTANT: renderForDisplays is the active display path, so bind the
+		// selected rasterizer here before submitting any mesh draw calls.
+		if (wireToggle && m_rasterizer) context.setRasterizerState(*m_rasterizer);
+		else context.clearRaster();
+
 		{
 			LightData lightData{};
 			lightData.lightDirection = Vec4(0.577f, -0.577f, 0.577f, 0.0f);

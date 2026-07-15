@@ -163,9 +163,9 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 	{
 		PostQuitMessage(0);
 	}
-	if(input.isKeyDown(dx3d::KeyCode::N))
+	if(input.isKeyPressed(dx3d::KeyCode::N))
 	{
-		// add post event here for wireframe toggle
+		// Post once per press so the renderer does not flip wireframe state every frame N is held.
 		dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::WIREFRAME_TOGGLE);
 
 	}
