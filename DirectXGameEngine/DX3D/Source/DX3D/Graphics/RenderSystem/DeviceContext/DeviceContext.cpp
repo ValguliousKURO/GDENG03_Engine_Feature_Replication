@@ -6,13 +6,19 @@
 #include <DX3D/Graphics/RenderSystem/ConstantBuffer/ConstantBuffer.h>
 #include <DX3D/Graphics/Texture.h>
 #include <DX3D/Graphics/Sampler.h>
+#include <DX3D/Graphics/Rasterizer.h>
 #include <ranges>
+
+// for the event broadcaster
+
 
 dx3d::DeviceContext::DeviceContext(const GraphicsResourceDesc& gDesc): GraphicsResource(gDesc)
 {
 	DX3DGraphicsLogThrowOnFail(m_device.CreateDeferredContext(0, &m_context),
 		"CreateDeferredContext failed!"
 		);
+
+
 }
 
 void dx3d::DeviceContext::clearAndSetBackBuffer(const SwapChain& swapChain, const Vec4& color)
@@ -148,4 +154,16 @@ void dx3d::DeviceContext::drawIndexedTriangleList(ui32 indexCount, ui32 startVer
 {
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	m_context->DrawIndexed(indexCount, startIndexLocation, startVertexIndex);
+}
+
+void dx3d::DeviceContext::setRasterizerState( Rasterizer& rasterizer) // note here
+{
+	m_context->RSSetState(rasterizer.getRasterizer().Get());
+}
+
+
+
+void dx3d::DeviceContext::clearRaster()
+{
+	m_context->RSSetState(nullptr);
 }

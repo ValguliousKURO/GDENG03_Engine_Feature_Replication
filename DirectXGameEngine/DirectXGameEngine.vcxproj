@@ -186,6 +186,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Resource\TextureResource.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineLayout.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Sampler.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Graphics\Rasterizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <!-- ADDED: Test UI declaration. -->
@@ -241,6 +242,7 @@
     <ClInclude Include="DX3D\Include\DX3D\Resource\TextureResource.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineLayout.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Sampler.h" />
+    <ClInclude Include="DX3D\Source\DX3D\Graphics\Rasterizer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

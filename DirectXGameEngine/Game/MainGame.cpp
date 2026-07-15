@@ -101,6 +101,7 @@ void MainGame::onCreate()
 void MainGame::onUpdate(dx3d::f32 deltaTime)
 {
 	Game::onUpdate(deltaTime);
+
 }
 
 void MainGame::onDrawUi()

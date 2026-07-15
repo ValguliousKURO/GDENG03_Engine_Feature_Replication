@@ -54,9 +54,11 @@ void Camera::SetOrthographic()
 void Camera::onCreate()
 {
 	createOrGetComponent<dx3d::CameraComponent>();
-
+// set events here
 	dx3d::EventBroadcastManager::getInstance().addObserver(dx3d::EventNames::PERSPECTIVE_MODE_TOGGLE, [this]() { this->SetPerspective(); });
 	dx3d::EventBroadcastManager::getInstance().addObserver(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE, [this]() { this->SetOrthographic(); });
+
+
 }
 
 void Camera::onUpdate(dx3d::f32 deltaTime)
@@ -71,6 +73,7 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 
 	//Toggle for Orthographic Mode/Top Down View
 	else if (input.isKeyPressed(dx3d::KeyCode::O)) dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::ORTHOGRAPHIC_MODE_TOGGLE);
+
 
 	//Movement and rotation controls for Perspective Mode
 	if (m_camera->getProjectionMode() == dx3d::ProjectionMode::Perspective)
@@ -155,5 +158,17 @@ void Camera::onUpdate(dx3d::f32 deltaTime)
 
 		m_camera->setOrthoZoom(currentZoom);
 	}
+
+	if(input.isKeyPressed(dx3d::KeyCode::Escape))
+	{
+		PostQuitMessage(0);
+	}
+	if(input.isKeyDown(dx3d::KeyCode::N))
+	{
+		// add post event here for wireframe toggle
+		dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::WIREFRAME_TOGGLE);
+
+	}
+	
 	
 }

@@ -34,6 +34,9 @@ namespace dx3d
 		RefPtr<IndexBuffer> createIndexBuffer(const IndexBufferDesc& desc);
 		RefPtr<Texture> createTexture(const TextureDesc& desc);
 		RefPtr<Sampler> createSampler(const SamplerDesc& desc);
+		//new function for graphics device
+		RefPtr<Rasterizer> createRasterizer(const RasterizerDesc& desc);
+
 		void executeCommandList(DeviceContext& context);
 	private:
 		GraphicsResourceDesc getGraphicsResourceDesc() const noexcept;

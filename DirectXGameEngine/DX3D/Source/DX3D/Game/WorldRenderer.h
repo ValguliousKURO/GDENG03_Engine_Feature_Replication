@@ -47,6 +47,9 @@ namespace dx3d
 		RefPtr<Sampler> m_sampler{};
 
 		std::vector<Texture*> m_textures{};
+
+		RefPtr<Rasterizer> m_rasterizer{};
+		bool wireToggle{ false }; //toggle switch for wireframe mode
 	};
 
 }

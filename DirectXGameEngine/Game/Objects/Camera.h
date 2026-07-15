@@ -10,9 +10,10 @@ public:
 	void SetPerspective();
 	void SetOrthographic();
 
-	void TestHi();
+	//void TestHi();
 protected:
 	virtual void onCreate();
 	virtual void onUpdate(dx3d::f32 deltaTime);
-
+private:
+	bool toggleWire{ false };
 };

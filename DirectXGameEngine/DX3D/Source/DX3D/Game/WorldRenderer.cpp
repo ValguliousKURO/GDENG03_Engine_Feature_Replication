@@ -26,6 +26,10 @@
 // ADDED: DirectX 11 backend renders ImGui after the engine command list has been executed.
 #include <imgui_impl_dx11.h>
 
+// event broadcast needed
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
+#include <iostream>
 
 dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.base), m_graphicsDevice(desc.engine)
 {
@@ -42,6 +46,28 @@ dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.ba
 	m_lightCb = device.createConstantBuffer({ {}, sizeof(LightData) });
 
 	m_sampler = device.createSampler({});
+
+
+
+	// create one wireframe rasterizer; this might not work but am gonna test
+	dx3d::RasterizerDesc rd{};
+	rd.isWire = true;
+	m_rasterizer = m_graphicsDevice.createRasterizer(rd);
+
+	// register for wireframe toggle events
+	dx3d::EventBroadcastManager::getInstance().addObserver(dx3d::EventNames::WIREFRAME_TOGGLE, [this]()
+		{
+		if(wireToggle)
+		{
+			wireToggle = false;
+		}
+		else
+		{
+			wireToggle = true;
+		}
+		std::cout << "Wireframe mode toggled: " << (wireToggle ? "ON" : "OFF") << std::endl;
+		
+		});
 }
 
 void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 deltaTime)
@@ -78,6 +104,9 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 				1.0f
 			);
 			context.updateConstantBuffer(cameraCb, std::as_bytes(std::span{ &cameraData, 1 }));
+
+			if (wireToggle && m_rasterizer) context.setRasterizerState(*m_rasterizer);
+			else context.clearRaster();
 			break;
 		}
 	}
