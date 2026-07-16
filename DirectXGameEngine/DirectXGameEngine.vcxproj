@@ -187,6 +187,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineLayout.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Sampler.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Rasterizer.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\Parameters.cpp" />
   </ItemGroup>
   <ItemGroup>
     <!-- ADDED: Test UI declaration. -->
@@ -243,6 +244,7 @@
     <ClInclude Include="DX3D\Source\DX3D\Graphics\GraphicsPipelineLayout.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Sampler.h" />
     <ClInclude Include="DX3D\Source\DX3D\Graphics\Rasterizer.h" />
+    <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\Parameters.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

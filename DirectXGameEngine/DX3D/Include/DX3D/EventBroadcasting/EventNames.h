@@ -12,5 +12,7 @@ namespace dx3d
 
 		inline static const std::string LIT_MODE_TOGGLE = "LIT_MODE_TOGGLE";
 		inline static const std::string WIREFRAME_MODE_TOGGLE = "WIREFRAME_MODE_TOGGLE";
+
+		inline static const std::string ON_WINDOW_DESTROY = "ON_WINDOW_DESTROY";
     };
 }

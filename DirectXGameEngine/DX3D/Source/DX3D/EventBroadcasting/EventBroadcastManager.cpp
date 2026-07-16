@@ -1,4 +1,4 @@
-#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+﻿#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <iostream>
 
 dx3d::EventBroadcastManager::EventBroadcastManager()
@@ -6,25 +6,45 @@ dx3d::EventBroadcastManager::EventBroadcastManager()
 
 }
 
-void dx3d::EventBroadcastManager::addObserver(const std::string eventID, Callback cb)
-{
-    listeners[eventID].push_back(cb);
-}
-
 void dx3d::EventBroadcastManager::RemoveObserver(const std::string eventID)
 {
-    listeners.erase(eventID);
+	if (listenersNoParams.contains(eventID)) listenersNoParams.erase(eventID);
+	if (listenersWithParams.contains(eventID)) listenersNoParams.erase(eventID);
 }
 
-void dx3d::EventBroadcastManager::postEvent(const std::string eventID)
-{
-    auto it = listeners.find(eventID);
-    if (it != listeners.end()) {
+
+// --- Add observer without parameters ---
+void dx3d::EventBroadcastManager::EventBroadcastManager::addObserver(const std::string& eventID, CallbackNoParams cb) {
+	listenersNoParams[eventID].push_back(cb);
+}
+
+// --- Add observer with parameters ---
+void dx3d::EventBroadcastManager::EventBroadcastManager::addObserver(const std::string& eventID, CallbackWithParams cb) {
+	listenersWithParams[eventID].push_back(cb);
+}
+
+// --- Post event without parameters ---
+void dx3d::EventBroadcastManager::EventBroadcastManager::postEvent(const std::string& eventID) {
+    auto it = listenersNoParams.find(eventID);
+    if (it != listenersNoParams.end()) {
         for (auto& cb : it->second) {
-            cb(); // invoke callback
+            cb(); // invoke no‑param callback
         }
     }
     else {
-        std::cout << "No listeners for event \"" << eventID << "\"\n";
+        std::cout << "No no‑param listeners for event \"" << eventID << "\"\n";
+    }
+}
+
+// --- Post event with parameters ---
+void dx3d::EventBroadcastManager::EventBroadcastManager::postEvent(const std::string& eventID, Parameters& params) {
+    auto it = listenersWithParams.find(eventID);
+    if (it != listenersWithParams.end()) {
+        for (auto& cb : it->second) {
+            cb(params); // invoke with‑param callback
+        }
+    }
+    else {
+        std::cout << "No param‑based listeners for event \"" << eventID << "\"\n";
     }
 }

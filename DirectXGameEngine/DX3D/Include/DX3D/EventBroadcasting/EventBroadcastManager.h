@@ -1,11 +1,14 @@
 #pragma once
+#include <DX3D/EventBroadcasting/Parameters.h>
+
 #include <functional>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include <functional>
 
-using Callback = std::function<void()>;
+using CallbackNoParams = std::function<void()>;
+using CallbackWithParams = std::function<void(dx3d::Parameters&)>;
 namespace dx3d
 {
 	class EventBroadcastManager
@@ -21,14 +24,17 @@ namespace dx3d
             return instance;
         }
 
-        void addObserver(const std::string eventID, Callback cb);
         void RemoveObserver(const std::string eventID);
 
-        // Broadcast event to all listeners
-        void postEvent(const std::string eventID);
+        void addObserver(const std::string& eventID, CallbackNoParams cb);
+        void addObserver(const std::string& eventID, CallbackWithParams cb);
+
+        void postEvent(const std::string& eventID);
+        void postEvent(const std::string& eventID, Parameters& params);
 
     private:
-        std::unordered_map<std::string, std::vector<Callback>> listeners;
+        std::unordered_map<std::string, std::vector<CallbackNoParams>> listenersNoParams;
+        std::unordered_map<std::string, std::vector<CallbackWithParams>> listenersWithParams;
         inline static EventBroadcastManager* instancePtra = nullptr;
 	};
 }
