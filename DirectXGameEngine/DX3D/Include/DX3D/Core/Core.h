@@ -54,7 +54,8 @@ namespace dx3d
 
 	// new stuff here
 
-	class TestUI;
+	class InspectorUI;
+	class MainMenuBarUI;
 	class Rasterizer;
 
 	using i32 = int;

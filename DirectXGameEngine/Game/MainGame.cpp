@@ -6,9 +6,29 @@
 #include <DX3D/Component/CameraComponent.h>
 #include <filesystem>
 
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
 
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {
+}
+
+void MainGame::onNewDisplay()
+{
+	auto& world = getWorld();
+	auto& display = getDisplays().back();
+
+	auto camera = world.createGameObjectForWindow<Camera>(display->getID(), display->getInputSystem());
+	auto* camComp = camera->createOrGetComponent<dx3d::CameraComponent>();
+	display->setCamera(camComp);
+
+	camera->getTransform().setPosition({ 0.0f, 1.0f, -2.0f });
+	camera->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+	camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
+	display->setRenderMode(dx3d::Display::RenderMode::Lit);
+
+	display->getInputSystem().setCursorLocked(false);
+	display->getInputSystem().setCursorVisible(true);
 }
 
 void MainGame::onCreate()
@@ -20,7 +40,8 @@ void MainGame::onCreate()
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
 	// UI testing implemn
-	m_testUi = std::make_unique<dx3d::TestUI>(dx3d::BaseDesc{ getLogger() });
+	m_InspectorUI = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
+	m_MainMenuBarUI = std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() });
 	
 	
 	// Create mesh resources (reusable)
@@ -123,6 +144,14 @@ void MainGame::onCreate()
 		display->getInputSystem().setCursorVisible(true);
 	}
 
+	// Events
+	dx3d::EventBroadcastManager::getInstance().addObserver(
+		dx3d::EventNames::ON_WINDOW_NEW,
+		[this]()
+		{
+			this->onNewDisplay();
+		}
+	);
 }
 
 void MainGame::onUpdate(dx3d::f32 deltaTime)
@@ -134,5 +163,7 @@ void MainGame::onUpdate(dx3d::f32 deltaTime)
 void MainGame::onDrawUi()
 {
 	if (m_testObject)
-		m_testUi->draw(*m_testObject, getDisplays()); // ADDED: Draw controls for the centre cube once ImGui begins a frame.
+		m_InspectorUI->draw(*m_testObject, getDisplays()); // ADDED: Draw controls for the centre cube once ImGui begins a frame.
+
+	m_MainMenuBarUI->draw();
 }
