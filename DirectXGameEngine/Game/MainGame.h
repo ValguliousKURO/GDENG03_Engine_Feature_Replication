@@ -1,6 +1,6 @@
 #pragma once
 #include <DX3D/All.h>
-#include <DX3D/Game/TestUI.h>
+#include <DX3D/UI/InspectorUI.h>
 
 class MainGame : public dx3d::Game
 {
@@ -12,6 +12,6 @@ protected:
 	virtual void onDrawUi() override; // ADDED: Submits this game's ImGui controls each frame.
 
 private:
-	dx3d::UniquePtr<dx3d::TestUI> m_testUi{};
+	dx3d::UniquePtr<dx3d::InspectorUI> m_testUi{};
 	dx3d::GameObject* m_testObject{}; // ADDED: The centre cube edited by the Transform tab.
 };

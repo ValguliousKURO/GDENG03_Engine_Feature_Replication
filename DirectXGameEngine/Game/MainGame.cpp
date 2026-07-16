@@ -20,7 +20,7 @@ void MainGame::onCreate()
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
 	// UI testing implemn
-	m_testUi = std::make_unique<dx3d::TestUI>(dx3d::BaseDesc{ getLogger() });
+	m_testUi = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
 	
 	
 	// Create mesh resources (reusable)

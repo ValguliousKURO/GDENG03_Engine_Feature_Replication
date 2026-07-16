@@ -140,7 +140,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\Sampler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DX3D\Source\DX3D\Game\TestUI.cpp">
+    <ClCompile Include="DX3D\Source\DX3D\UI\InspectorUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Game\Objects\Camera.cpp">
@@ -299,7 +299,7 @@
     <ClInclude Include="DX3D\Vendor\stb-image\include\stb-image\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DX3D\Include\DX3D\Game\TestUI.h">
+    <ClInclude Include="DX3D\Include\DX3D\UI\InspectorUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Game\Objects\Camera.h">

@@ -1,4 +1,4 @@
-#include <DX3D/Game/TestUI.h>
+#include <DX3D/UI/InspectorUI.h>
 
 #include <DX3D/Game/World.h>
 #include <DX3D/Game/GameObject.h>
@@ -16,16 +16,16 @@
 #include <cfloat>
 #include <imgui.h>
 
-dx3d::TestUI::TestUI(const BaseDesc& desc) :Base(desc)
+dx3d::InspectorUI::InspectorUI(const BaseDesc& desc) :Base(desc)
 {
 
 
 }
 
-void dx3d::TestUI::draw(GameObject& object, const std::vector<std::unique_ptr<Display>>& displays)
+void dx3d::InspectorUI::draw(GameObject& object, const std::vector<std::unique_ptr<Display>>& displays)
 {
 
-	if (ImGui::Begin("Test UI"))
+	if (ImGui::Begin("Inspector UI"))
 	{
 		if (ImGui::BeginTabBar("##TestTabs")) // create tab bar with id
 		{
@@ -62,13 +62,13 @@ void dx3d::TestUI::draw(GameObject& object, const std::vector<std::unique_ptr<Di
 
 }
 
-dx3d::TestUI::~TestUI()
+dx3d::InspectorUI::~InspectorUI()
 {
 
 
 }
 
-void dx3d::TestUI::drawViewportPanel(const std::vector<std::unique_ptr<Display>>& displays)
+void dx3d::InspectorUI::drawViewportPanel(const std::vector<std::unique_ptr<Display>>& displays)
 {
 	ImGui::TextColored(ImVec4(0.2f, 0.7f, 1.0f, 1.0f), "Active Viewports: %zu", displays.size());
 	ImGui::Separator();
@@ -146,15 +146,15 @@ void dx3d::TestUI::drawViewportPanel(const std::vector<std::unique_ptr<Display>>
 	}
 }
 
-void dx3d::TestUI::render(World& world, GraphicsDevice& graphicsDevice, SwapChain& swapChain)
+void dx3d::InspectorUI::render(World& world, GraphicsDevice& graphicsDevice, SwapChain& swapChain)
 {
 }
 
-void dx3d::TestUI::drawGameObjectPanel(World& world)
+void dx3d::InspectorUI::drawGameObjectPanel(World& world)
 {
 }
 
-void dx3d::TestUI::drawTransformInspector(GameObject& object) // draw the inspector tab
+void dx3d::InspectorUI::drawTransformInspector(GameObject& object) // draw the inspector tab
 {
 	auto& transform = object.getTransform();
 
@@ -185,7 +185,7 @@ void dx3d::TestUI::drawTransformInspector(GameObject& object) // draw the inspec
 	}
 }
 
-void dx3d::TestUI::drawComponentInspector(GameObject& object)
+void dx3d::InspectorUI::drawComponentInspector(GameObject& object)
 {
 	ImGui::Text("Components inspector - expand to list and edit components. Not out");
 

@@ -11,13 +11,13 @@ namespace dx3d
 	class GameObject;
 	class Display;
 
-	class TestUI : public Base
+	class InspectorUI : public Base
 	{
 	public:
-		TestUI(const BaseDesc& desc);
+		InspectorUI(const BaseDesc& desc);
 		void draw(GameObject& object, const std::vector<std::unique_ptr<Display>>& displays);
 
-		~TestUI();
+		~InspectorUI();
 	private:
 		void render(World& world, GraphicsDevice& graphicsDevice, SwapChain& swapChain);
 		void drawGameObjectPanel(World& world);

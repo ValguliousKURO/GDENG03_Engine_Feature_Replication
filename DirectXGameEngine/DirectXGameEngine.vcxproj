@@ -141,7 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <!-- ADDED: Dear ImGui core and the Win32/DirectX 11 backends required by TestUi. -->
-    <ClCompile Include="DX3D\Source\DX3D\Game\TestUI.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\InspectorUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\EventBroadcastManager.cpp" />
     <ClCompile Include="IMGUI\imgui.cpp" />
     <ClCompile Include="IMGUI\imgui_draw.cpp" />
@@ -191,7 +191,7 @@
   <ItemGroup>
     <!-- ADDED: Test UI declaration. -->
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventNames.h" />
-    <ClInclude Include="DX3D\Include\DX3D\Game\TestUI.h" />
+    <ClInclude Include="DX3D\Include\DX3D\UI\InspectorUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventBroadcastManager.h" />
     <ClInclude Include="Game\Objects\Camera.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\CameraComponent.h" />
