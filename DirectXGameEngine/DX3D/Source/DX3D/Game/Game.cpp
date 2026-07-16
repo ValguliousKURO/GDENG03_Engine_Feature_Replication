@@ -9,6 +9,8 @@
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/WorldRenderer.h>
 #include <DX3D/Resource/ResourceManager.h>
+#include <DX3D/EventBroadcasting/EventBroadcastManager.h>
+#include <DX3D/EventBroadcasting/EventNames.h>
 
 // ADDED: Engine-level setup for Dear ImGui's Win32 and DirectX 11 backends.
 #include <imgui.h>
@@ -24,21 +26,15 @@ dx3d::Game::Game(const GameDesc& desc)
 
 	m_graphicsDevice = std::make_shared<GraphicsDevice>(GraphicsDeviceDesc{ *m_logger });
 
-	// Create the primary display
-	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
-	//secondary display
-	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
-	//third display
-	addDisplay(DisplayDesc{ {*m_logger, desc.windowSize}, *m_graphicsDevice });
+	m_windowSize = desc.windowSize;
+	// Adding intial displays
+	addDisplay();
+	addDisplay();
 
 	auto context = SystemContext{ *m_graphicsDevice };
 	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger}, context });
 
-	// Set world for each display
-	for (auto& display : m_displays)
-	{
-		m_world = std::make_unique<World>(WorldDesc{ BaseDesc{*m_logger}, GameContext{display->getInputSystem(), *m_resourceManager, *m_graphicsDevice}});
-	}
+	m_world = std::make_unique<World>(WorldDesc{ BaseDesc{*m_logger}, GameContext{m_displays.front()->getInputSystem(), *m_resourceManager, *m_graphicsDevice}});
 
 	m_worldRenderer = std::make_unique<WorldRenderer>(WorldRendererDesc{ {*m_logger}, *m_graphicsDevice });
 
@@ -49,6 +45,12 @@ dx3d::Game::Game(const GameDesc& desc)
 	ImGui_ImplWin32_Init(m_displays.front()->getHandle());
 	ImGui_ImplDX11_Init(m_graphicsDevice->getNativeDevice(), m_graphicsDevice->getNativeContext());
 	m_imguiInitialized = true;
+
+	// Events
+	EventBroadcastManager::getInstance().addObserver(
+		EventNames::ON_WINDOW_NEW, 
+		[this]() { this->addDisplay();
+		});
 
 	DX3DLogInfo("Game Initialized!");
 }
@@ -110,8 +112,8 @@ void dx3d::Game::onInternalUpdate()
 	m_worldRenderer->renderForDisplays(*m_world, m_displays, deltaTime, ImGui::GetDrawData());
 }
 
-void dx3d::Game::addDisplay(const DisplayDesc& desc)
+void dx3d::Game::addDisplay()
 {
-	auto display = std::make_unique<Display>(desc);
+	auto display = std::make_unique<Display>(DisplayDesc{ {*m_logger, m_windowSize}, *m_graphicsDevice });
 	m_displays.push_back(std::move(display));
 }

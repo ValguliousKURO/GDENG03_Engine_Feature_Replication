@@ -1,21 +1,17 @@
 #pragma once
 #include <DX3D/Core/Base.h>
+#include <DX3D/UI/BaseUI.h>
 #include <vector>
 
 namespace dx3d
 {
 
-	class GraphicsDevice;
-	class SwapChain;
-	class World;
-	class GameObject;
-	class Display;
-
-	class InspectorUI : public Base
+	class InspectorUI : public BaseUI
 	{
 	public:
 		InspectorUI(const BaseDesc& desc);
 		void draw(GameObject& object, const std::vector<std::unique_ptr<Display>>& displays);
+		void draw() override;
 
 		~InspectorUI();
 	private:

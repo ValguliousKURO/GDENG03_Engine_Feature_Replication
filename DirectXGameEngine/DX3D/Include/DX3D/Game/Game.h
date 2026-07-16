@@ -20,7 +20,7 @@ namespace dx3d
         virtual void run() final;
 
         // New: add/remove displays
-        void addDisplay(const DisplayDesc& desc);
+        void addDisplay();
         const std::vector<UniquePtr<Display>>& getDisplays() const noexcept { return m_displays; }
 
 	protected:
@@ -36,6 +36,7 @@ namespace dx3d
         UniquePtr<ResourceManager> m_resourceManager{};
         UniquePtr<World> m_world{};
         UniquePtr<WorldRenderer> m_worldRenderer{};
+        Rect m_windowSize;
 		bool m_isRunning{ true };
 
 		bool m_imguiInitialized{ false }; // ADDED: Tracks ownership of the shared ImGui context and backends.

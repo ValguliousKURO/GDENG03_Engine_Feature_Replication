@@ -16,7 +16,7 @@
 #include <cfloat>
 #include <imgui.h>
 
-dx3d::InspectorUI::InspectorUI(const BaseDesc& desc) :Base(desc)
+dx3d::InspectorUI::InspectorUI(const BaseDesc& desc) :BaseUI(desc)
 {
 
 
@@ -60,6 +60,10 @@ void dx3d::InspectorUI::draw(GameObject& object, const std::vector<std::unique_p
 	ImGui::End(); // End Test UI window
 
 
+}
+
+void dx3d::InspectorUI::draw()
+{
 }
 
 dx3d::InspectorUI::~InspectorUI()
