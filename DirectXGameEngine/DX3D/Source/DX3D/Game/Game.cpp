@@ -25,6 +25,7 @@ dx3d::Game::Game(const GameDesc& desc)
 	DX3DLogInfo("-----------------");
 
 	m_graphicsDevice = std::make_shared<GraphicsDevice>(GraphicsDeviceDesc{ *m_logger });
+	IMGUI_CHECKVERSION();
 
 	m_windowSize = desc.windowSize;
 	// Adding intial displays
@@ -38,19 +39,12 @@ dx3d::Game::Game(const GameDesc& desc)
 
 	m_worldRenderer = std::make_unique<WorldRenderer>(WorldRendererDesc{ {*m_logger}, *m_graphicsDevice });
 
-	// ADDED: One ImGui context is shared by the game and drawn on the first display.
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(m_displays.front()->getHandle());
-	ImGui_ImplDX11_Init(m_graphicsDevice->getNativeDevice(), m_graphicsDevice->getNativeContext());
 	m_imguiInitialized = true;
 
 	// Events
 	EventBroadcastManager::getInstance().addObserver(
 		EventNames::ON_WINDOW_NEW, 
-		[this]() { this->addDisplay();
-		});
+		[this]() { ++m_pendingDisplayAdditions; });
 
 	DX3DLogInfo("Game Initialized!");
 }
@@ -69,9 +63,10 @@ dx3d::Game::~Game()
 {
 	if (m_imguiInitialized) // for disabling ui on shutdown
 	{
-		ImGui_ImplDX11_Shutdown(); 
-		ImGui_ImplWin32_Shutdown(); 
-		ImGui::DestroyContext(); 
+		for (auto& display : m_displays)
+		{
+			shutdownDisplayImGui(*display);
+		}
 	}
 
 	DX3DLogInfo("Game is shutting down...");
@@ -101,19 +96,71 @@ void dx3d::Game::onInternalUpdate()
 	onUpdate(deltaTime);
 	m_world->update(deltaTime);
 
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	onDrawUi();
-	ImGui::Render();
+	auto openDisplayCount = 0u;
+	for (auto& display : m_displays)
+	{
+		if (display->isClosed())
+		{
+			shutdownDisplayImGui(*display);
+			continue;
+		}
 
-	// Render the same completed ImGui frame into every display's swap-chain.
-	// The renderer binds each display's back buffer before drawing the UI.
-	m_worldRenderer->renderForDisplays(*m_world, m_displays, deltaTime, ImGui::GetDrawData());
+		auto* hwnd = static_cast<HWND>(display->getHandle());
+		if (!hwnd || IsIconic(hwnd))
+			continue;
+
+		++openDisplayCount;
+
+		ImGui::SetCurrentContext(display->getImGuiContext());
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		onDrawUi(*display);
+		ImGui::Render();
+
+		m_worldRenderer->renderForDisplay(*m_world, *display, deltaTime, ImGui::GetDrawData());
+	}
+
+	while (m_pendingDisplayAdditions > 0)
+	{
+		addDisplay();
+		onDisplayAdded(*m_displays.back());
+		--m_pendingDisplayAdditions;
+	}
+
+	if (openDisplayCount == 0 && m_pendingDisplayAdditions == 0)
+	{
+		m_isRunning = false;
+	}
 }
 
 void dx3d::Game::addDisplay()
 {
 	auto display = std::make_unique<Display>(DisplayDesc{ {*m_logger, m_windowSize}, *m_graphicsDevice });
+	initializeDisplayImGui(*display);
 	m_displays.push_back(std::move(display));
+}
+
+void dx3d::Game::initializeDisplayImGui(Display& display)
+{
+	auto* context = ImGui::CreateContext();
+	display.setImGuiContext(context);
+
+	ImGui::SetCurrentContext(context);
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(display.getHandle());
+	ImGui_ImplDX11_Init(m_graphicsDevice->getNativeDevice(), m_graphicsDevice->getNativeContext());
+}
+
+void dx3d::Game::shutdownDisplayImGui(Display& display)
+{
+	auto* context = display.getImGuiContext();
+	if (!context)
+		return;
+
+	ImGui::SetCurrentContext(context);
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext(context);
+	display.setImGuiContext(nullptr);
 }

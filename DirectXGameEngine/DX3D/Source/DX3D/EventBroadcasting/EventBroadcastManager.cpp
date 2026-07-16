@@ -9,7 +9,7 @@ dx3d::EventBroadcastManager::EventBroadcastManager()
 void dx3d::EventBroadcastManager::RemoveObserver(const std::string eventID)
 {
 	if (listenersNoParams.contains(eventID)) listenersNoParams.erase(eventID);
-	if (listenersWithParams.contains(eventID)) listenersNoParams.erase(eventID);
+	if (listenersWithParams.contains(eventID)) listenersWithParams.erase(eventID);
 }
 
 
@@ -27,12 +27,13 @@ void dx3d::EventBroadcastManager::EventBroadcastManager::addObserver(const std::
 void dx3d::EventBroadcastManager::EventBroadcastManager::postEvent(const std::string& eventID) {
     auto it = listenersNoParams.find(eventID);
     if (it != listenersNoParams.end()) {
-        for (auto& cb : it->second) {
-            cb(); // invoke no‑param callback
+        auto callbacks = it->second;
+        for (auto& cb : callbacks) {
+            cb(); // invoke no-param callback
         }
     }
     else {
-        std::cout << "No no‑param listeners for event \"" << eventID << "\"\n";
+        std::cout << "No no-param listeners for event \"" << eventID << "\"\n";
     }
 }
 
@@ -40,11 +41,12 @@ void dx3d::EventBroadcastManager::EventBroadcastManager::postEvent(const std::st
 void dx3d::EventBroadcastManager::EventBroadcastManager::postEvent(const std::string& eventID, Parameters& params) {
     auto it = listenersWithParams.find(eventID);
     if (it != listenersWithParams.end()) {
-        for (auto& cb : it->second) {
-            cb(params); // invoke with‑param callback
+        auto callbacks = it->second;
+        for (auto& cb : callbacks) {
+            cb(params); // invoke with-param callback
         }
     }
     else {
-        std::cout << "No param‑based listeners for event \"" << eventID << "\"\n";
+        std::cout << "No param-based listeners for event \"" << eventID << "\"\n";
     }
 }

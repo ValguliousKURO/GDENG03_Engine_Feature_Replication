@@ -22,10 +22,13 @@ dx3d::InspectorUI::InspectorUI(const BaseDesc& desc) :BaseUI(desc)
 
 }
 
-void dx3d::InspectorUI::draw(GameObject& object, const std::vector<std::unique_ptr<Display>>& displays)
+void dx3d::InspectorUI::draw(GameObject& object, Display& display)
 {
+	std::string windowTitle = "Inspector UI - Window " + std::to_string(display.getID()) + "###InspectorUI_" + std::to_string(display.getID());
 
-	if (ImGui::Begin("Inspector UI"))
+	ImGui::SetNextWindowSize(ImVec2(430.0f, 360.0f), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSizeConstraints(ImVec2(430.0f, 300.0f), ImVec2(FLT_MAX, FLT_MAX));
+	if (ImGui::Begin(windowTitle.c_str()))
 	{
 		if (ImGui::BeginTabBar("##TestTabs")) // create tab bar with id
 		{
@@ -43,7 +46,7 @@ void dx3d::InspectorUI::draw(GameObject& object, const std::vector<std::unique_p
 
 			if (ImGui::BeginTabItem("Viewports"))
 			{
-				drawViewportPanel(displays);
+				drawViewportPanel(display);
 				ImGui::EndTabItem();
 			}
 
@@ -72,21 +75,18 @@ dx3d::InspectorUI::~InspectorUI()
 
 }
 
-void dx3d::InspectorUI::drawViewportPanel(const std::vector<std::unique_ptr<Display>>& displays)
+void dx3d::InspectorUI::drawViewportPanel(Display& display)
 {
-	ImGui::TextColored(ImVec4(0.2f, 0.7f, 1.0f, 1.0f), "Active Viewports: %zu", displays.size());
+	ImGui::TextColored(ImVec4(0.2f, 0.7f, 1.0f, 1.0f), "Current Viewport");
 	ImGui::Separator();
 
-	int index = 1;
-	for (auto& display : displays)
-	{
-		ImGui::PushID(display->getID());
+	ImGui::PushID(display.getID());
 		
-		std::string label = "Viewport " + std::to_string(index) + " (Window ID: " + std::to_string(display->getID()) + ")";
+		std::string label = "Viewport (Window ID: " + std::to_string(display.getID()) + ")";
 		if (ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// View Mode: Perspective vs. Top Down
-			auto* camera = display->getCamera();
+			auto* camera = display.getCamera();
 			if (camera)
 			{
 				auto mode = camera->getProjectionMode();
@@ -98,11 +98,11 @@ void dx3d::InspectorUI::drawViewportPanel(const std::vector<std::unique_ptr<Disp
 				{
 					if (currentModeIndex == 0)
 					{
-						EventBroadcastManager::getInstance().postEvent(EventNames::PERSPECTIVE_MODE_TOGGLE + "_" + std::to_string(display->getID()));
+						EventBroadcastManager::getInstance().postEvent(EventNames::PERSPECTIVE_MODE_TOGGLE + "_" + std::to_string(display.getID()));
 					}
 					else
 					{
-						EventBroadcastManager::getInstance().postEvent(EventNames::ORTHOGRAPHIC_MODE_TOGGLE + "_" + std::to_string(display->getID()));
+						EventBroadcastManager::getInstance().postEvent(EventNames::ORTHOGRAPHIC_MODE_TOGGLE + "_" + std::to_string(display.getID()));
 					}
 				}
 
@@ -123,17 +123,17 @@ void dx3d::InspectorUI::drawViewportPanel(const std::vector<std::unique_ptr<Disp
 			ImGui::Spacing();
 			// Render Mode: Lit vs. Wireframe
 			ImGui::Text("Render Settings:");
-			int renderModeIndex = (display->getRenderMode() == Display::RenderMode::Lit) ? 0 : 1;
+			int renderModeIndex = (display.getRenderMode() == Display::RenderMode::Lit) ? 0 : 1;
 			const char* renderModes[] = { "Lit (Default)", "Wireframe" };
 			if (ImGui::Combo("Render Mode", &renderModeIndex, renderModes, IM_ARRAYSIZE(renderModes)))
 			{
 				if (renderModeIndex == 0)
 				{
-					EventBroadcastManager::getInstance().postEvent(EventNames::LIT_MODE_TOGGLE + "_" + std::to_string(display->getID()));
+					EventBroadcastManager::getInstance().postEvent(EventNames::LIT_MODE_TOGGLE + "_" + std::to_string(display.getID()));
 				}
 				else
 				{
-					EventBroadcastManager::getInstance().postEvent(EventNames::WIREFRAME_MODE_TOGGLE + "_" + std::to_string(display->getID()));
+					EventBroadcastManager::getInstance().postEvent(EventNames::WIREFRAME_MODE_TOGGLE + "_" + std::to_string(display.getID()));
 				}
 			}
 			
@@ -144,10 +144,8 @@ void dx3d::InspectorUI::drawViewportPanel(const std::vector<std::unique_ptr<Disp
 			}
 		}
 
-		ImGui::PopID();
-		ImGui::Separator();
-		index++;
-	}
+	ImGui::PopID();
+	ImGui::Separator();
 }
 
 void dx3d::InspectorUI::render(World& world, GraphicsDevice& graphicsDevice, SwapChain& swapChain)

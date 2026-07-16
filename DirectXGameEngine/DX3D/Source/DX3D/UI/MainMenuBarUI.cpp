@@ -31,6 +31,6 @@ void dx3d::MainMenuBarUI::draw()
 			}
 			ImGui::EndMenu();
 		}
+		ImGui::EndMainMenuBar();
 	}
-	ImGui::EndMainMenuBar();
 }
