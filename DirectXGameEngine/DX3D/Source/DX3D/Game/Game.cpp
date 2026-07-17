@@ -31,6 +31,7 @@ dx3d::Game::Game(const GameDesc& desc)
 	// Adding intial displays
 	addDisplay();
 	addDisplay();
+	addDisplay();
 
 	auto context = SystemContext{ *m_graphicsDevice };
 	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger}, context });
