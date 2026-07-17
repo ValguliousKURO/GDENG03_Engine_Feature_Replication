@@ -4,6 +4,7 @@
 #include <atomic>
 
 //include window impl
+#include <imgui.h>
 #include <imgui_impl_win32.h>
 
 // backend header implement for ui
@@ -14,9 +15,6 @@ static std::atomic<uint32_t> g_windowCounter{ 0 };
 
 LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	
-	ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam);
-
     dx3d::Window* pThis = nullptr;
 
     if (msg == WM_CREATE)
@@ -28,6 +26,13 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpar
     else
     {
         pThis = reinterpret_cast<dx3d::Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+    }
+
+    if (pThis && pThis->getImGuiContext())
+    {
+        ImGui::SetCurrentContext(pThis->getImGuiContext());
+        if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+            return true;
     }
 
     if (pThis)
@@ -104,7 +109,8 @@ dx3d::Rect dx3d::Window::getClientAreaInScreenSpace()
 
 dx3d::Window::~Window()
 {
-    DestroyWindow(static_cast<HWND>(m_handle));
+    if (m_handle)
+        DestroyWindow(static_cast<HWND>(m_handle));
 }
 
 // Default message handler
@@ -113,6 +119,21 @@ LRESULT dx3d::Window::handleMessage(UINT msg, WPARAM wparam, LPARAM lparam)
 
 	switch (msg)
     {
+    case WM_CLOSE:
+        m_isClosed = true;
+        if (m_handle)
+        {
+            auto handle = static_cast<HWND>(m_handle);
+            m_handle = nullptr;
+            DestroyWindow(handle);
+        }
+        return 0;
+
+    case WM_DESTROY:
+        m_isClosed = true;
+        m_handle = nullptr;
+        break;
+
     case WM_SETFOCUS:
         m_hasFocus = true;
         break;

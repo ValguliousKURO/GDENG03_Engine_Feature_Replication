@@ -272,3 +272,93 @@ void dx3d::WorldRenderer::renderForDisplays(const World& world, const std::vecto
 		swapChain.present();
 	}
 }
+
+void dx3d::WorldRenderer::renderForDisplay(const World& world, Display& display, f32 deltaTime, ImDrawData* uiDrawData)
+{
+	HWND hwnd = static_cast<HWND>(display.getHandle());
+	if (IsIconic(hwnd))
+		return;
+
+	auto& swapChain = display.getSwapChain();
+	auto size = swapChain.getSize();
+
+	auto& context = *m_deviceContext;
+	context.clearAndSetBackBuffer(swapChain, { 0.27f, 0.39f, 0.55f, 1.0f });
+	context.setViewportSize(size);
+
+	Sampler* samplers[] = { m_sampler.get() };
+	context.setSamplers(std::span<Sampler*>{samplers});
+
+	if (auto* camera = display.getCamera())
+	{
+		CameraData cameraData{};
+		cameraData.view = camera->getViewMatrix();
+		camera->setViewportSize(size);
+		cameraData.proj = camera->getProjectionMatrix();
+		cameraData.cameraPosition = Vec4(
+			camera->getGameObject().getTransform().getPosition().x,
+			camera->getGameObject().getTransform().getPosition().y,
+			camera->getGameObject().getTransform().getPosition().z,
+			1.0f
+		);
+		context.updateConstantBuffer(*m_cameraCb, std::as_bytes(std::span{ &cameraData, 1 }));
+	}
+
+	if (display.getRenderMode() == Display::RenderMode::Wireframe && m_rasterizer) context.setRasterizerState(*m_rasterizer);
+	else context.clearRaster();
+
+	{
+		LightData lightData{};
+		lightData.lightDirection = Vec4(0.577f, -0.577f, 0.577f, 0.0f);
+		lightData.lightColor = Vec4(1.0f, 0.95f, 0.9f, 1.0f);
+		lightData.ambientColor = Vec4(0.2f, 0.22f, 0.25f, 1.0f);
+		context.updateConstantBuffer(*m_lightCb, std::as_bytes(std::span{ &lightData, 1 }));
+	}
+
+	ui32 numComponents = 0;
+	auto components = world.getComponents<MeshComponent>(numComponents);
+	for (auto i : std::views::iota(0u, numComponents))
+	{
+		auto component = components[i];
+		auto& transform = component->getGameObject().getTransform();
+		auto mesh = component->getMesh();
+		auto material = component->getMaterial();
+
+		if (material)
+		{
+			ObjectData objectData{};
+			objectData.world = transform.getAffineWorldMatrix();
+
+			context.setGraphicsPipelineState(material->getGraphicsPipelineState());
+			context.updateConstantBuffer(*m_objectCb, std::as_bytes(std::span{ &objectData, 1 }));
+			context.updateConstantBuffer(*m_materialCb, material->getData());
+			ConstantBuffer* cbs[] = { m_objectCb.get(), m_cameraCb.get(), m_materialCb.get(), m_lightCb.get() };
+			context.setConstantBuffers(std::span<ConstantBuffer*>{cbs});
+
+			auto vb = component->getOrCreateVertexBuffer(m_graphicsDevice);
+			auto ib = component->getOrCreateIndexBuffer(m_graphicsDevice);
+
+			m_textures.clear();
+			m_textures.resize(material->getNumTextures());
+			for (auto t : std::views::iota(0u, m_textures.size()))
+			{
+				auto tex = material->getTexture(t);
+				if (tex) m_textures[t] = &tex->getTexture();
+			}
+			context.setTextures(std::span<Texture*>{m_textures});
+
+			context.setVertexBuffer(*vb);
+			context.setIndexBuffer(*ib);
+			context.drawIndexedTriangleList(mesh->getIndexCount(), 0u, 0u);
+		}
+	}
+
+	m_graphicsDevice.executeCommandList(context);
+	if (uiDrawData)
+	{
+		auto* renderTarget = swapChain.getRenderTargetView();
+		m_graphicsDevice.getNativeContext()->OMSetRenderTargets(1, &renderTarget, nullptr);
+		ImGui_ImplDX11_RenderDrawData(uiDrawData);
+	}
+	swapChain.present();
+}

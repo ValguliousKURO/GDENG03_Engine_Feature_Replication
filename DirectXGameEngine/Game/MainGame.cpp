@@ -13,22 +13,23 @@ MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {
 }
 
-void MainGame::onNewDisplay()
+void MainGame::onNewDisplay(dx3d::Display& display)
 {
 	auto& world = getWorld();
-	auto& display = getDisplays().back();
 
-	auto camera = world.createGameObjectForWindow<Camera>(display->getID(), display->getInputSystem());
+	auto camera = world.createGameObjectForWindow<Camera>(display.getID(), display.getInputSystem());
 	auto* camComp = camera->createOrGetComponent<dx3d::CameraComponent>();
-	display->setCamera(camComp);
+	display.setCamera(camComp);
 
 	camera->getTransform().setPosition({ 0.0f, 1.0f, -2.0f });
 	camera->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
 	camComp->setProjectionMode(dx3d::ProjectionMode::Perspective);
-	display->setRenderMode(dx3d::Display::RenderMode::Lit);
+	display.setRenderMode(dx3d::Display::RenderMode::Lit);
 
-	display->getInputSystem().setCursorLocked(false);
-	display->getInputSystem().setCursorVisible(true);
+	display.getInputSystem().setCursorLocked(false);
+	display.getInputSystem().setCursorVisible(true);
+
+	m_InspectorUIs[display.getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
 }
 
 void MainGame::onCreate()
@@ -39,8 +40,6 @@ void MainGame::onCreate()
 	auto woodTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base/"DirectXGameEngine/Game/Assets/Textures/wood.jpg").c_str());
 	auto floorTex = getResourceManager().createResourceFromFile<dx3d::TextureResource>((base / "DirectXGameEngine/Game/Assets/Textures/floor.jpg").c_str());
 
-	// UI testing implemn
-	m_InspectorUI = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
 	m_MainMenuBarUI = std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() });
 	
 	
@@ -142,16 +141,9 @@ void MainGame::onCreate()
 	{
 		display->getInputSystem().setCursorLocked(false);
 		display->getInputSystem().setCursorVisible(true);
+		m_InspectorUIs[display->getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
 	}
 
-	// Events
-	dx3d::EventBroadcastManager::getInstance().addObserver(
-		dx3d::EventNames::ON_WINDOW_NEW,
-		[this]()
-		{
-			this->onNewDisplay();
-		}
-	);
 }
 
 void MainGame::onUpdate(dx3d::f32 deltaTime)
@@ -160,10 +152,22 @@ void MainGame::onUpdate(dx3d::f32 deltaTime)
 
 }
 
-void MainGame::onDrawUi()
+void MainGame::onDisplayAdded(dx3d::Display& display)
+{
+	onNewDisplay(display);
+}
+
+void MainGame::onDrawUi(dx3d::Display& display)
 {
 	if (m_testObject)
-		m_InspectorUI->draw(*m_testObject, getDisplays()); // ADDED: Draw controls for the centre cube once ImGui begins a frame.
+	{
+		auto it = m_InspectorUIs.find(display.getID());
+		if (it == m_InspectorUIs.end())
+		{
+			it = m_InspectorUIs.emplace(display.getID(), std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() })).first;
+		}
+		it->second->draw(*m_testObject, display);
+	}
 
 	m_MainMenuBarUI->draw();
 }

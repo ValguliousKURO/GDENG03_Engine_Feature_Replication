@@ -16,8 +16,7 @@ namespace dx3d
 		explicit WorldRenderer(const WorldRendererDesc& desc);
 
 		void render(const World& world, SwapChain& swapChain, f32 deltaTime);
-		// uiDrawData is rendered into every display.  Each display owns a distinct
-	// add display render here to render ui for multiple displays 
+		void renderForDisplay(const World& world, Display& display, f32 deltaTime, ImDrawData* uiDrawData);
 		void renderForDisplays(const World& world, const std::vector<UniquePtr<Display>>& displays, f32 deltaTime, ImDrawData* uiDrawData);
 
 	private:

@@ -26,9 +26,12 @@ namespace dx3d
 	protected:
 		virtual void onCreate() {}
 		virtual void onUpdate(f32 deltaTime) {}
-		virtual void onDrawUi() {} // ADDED: Derived games submit their ImGui widgets here every frame.
+		virtual void onDisplayAdded(Display& display) {}
+		virtual void onDrawUi(Display& display) {} // ADDED: Derived games submit ImGui widgets for the display currently being rendered.
     private:
         void onInternalUpdate();
+		void initializeDisplayImGui(Display& display);
+		void shutdownDisplayImGui(Display& display);
 
         UniquePtr<Logger> m_logger{};
         RefPtr<GraphicsDevice> m_graphicsDevice{};
@@ -39,7 +42,8 @@ namespace dx3d
         Rect m_windowSize;
 		bool m_isRunning{ true };
 
-		bool m_imguiInitialized{ false }; // ADDED: Tracks ownership of the shared ImGui context and backends.
+		bool m_imguiInitialized{ false }; // ADDED: Tracks whether display ImGui contexts may be shut down.
+		ui32 m_pendingDisplayAdditions{};
 
         std::chrono::steady_clock::time_point m_previousTime{};
     };

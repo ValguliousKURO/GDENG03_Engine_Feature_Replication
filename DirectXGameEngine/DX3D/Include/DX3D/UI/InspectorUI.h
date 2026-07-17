@@ -10,7 +10,7 @@ namespace dx3d
 	{
 	public:
 		InspectorUI(const BaseDesc& desc);
-		void draw(GameObject& object, const std::vector<std::unique_ptr<Display>>& displays);
+		void draw(GameObject& object, Display& display);
 		void draw() override;
 
 		~InspectorUI();
@@ -19,7 +19,7 @@ namespace dx3d
 		void drawGameObjectPanel(World& world);
 		void drawTransformInspector(GameObject& object);
 		void drawComponentInspector(GameObject& object);
-		void drawViewportPanel(const std::vector<std::unique_ptr<Display>>& displays);
+		void drawViewportPanel(Display& display);
 
 	};
 
