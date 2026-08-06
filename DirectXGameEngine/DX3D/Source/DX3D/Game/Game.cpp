@@ -36,6 +36,7 @@ dx3d::Game::Game(const GameDesc& desc)
 	m_windowSize = desc.windowSize;
 	// Adding intial displays
 	addDisplay();
+	initializeDisplayImGui(*m_displays.front());
 
 	auto context = SystemContext{ *m_graphicsDevice };
 	m_resourceManager = std::make_unique<ResourceManager>(ResourceManagerDesc{ {*m_logger}, context });
@@ -45,17 +46,10 @@ dx3d::Game::Game(const GameDesc& desc)
 
 	m_worldRenderer = std::make_unique<WorldRenderer>(WorldRendererDesc{ {*m_logger}, *m_graphicsDevice });
 
-	m_imguiInitialized = true;
-
 	// Events
 	EventBroadcastManager::getInstance().addObserver(
 		EventNames::ON_WINDOW_NEW, 
 		[this]() { ++m_pendingDisplayAdditions; });
-
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;   // Keyboard controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;       // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;     // Enable Multi-Viewport
 
 	DX3DLogInfo("Game Initialized!");
 
@@ -82,10 +76,7 @@ dx3d::Game::~Game()
 {
 	if (m_imguiInitialized) // for disabling ui on shutdown
 	{
-		for (auto& display : m_displays)
-		{
-			shutdownDisplayImGui(*display);
-		}
+		shutdownImGui();
 	}
 
 	DX3DLogInfo("Game is shutting down...");
@@ -107,6 +98,10 @@ void dx3d::Game::onInternalUpdate()
 	std::chrono::duration<f32> delta = currentTime - m_previousTime;
 	m_previousTime = currentTime;
 	auto deltaTime = delta.count();
+
+	if (m_imguiContext)
+		ImGui::SetCurrentContext(m_imguiContext);
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	// Update each display's input system separately
@@ -126,14 +121,34 @@ void dx3d::Game::onInternalUpdate()
 	onUpdate(deltaTime);
 	m_world->update(deltaTime);
 
+	Display* primaryOpenDisplay{};
+	for (auto& display : m_displays)
+	{
+		if (!display->isClosed() && display->getHandle())
+		{
+			primaryOpenDisplay = display.get();
+			break;
+		}
+	}
+
 	auto openDisplayCount = 0u;
+	if (primaryOpenDisplay && m_imguiContext)
+	{
+		ImGui::SetCurrentContext(m_imguiContext);
+
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+		ImGui::DockSpaceOverViewport();
+		onRenderSceneViewports();
+		onDrawUi(*primaryOpenDisplay);
+		ImGui::Render();
+	}
+
 	for (auto& display : m_displays)
 	{
 		if (display->isClosed())
-		{
-			shutdownDisplayImGui(*display);
 			continue;
-		}
 
 		auto* hwnd = static_cast<HWND>(display->getHandle());
 		if (!hwnd || IsIconic(hwnd))
@@ -141,25 +156,15 @@ void dx3d::Game::onInternalUpdate()
 
 		++openDisplayCount;
 
-		ImGui::SetCurrentContext(display->getImGuiContext());
-		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-		ImGui::DockSpaceOverViewport();
-		onRenderSceneViewports();
-		onDrawUi(*display);
-		ImGui::Render();
+		auto* drawData = (display.get() == primaryOpenDisplay && m_imguiContext) ? ImGui::GetDrawData() : nullptr;
+		m_worldRenderer->renderForDisplay(*m_world, *display, deltaTime, drawData);
+	}
 
-		m_worldRenderer->renderForDisplay(*m_world, *display, deltaTime, ImGui::GetDrawData());
-
-
-		// Handle multiple viewports
-		ImGuiIO& io = ImGui::GetIO();
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-		}
-
+	if (primaryOpenDisplay && m_imguiContext && (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable))
+	{
+		ImGui::SetCurrentContext(m_imguiContext);
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
 	}
 
 	while (m_pendingDisplayAdditions > 0)
@@ -178,7 +183,8 @@ void dx3d::Game::onInternalUpdate()
 void dx3d::Game::addDisplay()
 {
 	auto display = std::make_unique<Display>(DisplayDesc{ {*m_logger, m_windowSize}, *m_graphicsDevice });
-	initializeDisplayImGui(*display);
+	if (m_imguiContext)
+		display->setImGuiContext(m_imguiContext);
 	m_displays.push_back(std::move(display));
 }
 
@@ -204,10 +210,13 @@ void dx3d::Game::onRenderSceneViewports()
 
 void dx3d::Game::initializeDisplayImGui(Display& display)
 {
-	auto* context = ImGui::CreateContext();
-	display.setImGuiContext(context);
+	if (m_imguiInitialized)
+		return;
 
-	ImGui::SetCurrentContext(context);
+	m_imguiContext = ImGui::CreateContext();
+	display.setImGuiContext(m_imguiContext);
+
+	ImGui::SetCurrentContext(m_imguiContext);
 	ImGui::StyleColorsDark();
 
 	ImGui_ImplWin32_Init(display.getHandle());
@@ -218,20 +227,30 @@ void dx3d::Game::initializeDisplayImGui(Display& display)
 
 	// Set DisplaySize
 	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 	auto size = display.getSwapChain().getSize();
 	io.DisplaySize = ImVec2((float)size.width, (float)size.height);
+
+	m_imguiInitialized = true;
 }
 
 
-void dx3d::Game::shutdownDisplayImGui(Display& display)
+void dx3d::Game::shutdownImGui()
 {
-	auto* context = display.getImGuiContext();
-	if (!context)
+	if (!m_imguiContext)
 		return;
 
-	ImGui::SetCurrentContext(context);
+	ImGui::SetCurrentContext(m_imguiContext);
 	ImGui_ImplDX11_Shutdown();
 	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext(context);
-	display.setImGuiContext(nullptr);
+	ImGui::DestroyContext(m_imguiContext);
+
+	for (auto& display : m_displays)
+	{
+		display->setImGuiContext(nullptr);
+	}
+	m_imguiContext = nullptr;
+	m_imguiInitialized = false;
 }

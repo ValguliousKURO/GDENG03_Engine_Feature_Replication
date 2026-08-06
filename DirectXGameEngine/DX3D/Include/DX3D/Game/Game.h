@@ -6,6 +6,8 @@
 #include <chrono>
 #include <vector>
 
+struct ImGuiContext;
+
 namespace dx3d
 {
     class Game
@@ -44,7 +46,7 @@ namespace dx3d
     private:
         void onInternalUpdate();
 		void initializeDisplayImGui(Display& display);
-		void shutdownDisplayImGui(Display& display);
+		void shutdownImGui();
 
         UniquePtr<Logger> m_logger{};
         RefPtr<GraphicsDevice> m_graphicsDevice{};
@@ -59,7 +61,8 @@ namespace dx3d
         Rect m_windowSize;
 		bool m_isRunning{ true };
 
-		bool m_imguiInitialized{ false }; // Tracks whether display ImGui contexts may be shut down.
+		bool m_imguiInitialized{ false }; // Tracks ownership of the shared ImGui context/backends.
+		ImGuiContext* m_imguiContext{};
 		ui32 m_pendingDisplayAdditions{};
 
         std::chrono::steady_clock::time_point m_previousTime{};
