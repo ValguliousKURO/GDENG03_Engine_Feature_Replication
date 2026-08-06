@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <!-- ADDED: Dear ImGui core and the Win32/DirectX 11 backends required by TestUi. -->
+    <ClCompile Include="DX3D\Source\DX3D\Core\DebugLogManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\BaseUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\InspectorUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\EventBroadcastManager.cpp" />
@@ -192,11 +193,13 @@
     <ClCompile Include="DX3D\Source\DX3D\EventBroadcasting\Parameters.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\MainMenuBarUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\SceneViewportUI.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\UI\DebugWindowUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Resource\TextureManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.cpp" />
   </ItemGroup>
   <ItemGroup>
     <!-- ADDED: Test UI declaration. -->
+    <ClInclude Include="DX3D\Include\DX3D\Core\DebugLogManager.h" />
     <ClInclude Include="DX3D\Include\DX3D\Math\Quaternion.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\BaseUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\EventBroadcasting\EventNames.h" />
@@ -256,6 +259,7 @@
     <ClInclude Include="DX3D\Include\DX3D\UI\MainMenuBarUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\HierarchyUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\SceneViewportUI.h" />
+    <ClInclude Include="DX3D\Include\DX3D\UI\DebugWindowUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\Resource\TextureManager.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.h" />
   </ItemGroup>

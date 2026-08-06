@@ -6,6 +6,7 @@
 #include <DX3D/Component/CameraComponent.h>
 #include <filesystem>
 
+#include <DX3D/UI/DebugWindowUI.h>
 #include <DX3D/UI/HierarchyUI.h>
 #include <DX3D/UI/MainMenuBarUI.h>
 
@@ -37,6 +38,8 @@ void MainGame::onNewDisplay(dx3d::Display& display)
 	display.getInputSystem().setCursorVisible(true);
 
 	//m_InspectorUIs[display.getID()] = std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() });
+
+
 }
 
 void MainGame::onNewWorldView(std::string name)
@@ -69,6 +72,7 @@ void MainGame::onCreate()
 	std::unique_ptr<dx3d::HierarchyUI> hierarchy_UI = std::make_unique<dx3d::HierarchyUI>(dx3d::BaseDesc{ getLogger() });
 	hierarchy_UI->setGameObjectList(&world.getGameObjectList());
 	m_UIs.push_back(std::move(hierarchy_UI));
+	m_UIs.push_back(std::make_unique<dx3d::DebugWindowUI>(dx3d::BaseDesc{ getLogger() }));
 
 	m_UIs.push_back(std::make_unique<dx3d::MainMenuBarUI>(dx3d::BaseDesc{ getLogger() }));
 	m_UIs.push_back(std::make_unique<dx3d::InspectorUI>(dx3d::BaseDesc{ getLogger() }));
@@ -114,6 +118,7 @@ void MainGame::onCreate()
 		floor->getTransform().setPosition({ 0, 0, 0 });
 
 		///  test object
+
 		//commented out since I don't have the model for me -Ira uncomment if you have the model in your project folder
 		//auto armaDObject = world.createGameObject<dx3d::GameObject>();
 		//

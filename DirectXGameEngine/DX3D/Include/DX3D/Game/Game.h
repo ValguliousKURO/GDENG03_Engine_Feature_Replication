@@ -50,8 +50,10 @@ namespace dx3d
         RefPtr<GraphicsDevice> m_graphicsDevice{};
         std::vector<UniquePtr<Display>> m_displays{};   // multiple displays
         std::vector< dx3d::UniquePtr<dx3d::SceneViewportUI>> m_sceneViewportUIs{};
+		//manager instances
         UniquePtr<ResourceManager> m_resourceManager{};
 		UniquePtr<MeshFactory> m_meshFactory{};
+        
         UniquePtr<World> m_world{};
         UniquePtr<WorldRenderer> m_worldRenderer{};
         Rect m_windowSize;

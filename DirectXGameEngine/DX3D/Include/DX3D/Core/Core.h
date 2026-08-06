@@ -57,8 +57,10 @@ namespace dx3d
 	class MeshFactory;
 	class InspectorUI;
 	class MainMenuBarUI;
+
 	class Rasterizer;
 
+	class DebugWindowUI;
 	using i32 = int;
 	using ui32 = unsigned int;
 	using f32 = float;

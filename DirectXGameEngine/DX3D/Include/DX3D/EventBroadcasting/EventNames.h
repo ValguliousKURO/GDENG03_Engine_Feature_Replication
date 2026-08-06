@@ -25,8 +25,12 @@ namespace dx3d
 		inline static const std::string ON_TRANSFORM_CHANGED = "ON_TRANSFORM_CHANGED";
 		inline static const std::string ON_EDITOR_UNDO = "ON_EDITOR_UNDO";
 		inline static const std::string ON_EDITOR_REDO = "ON_EDITOR_REDO";
+
+
 		inline static const std::string ON_EDITOR_PLAY_MODE_CHANGED = "ON_EDITOR_PLAY_MODE_CHANGED";
 
 		inline static const std::string ON_VIEWPORT_FOCUSED = "ON_VIEWPORT_FOCUSED";
+
+		inline static const std::string ON_DEBUG_LOG_ENTRY = "ON_DEBUG_LOG_ENTRY";
     };
 }
