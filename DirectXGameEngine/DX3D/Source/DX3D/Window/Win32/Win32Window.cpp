@@ -116,22 +116,35 @@ dx3d::Window::~Window()
 // Default message handler
 LRESULT dx3d::Window::handleMessage(UINT msg, WPARAM wparam, LPARAM lparam)
 {
+    auto hwnd = static_cast<HWND>(m_handle);
 
 	switch (msg)
     {
     case WM_CLOSE:
         m_isClosed = true;
-        if (m_handle)
-        {
-            auto handle = static_cast<HWND>(m_handle);
-            m_handle = nullptr;
-            DestroyWindow(handle);
-        }
+        if (hwnd)
+            DestroyWindow(hwnd);
         return 0;
 
     case WM_DESTROY:
         m_isClosed = true;
+        m_hasFocus = false;
+        break;
+
+    case WM_NCDESTROY:
+        m_isClosed = true;
+        m_hasFocus = false;
+        if (hwnd)
+            SetWindowLongPtr(hwnd, GWLP_USERDATA, 0);
         m_handle = nullptr;
+        return DefWindowProc(hwnd, msg, wparam, lparam);
+
+    case WM_SIZE:
+        if (wparam != SIZE_MINIMIZED)
+        {
+            m_size.width = LOWORD(lparam);
+            m_size.height = HIWORD(lparam);
+        }
         break;
 
     case WM_SETFOCUS:
@@ -143,7 +156,7 @@ LRESULT dx3d::Window::handleMessage(UINT msg, WPARAM wparam, LPARAM lparam)
         break;
 
     default:
-        return DefWindowProc(static_cast<HWND>(m_handle), msg, wparam, lparam);
+        return DefWindowProc(hwnd, msg, wparam, lparam);
     }
     return 0;
 }
