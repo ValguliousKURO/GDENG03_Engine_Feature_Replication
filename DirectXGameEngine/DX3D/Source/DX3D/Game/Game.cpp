@@ -13,6 +13,7 @@
 // MANAGERS
 #include <DX3D/Resource/ResourceManager.h>
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
+#include <DX3D/Physics/PhysicsManager.h>
 
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
@@ -51,6 +52,8 @@ dx3d::Game::Game(const GameDesc& desc)
 		EventNames::ON_WINDOW_NEW, 
 		[this]() { ++m_pendingDisplayAdditions; });
 
+	PhysicsManager::getInstance().initialize();
+
 	DX3DLogInfo("Game Initialized!");
 
 	/// testing add Obj mesh data  via meshfactory here
@@ -74,6 +77,8 @@ dx3d::Logger& dx3d::Game::getLogger() noexcept
 
 dx3d::Game::~Game()
 {
+	PhysicsManager::getInstance().shutdown();
+
 	if (m_imguiInitialized) // for disabling ui on shutdown
 	{
 		shutdownImGui();
@@ -98,6 +103,8 @@ void dx3d::Game::onInternalUpdate()
 	std::chrono::duration<f32> delta = currentTime - m_previousTime;
 	m_previousTime = currentTime;
 	auto deltaTime = delta.count();
+
+	PhysicsManager::getInstance().update(deltaTime);
 
 	if (m_imguiContext)
 		ImGui::SetCurrentContext(m_imguiContext);

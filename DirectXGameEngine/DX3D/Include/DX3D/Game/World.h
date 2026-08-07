@@ -2,6 +2,7 @@
 #include <DX3D/Core/Common.h>
 #include <DX3D/Core/Base.h>
 #include <DX3D/Core/Identifiable.h>
+#include <reactphysics3d/reactphysics3d.h>
 #include <unordered_map>
 #include <vector>
 

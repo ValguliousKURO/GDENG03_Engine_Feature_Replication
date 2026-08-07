@@ -17,6 +17,7 @@
 #include <DX3D/Resource/TextureManager.h>
 
 #include <reactphysics3d/reactphysics3d.h>
+#include <DX3D/Component/PhysicsComponent.h>
 
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {
@@ -401,25 +402,85 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 	auto* object = getWorld().createGameObject<dx3d::GameObject>();
 	if (!object) return nullptr;
 
-	const auto objectTypeName = type == "Empty" ? std::string{ "Empty GameObject" } : type;
-	const auto objectIndex = ++m_spawnedObjectCounters[objectTypeName];
-	object->setName(objectTypeName + " " + std::to_string(objectIndex));
+	bool isPhysics = (type.find("Physics-") != std::string::npos);
+	std::string cleanType = type;
+	if (isPhysics)
+	{
+		cleanType = type.substr(8); // Remove "Physics-" prefix
+	}
+
+	const auto objectTypeName = cleanType == "Empty" ? std::string{ "Empty GameObject" } : cleanType;
+	const auto objectIndex = ++m_spawnedObjectCounters[type];
+
+	std::string displayName = isPhysics ? "Physics-" + objectTypeName : objectTypeName;
+	object->setName(displayName + " " + std::to_string(objectIndex));
 
 	object->getTransform().setPosition({ 0.0f, 0.5f, 0.0f });
 	object->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
 
 	dx3d::RefPtr<dx3d::Mesh> spawnMesh{};
-	if (type == "Cube") spawnMesh = m_spawnCubeMesh;
-	else if (type == "Sphere") spawnMesh = m_spawnSphereMesh;
-	else if (type == "Capsule") spawnMesh = m_spawnCapsuleMesh;
-	else if (type == "Cylinder") spawnMesh = m_spawnCylinderMesh;
-	else if (type == "Plane") spawnMesh = m_spawnPlaneMesh;
+
+	dx3d::PhysicsColliderType colliderType = dx3d::PhysicsColliderType::Box;
+	dx3d::Vec3 colliderSize = { 1.0f, 1.0f, 1.0f };
+
+	if (cleanType == "Cube")
+	{
+		spawnMesh = m_spawnCubeMesh;
+		colliderType = dx3d::PhysicsColliderType::Box;
+		colliderSize = { 1.0f, 1.0f, 1.0f };
+	}
+	else if (cleanType == "Sphere")
+	{
+		spawnMesh = m_spawnSphereMesh;
+		colliderType = dx3d::PhysicsColliderType::Sphere;
+		colliderSize = { 1.0f, 1.0f, 1.0f };
+	}
+	else if (cleanType == "Capsule")
+	{
+		spawnMesh = m_spawnCapsuleMesh;
+		colliderType = dx3d::PhysicsColliderType::Capsule;
+		colliderSize = { 1.0f, 2.0f, 1.0f };
+	}
+	else if (cleanType == "Cylinder")
+	{
+		spawnMesh = m_spawnCylinderMesh;
+		colliderType = dx3d::PhysicsColliderType::Capsule;
+		colliderSize = { 1.0f, 2.0f, 1.0f };
+	}
+	else if (cleanType == "Plane")
+	{
+		spawnMesh = m_spawnPlaneMesh;
+		colliderType = dx3d::PhysicsColliderType::Box;
+		colliderSize = { 10.0f, 0.1f, 10.0f };
+	}
 
 	if (spawnMesh && m_spawnMaterial)
 	{
 		auto* mesh = object->createOrGetComponent<dx3d::MeshComponent>();
 		mesh->setMesh(spawnMesh);
 		mesh->setMaterial(m_spawnMaterial);
+	}
+
+	//Add physics component if it's a physics object
+	if (isPhysics && spawnMesh)
+	{
+		auto* physComp = object->createOrGetComponent<dx3d::PhysicsComponent>();
+
+		physComp->setColliderType(colliderType);
+		physComp->setColliderSize(colliderSize);
+
+		if (cleanType == "Plane")
+		{
+			physComp->setBodyType(dx3d::PhysicsBodyType::Static);
+			physComp->setMass(0.0f);
+		}
+		else
+		{
+			physComp->setBodyType(dx3d::PhysicsBodyType::Dynamic);
+			physComp->setMass(1.0f);
+		}
+		physComp->setUseGravity(true);
+		physComp->initialize();
 	}
 
 	return object;

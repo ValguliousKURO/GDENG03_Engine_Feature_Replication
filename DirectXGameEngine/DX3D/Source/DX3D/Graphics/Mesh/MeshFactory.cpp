@@ -27,7 +27,7 @@ void dx3d::MeshFactory::loadAll()
 }
 
 
-dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh() //Generate a cube mesh
 {
 	std::vector<Vertex> vertices;
 	std::vector<ui32> indices;
@@ -83,7 +83,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh()
 	return std::make_shared<Mesh>(vertices, indices);
 }
 
-dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createSphereMesh(ui32 stacks, ui32 slices)
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createSphereMesh(ui32 stacks, ui32 slices) //Generate a sphere mesh
 {
 	std::vector<Vertex> vertices;
 	std::vector<ui32> indices;
@@ -145,7 +145,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createSphereMesh(ui32 stacks, ui32 s
 
 
 
-dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 height, ui32 segments, ui32 rings)
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCapsuleMesh(f32 radius, f32 height, ui32 segments, ui32 rings) //Generate a capsule mesh
 {
 	std::vector<Vertex> vertices;
 	std::vector<ui32> indices;
@@ -388,7 +388,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
 	return std::make_shared<Mesh>(vertices, indices);
 }
 
-dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createPlaneMesh(f32 width, f32 height, ui32 widthSegments, ui32 heightSegments)
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createPlaneMesh(f32 width, f32 height, ui32 widthSegments, ui32 heightSegments) //Generate a flat plane mesh
 {
 	std::vector<Vertex> vertices;
 	std::vector<ui32> indices;
@@ -435,7 +435,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createPlaneMesh(f32 width, f32 heigh
 	return std::make_shared<Mesh>(vertices, indices);
 }
 
-dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 segments)
+dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 segments) //Generate a flat circle mesh
 {
 	std::vector<Vertex> vertices;
 	std::vector<ui32> indices;
@@ -443,10 +443,10 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 se
 	constexpr f32 PI = 3.14159265359f;
 	constexpr f32 TWO_PI = 2.0f * PI;
 
-	// Center vertex
+	//Center vertex
 	vertices.push_back({ {0.0f, 0.0f, 0.0f}, {0.5f, 0.5f}, {0.0f, 1.0f, 0.0f} });
 
-	// Circumference vertices
+	//Circumference vertices
 	for (ui32 i = 0; i <= segments; ++i)
 	{
 		f32 theta = TWO_PI * (i / static_cast<f32>(segments));
@@ -457,7 +457,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 se
 		vertices.push_back({ {x, 0.0f, z}, uv, {0.0f, 1.0f, 0.0f} });
 	}
 
-	// Generate indices (fan triangulation from center)
+	//Generate indices (fan triangulation from center)
 	for (ui32 i = 1; i <= segments; ++i)
 	{
 		indices.push_back(0);
@@ -468,7 +468,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCircleMesh(f32 radius, ui32 se
 	return std::make_shared<Mesh>(vertices, indices);
 }
 
-// get the mesh here
+//Get the mesh here
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::getCustomMesh(const std::string& name) 
 {
 	 auto mesh = m_ObjMesh.find(name);
@@ -476,7 +476,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::getCustomMesh(const std::string& nam
 }
 
 
-// custom OBJ
+//custom OBJ
 
 void dx3d::MeshFactory::loadMeshFromFile(const std::string& name, const std::string& filepath)
 {
@@ -595,7 +595,7 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createMesh(const std::vector<Vertex>
 }
 
 
-/// HELPER FUNCTIONS FOR LoadMesh
+///HELPER FUNCTIONS FOR LoadMesh
 
 namespace
 {
