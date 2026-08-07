@@ -43,6 +43,11 @@ void dx3d::PhysicsComponent::createBody()
     Vec3 rot = transform.getRotation();
     Vec3 scale = transform.getScale();
 
+    //Store initial transform for change detection
+    m_previousPosition = pos;
+    m_previousRotation = rot;
+    m_previousScale = scale;
+
     reactphysics3d::Vector3 position(pos.x, pos.y, pos.z);
     reactphysics3d::Quaternion orientation =
         reactphysics3d::Quaternion::fromEulerAngles(rot.x, rot.y, rot.z);
@@ -52,6 +57,7 @@ void dx3d::PhysicsComponent::createBody()
 
     if (!m_rigidBody) return;
 
+    //Set body type
     reactphysics3d::BodyType bodyType;
     switch (m_bodyType)
     {
@@ -73,7 +79,7 @@ void dx3d::PhysicsComponent::createBody()
         m_rigidBody->setMass(m_mass);
     }
 
-    // Handle mesh colliders
+    //Handle mesh colliders
     if (m_colliderType == PhysicsColliderType::ConvexMesh && m_hasMeshData)
     {
         createConvexMeshCollider();
@@ -85,7 +91,7 @@ void dx3d::PhysicsComponent::createBody()
         return;
     }
 
-    // Create primitive collider
+    //Create primitive collider
     reactphysics3d::CollisionShape* shape = nullptr;
     Vec3 scaledSize = { m_colliderSize.x * scale.x, m_colliderSize.y * scale.y, m_colliderSize.z * scale.z };
 
@@ -112,32 +118,110 @@ void dx3d::PhysicsComponent::createBody()
 
 void dx3d::PhysicsComponent::syncPhysicsToTransform()
 {
-    if (!m_rigidBody || m_bodyType == PhysicsBodyType::Static) return;
+    if (!m_rigidBody) return;
+
+    auto& transform = getGameObject().getTransform();
+    Vec3 currentPos = transform.getPosition();
+    Vec3 currentRot = transform.getRotation();
+    Vec3 currentScale = transform.getScale();
+
+    if (m_bodyType == PhysicsBodyType::Static)
+    {
+        // Static bodies: always sync from game transform to physics
+        // Check if position changed
+        bool posChanged = (std::abs(currentPos.x - m_previousPosition.x) > 0.0001f ||
+            std::abs(currentPos.y - m_previousPosition.y) > 0.0001f ||
+            std::abs(currentPos.z - m_previousPosition.z) > 0.0001f);
+
+        bool rotChanged = (std::abs(currentRot.x - m_previousRotation.x) > 0.0001f ||
+            std::abs(currentRot.y - m_previousRotation.y) > 0.0001f ||
+            std::abs(currentRot.z - m_previousRotation.z) > 0.0001f);
+
+        if (posChanged || rotChanged)
+        {
+            reactphysics3d::Vector3 position(currentPos.x, currentPos.y, currentPos.z);
+            reactphysics3d::Quaternion orientation =
+                reactphysics3d::Quaternion::fromEulerAngles(currentRot.x, currentRot.y, currentRot.z);
+            m_rigidBody->setTransform(reactphysics3d::Transform(position, orientation));
+
+            m_previousPosition = currentPos;
+            m_previousRotation = currentRot;
+        }
+        return;
+    }
+
+    // For dynamic/kinematic bodies
+    // Check if game object transform was changed externally (editor, code)
+    bool posChanged = (std::abs(currentPos.x - m_previousPosition.x) > 0.0001f ||
+        std::abs(currentPos.y - m_previousPosition.y) > 0.0001f ||
+        std::abs(currentPos.z - m_previousPosition.z) > 0.0001f);
+
+    bool rotChanged = (std::abs(currentRot.x - m_previousRotation.x) > 0.0001f ||
+        std::abs(currentRot.y - m_previousRotation.y) > 0.0001f ||
+        std::abs(currentRot.z - m_previousRotation.z) > 0.0001f);
+
+    if (posChanged || rotChanged)
+    {
+        // GameObject was moved externally - teleport the physics body
+        reactphysics3d::Vector3 position(currentPos.x, currentPos.y, currentPos.z);
+        reactphysics3d::Quaternion orientation =
+            reactphysics3d::Quaternion::fromEulerAngles(currentRot.x, currentRot.y, currentRot.z);
+        m_rigidBody->setTransform(reactphysics3d::Transform(position, orientation));
+
+        // Reset velocities when teleporting to prevent weird physics
+        if (m_rigidBody->getType() == reactphysics3d::BodyType::DYNAMIC)
+        {
+            m_rigidBody->setLinearVelocity(reactphysics3d::Vector3(0, 0, 0));
+            m_rigidBody->setAngularVelocity(reactphysics3d::Vector3(0, 0, 0));
+        }
+
+        m_previousPosition = currentPos;
+        m_previousRotation = currentRot;
+        m_previousScale = currentScale;
+        return;
+    }
+
+    // No external change - physics drives the transform (for dynamic bodies)
+    if (m_bodyType == PhysicsBodyType::Static) return;
 
     const auto& physicsTransform = m_rigidBody->getTransform();
     const auto& pos = physicsTransform.getPosition();
     const auto& orient = physicsTransform.getOrientation();
 
-    auto& transform = getGameObject().getTransform();
-
     Vec3 newPos = { pos.x, pos.y, pos.z };
 
-    float qx = orient.x, qy = orient.y, qz = orient.z, qw = orient.w;
+    // Convert quaternion to Euler angles
+    float qx = orient.x;
+    float qy = orient.y;
+    float qz = orient.z;
+    float qw = orient.w;
+
+    // Roll (x-axis rotation)
     float sinr_cosp = 2.0f * (qw * qx + qy * qz);
     float cosr_cosp = 1.0f - 2.0f * (qx * qx + qy * qy);
     float roll = std::atan2(sinr_cosp, cosr_cosp);
 
+    // Pitch (y-axis rotation)
     float sinp = 2.0f * (qw * qy - qz * qx);
-    float pitch = (std::abs(sinp) >= 1.0f) ? std::copysign(3.14159265359f / 2.0f, sinp) : std::asin(sinp);
+    float pitch;
+    if (std::abs(sinp) >= 1.0f)
+        pitch = std::copysign(3.14159265359f / 2.0f, sinp);
+    else
+        pitch = std::asin(sinp);
 
+    // Yaw (z-axis rotation)
     float siny_cosp = 2.0f * (qw * qz + qx * qy);
     float cosy_cosp = 1.0f - 2.0f * (qy * qy + qz * qz);
     float yaw = std::atan2(siny_cosp, cosy_cosp);
 
     Vec3 newRot = { roll, pitch, yaw };
 
+    // Update game object transform from physics
     transform.setPosition(newPos);
     transform.setRotation(newRot);
+
+    m_previousPosition = newPos;
+    m_previousRotation = newRot;
 }
 
 void dx3d::PhysicsComponent::syncTransformToPhysics()

@@ -352,26 +352,32 @@ void MainGame::registerEditorEvents()
 
 	events.addObserver(dx3d::EventNames::ON_TRANSFORM_CHANGED, [this](dx3d::Parameters& params)
 	{
-		if (m_isPlayMode) return;
+			if (m_isPlayMode) return;
 
-		auto* object = params.GetGameObjectPtr("Target", nullptr);
-		if (!object || object->isDeleted()) return;
+			auto* object = params.GetGameObjectPtr("Target", nullptr);
+			if (!object || object->isDeleted()) return;
 
-		auto property = params.GetStringExtra("Property", "");
-		auto oldValue = params.GetVec3Extra("OldValue", {});
-		auto newValue = params.GetVec3Extra("NewValue", oldValue);
+			auto property = params.GetStringExtra("Property", "");
+			auto oldValue = params.GetVec3Extra("OldValue", {});
+			auto newValue = params.GetVec3Extra("NewValue", oldValue);
 
-		auto applyValue = [object, property](const dx3d::Vec3& value)
-		{
-			if (property == "Position") object->getTransform().setPosition(value);
-			else if (property == "Rotation") object->getTransform().setRotation(value);
-			else if (property == "Scale") object->getTransform().setScale(value);
-		};
+			auto applyValue = [object, property](const dx3d::Vec3& value)
+				{
+					if (property == "Position") object->getTransform().setPosition(value);
+					else if (property == "Rotation") object->getTransform().setRotation(value);
+					else if (property == "Scale") object->getTransform().setScale(value);
 
-		executeEditorCommand(EditorCommand{
-			[applyValue, oldValue]() { applyValue(oldValue); },
-			[applyValue, newValue]() { applyValue(newValue); }
-		});
+					// Sync physics if the object has a physics component
+					if (auto* physComp = object->getComponent<dx3d::PhysicsComponent>())
+					{
+						physComp->syncTransformToPhysics();
+					}
+				};
+
+			executeEditorCommand(EditorCommand{
+				[applyValue, oldValue]() { applyValue(oldValue); },
+				[applyValue, newValue]() { applyValue(newValue); }
+				});
 	});
 
 	events.addObserver(dx3d::EventNames::ON_SET_PARENT, [this](dx3d::Parameters& params)
