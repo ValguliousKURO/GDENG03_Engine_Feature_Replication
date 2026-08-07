@@ -1,5 +1,7 @@
 #pragma once
 #include <unordered_map>
+#include <string>
+#include <vector>
 #include <DX3D/Core/Base.h>
 #include <DX3D/Graphics/Mesh/Mesh.h>
 
@@ -21,14 +23,16 @@ namespace dx3d
 
 		//RefPtr<Mesh> loadMeshFromFile(const std::string& filepath);
 		void loadAll();
+		void loadAllObjMeshes(const std::string& directory);
 		RefPtr<Mesh> getCustomMesh(const std::string& name) ;
+		std::vector<std::string> getCustomMeshNames() const;
 
 
 
 
 	private:
 		// add a storage system like unordered maps or smth to store Obj files where engine can reference or load instead of setting filepath every time.
-		void loadMeshFromFile(const std::string& name, const std::string& filepath);
+		bool loadMeshFromFile(const std::string& name, const std::string& filepath);
 		RefPtr<Mesh> createMesh(const std::vector<Vertex>& vertices, const std::vector<ui32>& indices);
 
 		// for storage of object meshes

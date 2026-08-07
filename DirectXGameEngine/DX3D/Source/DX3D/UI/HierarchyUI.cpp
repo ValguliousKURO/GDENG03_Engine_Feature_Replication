@@ -86,6 +86,29 @@ void dx3d::HierarchyUI::draw()
                 }
 
                 ImGui::Separator();
+                if (ImGui::BeginMenu("Models"))
+                {
+                    if (!m_objModelNames || m_objModelNames->empty())
+                    {
+                        ImGui::MenuItem("No OBJ models found", nullptr, false, false);
+                    }
+                    else
+                    {
+                        for (const auto& modelName : *m_objModelNames)
+                        {
+                            if (ImGui::MenuItem(modelName.c_str()))
+                            {
+                                param.PutExtra("Key", "Obj");
+                                param.PutExtra("ModelName", modelName);
+                                EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+                                DX3DLogInfo("Added OBJ GameObject: {}", modelName);
+                            }
+                        }
+                    }
+                    ImGui::EndMenu();
+                }
+
+                ImGui::Separator();
                 ImGui::TextColored(ImVec4(0.5f, 0.8f, 1.0f, 1.0f), "Physics Objects");
                 if (ImGui::MenuItem("Add Physics-Cube"))
                 {
@@ -262,5 +285,10 @@ void dx3d::HierarchyUI::drawGameObjectNode(GameObject* obj)
 void dx3d::HierarchyUI::setGameObjectList(const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>* list)
 {
     m_gameObjects = list;
+}
+
+void dx3d::HierarchyUI::setObjModelNames(const std::vector<std::string>* modelNames)
+{
+    m_objModelNames = modelNames;
 }
 
