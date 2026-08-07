@@ -19,6 +19,36 @@
 #include <reactphysics3d/reactphysics3d.h>
 #include <DX3D/Component/PhysicsComponent.h>
 
+namespace
+{
+	std::filesystem::path findObjFilesDirectory()
+	{
+		namespace fs = std::filesystem;
+
+		const auto current = fs::current_path();
+		const std::vector<fs::path> candidates =
+		{
+			current / "Assets" / "ObjFiles",
+			current.parent_path() / "Assets" / "ObjFiles",
+			current.parent_path().parent_path() / "Assets" / "ObjFiles",
+			current / "DirectXGameEngine" / "Assets" / "ObjFiles",
+			current.parent_path() / "DirectXGameEngine" / "Assets" / "ObjFiles",
+			current.parent_path().parent_path() / "DirectXGameEngine" / "Assets" / "ObjFiles"
+		};
+
+		for (const auto& candidate : candidates)
+		{
+			std::error_code error;
+			if (fs::exists(candidate, error) && fs::is_directory(candidate, error))
+			{
+				return candidate;
+			}
+		}
+
+		return current / "Assets" / "ObjFiles";
+	}
+}
+
 MainGame::MainGame(const dx3d::GameDesc& desc) : dx3d::Game(desc)
 {
 }
@@ -72,8 +102,13 @@ void MainGame::onCreate()
 	auto floorTex = dx3d::TextureManager::getInstance().getTexture("floor");
 
 	// UI initialize
+	const auto objFilesDirectory = findObjFilesDirectory();
+	getMeshFactory().loadAllObjMeshes(objFilesDirectory.string());
+	m_availableObjModels = getMeshFactory().getCustomMeshNames();
+
 	std::unique_ptr<dx3d::HierarchyUI> hierarchy_UI = std::make_unique<dx3d::HierarchyUI>(dx3d::BaseDesc{ getLogger() });
 	hierarchy_UI->setGameObjectList(&world.getGameObjectList());
+	hierarchy_UI->setObjModelNames(&m_availableObjModels);
 	m_UIs.push_back(std::move(hierarchy_UI));
 	m_UIs.push_back(std::make_unique<dx3d::DebugWindowUI>(dx3d::BaseDesc{ getLogger() }));
 
@@ -266,6 +301,13 @@ void MainGame::registerEditorEvents()
 		if (m_isPlayMode) return;
 
 		auto type = params.GetStringExtra("Key", "Cube");
+		if (type == "Obj")
+		{
+			const auto modelName = params.GetStringExtra("ModelName", "");
+			if (modelName.empty()) return;
+			type = "Obj:" + modelName;
+		}
+
 		auto* object = spawnEditorObject(type);
 		if (!object) return;
 
@@ -402,23 +444,18 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 	auto* object = getWorld().createGameObject<dx3d::GameObject>();
 	if (!object) return nullptr;
 
-	bool isPhysics = (type.find("Physics-") != std::string::npos);
+	bool isPhysics = (type.rfind("Physics-", 0) == 0);
 	std::string cleanType = type;
 	if (isPhysics)
 	{
 		cleanType = type.substr(8); // Remove "Physics-" prefix
 	}
 
-	const auto objectTypeName = cleanType == "Empty" ? std::string{ "Empty GameObject" } : cleanType;
-	const auto objectIndex = ++m_spawnedObjectCounters[type];
-
-	std::string displayName = isPhysics ? "Physics-" + objectTypeName : objectTypeName;
-	object->setName(displayName + " " + std::to_string(objectIndex));
-
 	object->getTransform().setPosition({ 0.0f, 0.5f, 0.0f });
 	object->getTransform().setScale({ 0.5f, 0.5f, 0.5f });
 
 	dx3d::RefPtr<dx3d::Mesh> spawnMesh{};
+	std::string displayName = cleanType == "Empty" ? std::string{ "Empty GameObject" } : cleanType;
 
 	dx3d::PhysicsColliderType colliderType = dx3d::PhysicsColliderType::Box;
 	dx3d::Vec3 colliderSize = { 1.0f, 1.0f, 1.0f };
@@ -453,6 +490,29 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 		colliderType = dx3d::PhysicsColliderType::Box;
 		colliderSize = { 10.0f, 0.1f, 10.0f };
 	}
+	else if (cleanType.rfind("Obj:", 0) == 0)
+	{
+		const auto modelName = cleanType.substr(4);
+		spawnMesh = getMeshFactory().getCustomMesh(modelName);
+		if (!modelName.empty())
+		{
+			displayName = modelName;
+		}
+	}
+
+	if (cleanType.rfind("Obj:", 0) == 0 && !spawnMesh)
+	{
+		object->setDeleted(true);
+		return nullptr;
+	}
+
+	if (isPhysics)
+	{
+		displayName = "Physics-" + displayName;
+	}
+
+	const auto objectIndex = ++m_spawnedObjectCounters[type];
+	object->setName(displayName + " " + std::to_string(objectIndex));
 
 	if (spawnMesh && m_spawnMaterial)
 	{

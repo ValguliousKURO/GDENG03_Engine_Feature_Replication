@@ -1,6 +1,7 @@
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -23,9 +24,39 @@ dx3d::MeshFactory::MeshFactory(const MeshFactoryDesc& desc) : Base(desc.base)
 
 void dx3d::MeshFactory::loadAll()
 {
-	this->loadMeshFromFile("Armadillo", "Assets/Objects/armadillo.obj");
+	this->loadAllObjMeshes("Assets/ObjFiles");
 }
 
+void dx3d::MeshFactory::loadAllObjMeshes(const std::string& directory)
+{
+	namespace fs = std::filesystem;
+
+	std::error_code error;
+	if (!fs::exists(directory, error) || !fs::is_directory(directory, error))
+	{
+		return;
+	}
+
+	std::vector<fs::path> objFiles;
+	for (const auto& entry : fs::directory_iterator(directory, error))
+	{
+		if (error) return;
+		if (!entry.is_regular_file(error)) continue;
+
+		auto path = entry.path();
+		if (path.extension() == ".obj" || path.extension() == ".OBJ")
+		{
+			objFiles.push_back(path);
+		}
+	}
+
+	std::sort(objFiles.begin(), objFiles.end());
+	for (const auto& path : objFiles)
+	{
+		const auto name = path.stem().string();
+		loadMeshFromFile(name, path.string());
+	}
+}
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCubeMesh() //Generate a cube mesh
 {
@@ -475,13 +506,25 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::getCustomMesh(const std::string& nam
 	return mesh != m_ObjMesh.end() ? mesh->second : nullptr; //if entry in obj is found and the stored value is not empty
 }
 
+std::vector<std::string> dx3d::MeshFactory::getCustomMeshNames() const
+{
+	std::vector<std::string> names;
+	names.reserve(m_ObjMesh.size());
+	for (const auto& [name, mesh] : m_ObjMesh)
+	{
+		if (mesh) names.push_back(name);
+	}
+	std::sort(names.begin(), names.end());
+	return names;
+}
+
 
 //custom OBJ
 
-void dx3d::MeshFactory::loadMeshFromFile(const std::string& name, const std::string& filepath)
+bool dx3d::MeshFactory::loadMeshFromFile(const std::string& name, const std::string& filepath)
 {
 	std::ifstream file(filepath);
-	if (!file) return;
+	if (!file) return false;
 
 	std::vector<Vec3> positions;
 	std::vector<Vec2> texcoords;
@@ -503,7 +546,7 @@ void dx3d::MeshFactory::loadMeshFromFile(const std::string& name, const std::str
 		if (command == "v") // object position bounds of an obj
 		{
 			Vec3 position;
-			if (!(stream >> position.x >> position.y >> position.z)) return ;
+			if (!(stream >> position.x >> position.y >> position.z)) return false;
 			positions.push_back(position);
 			if (!hasPositionBounds)
 			{
@@ -523,7 +566,7 @@ void dx3d::MeshFactory::loadMeshFromFile(const std::string& name, const std::str
 		else if (command == "vt") // texture coordinates
 		{
 			Vec2 texcoord;
-			if (!(stream >> texcoord.x >> texcoord.y)) return;
+			if (!(stream >> texcoord.x >> texcoord.y)) return false;
 			// OBJ UVs start at the lower edge; Direct3D texture coordinates start at the top.
 			texcoord.y = 1.0f - texcoord.y; // from top to bottom
 			texcoords.push_back(texcoord);
@@ -531,7 +574,7 @@ void dx3d::MeshFactory::loadMeshFromFile(const std::string& name, const std::str
 		else if (command == "vn") // normals
 		{
 			Vec3 normal;
-			if (!(stream >> normal.x >> normal.y >> normal.z)) return ;
+			if (!(stream >> normal.x >> normal.y >> normal.z)) return false;
 			normals.push_back(Vec3::normalize(normal));
 		}
 		
@@ -545,14 +588,14 @@ void dx3d::MeshFactory::loadMeshFromFile(const std::string& name, const std::str
 				// OBJ permits an inline comment after a face definition.
 				if (token.starts_with('#')) break;
 				ObjIndex index;
-				if (!parseObjIndex(token, index)) return ;
+				if (!parseObjIndex(token, index)) return false;
 				index.position = resolveObjIndex(index.position, positions.size());
 				index.texcoord = index.texcoord ? resolveObjIndex(index.texcoord, texcoords.size()) : -1;
 				index.normal = index.normal ? resolveObjIndex(index.normal, normals.size()) : -1;
-				if (index.position < 0 || index.position >= static_cast<int>(positions.size()) || index.texcoord >= static_cast<int>(texcoords.size()) || index.normal >= static_cast<int>(normals.size())) return ;
+				if (index.position < 0 || index.position >= static_cast<int>(positions.size()) || index.texcoord >= static_cast<int>(texcoords.size()) || index.normal >= static_cast<int>(normals.size())) return false;
 				face.push_back(index);
 			}
-			if (face.size() < 3) return ;
+			if (face.size() < 3) return false;
 			// Fan triangulation supports triangles, quads, and convex OBJ polygons.
 			for (size_t i = 1; i + 1 < face.size(); ++i)
 			{
@@ -577,7 +620,11 @@ void dx3d::MeshFactory::loadMeshFromFile(const std::string& name, const std::str
 			}
 		}
 	}
-	m_ObjMesh[name] = createMesh(vertices, indices);
+	auto mesh = createMesh(vertices, indices);
+	if (!mesh) return false;
+
+	m_ObjMesh[name] = mesh;
+	return true;
 }
 
 dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createMesh(const std::vector<Vertex>& vertices, const std::vector<ui32>& indices)
