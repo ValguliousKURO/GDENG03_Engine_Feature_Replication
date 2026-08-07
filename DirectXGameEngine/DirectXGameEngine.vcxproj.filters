@@ -55,6 +55,8 @@
     <ClCompile Include="DX3D\Source\DX3D\UI\DebugWindowUI.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Resource\TextureManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Component\PhysicsComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Physics\PhysicsManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DX3D\Include\DX3D\Core\DebugLogManager.h" />
@@ -120,6 +122,8 @@
     <ClInclude Include="DX3D\Include\DX3D\UI\DebugWindowUI.h" />
     <ClInclude Include="DX3D\Include\DX3D\Resource\TextureManager.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Component\PhysicsComponent.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Physics\PhysicsManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ClassDiagram.cd" />

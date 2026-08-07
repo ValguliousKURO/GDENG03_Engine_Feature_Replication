@@ -2,6 +2,8 @@
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/Component.h>
 #include <DX3D/Component/TransformComponent.h>
+#include <DX3D/Component/PhysicsComponent.h>
+#include <DX3D/Physics/PhysicsManager.h>
 
 dx3d::World::World(const WorldDesc& desc) : 
     Base(desc.base), 
@@ -32,7 +34,9 @@ void dx3d::World::update(f32 deltaTime)
         for (auto& obj : objects)
         {
             if (obj && obj->isEnabled() && !obj->isDeleted())
+            {
                 obj->onUpdate(deltaTime);
+            }
         }
     }
 
