@@ -57,5 +57,9 @@ namespace dx3d
         reactphysics3d::RigidBody* m_rigidBody = nullptr;
         reactphysics3d::Collider* m_collider = nullptr;
         bool m_initialized = false;
+
+        Vec3 m_previousPosition;
+        Vec3 m_previousRotation;
+        Vec3 m_previousScale;
     };
 }
