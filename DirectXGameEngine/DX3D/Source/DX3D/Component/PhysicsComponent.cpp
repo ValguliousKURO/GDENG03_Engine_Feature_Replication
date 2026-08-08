@@ -3,7 +3,6 @@
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Component/TransformComponent.h>
 
-
 dx3d::PhysicsComponent::PhysicsComponent(const ComponentDesc& desc)
     : Component(desc)
 {}
@@ -11,7 +10,6 @@ dx3d::PhysicsComponent::PhysicsComponent(const ComponentDesc& desc)
 dx3d::PhysicsComponent::~PhysicsComponent()
 {
     PhysicsManager::getInstance().unregisterComponent(this);
-    // Don't destroy rigid body - PhysicsManager handles that
     m_rigidBody = nullptr;
     m_collider = nullptr;
 }
@@ -30,7 +28,6 @@ void dx3d::PhysicsComponent::initialize()
 
 void dx3d::PhysicsComponent::onPhysicsDestroy()
 {
-    // Called by PhysicsManager before destroying the physics world
     m_rigidBody = nullptr;
     m_collider = nullptr;
     m_initialized = false;
@@ -53,11 +50,45 @@ void dx3d::PhysicsComponent::onEnd()
 
     auto& transformComponent = getGameObject().getTransform();
 
+    //Reset transform to initial values
     transformComponent.setPosition(m_initial_transform["Position"]);
     transformComponent.setScale(m_initial_transform["Scale"]);
     transformComponent.setRotation(m_initial_transform["Rotation"]);
 
-    syncTransformToPhysics();
+    //Fully reset the physics body
+    if (m_rigidBody)
+    {
+        //Reset velocity and forces
+        m_rigidBody->setLinearVelocity(reactphysics3d::Vector3(0, 0, 0));
+        m_rigidBody->setAngularVelocity(reactphysics3d::Vector3(0, 0, 0));
+
+        //Reset transform to initial position
+        Vec3 initPos = m_initial_transform["Position"];
+        Vec3 initRot = m_initial_transform["Rotation"];
+
+        //Use World position for the rigid body
+        auto& transform = getGameObject().getTransform();
+        transform.updateWorldMatrix();
+        Mat4x4 worldMat = transform.getAffineWorldMatrix();
+        Vec3 worldPos = { worldMat.row(3).x, worldMat.row(3).y, worldMat.row(3).z };
+
+        reactphysics3d::Vector3 position(worldPos.x, worldPos.y, worldPos.z);
+        reactphysics3d::Quaternion orientation =
+            reactphysics3d::Quaternion::fromEulerAngles(initRot.x, initRot.y, initRot.z);
+        m_rigidBody->setTransform(reactphysics3d::Transform(position, orientation));
+
+        //Reset force and torque accumulators
+        m_rigidBody->applyWorldForceAtCenterOfMass(reactphysics3d::Vector3(0, 0, 0));
+        m_rigidBody->applyWorldTorque(reactphysics3d::Vector3(0, 0, 0));
+
+        //Make sure the body is awake
+        m_rigidBody->setIsSleeping(false);
+    }
+
+    // Reset previous tracking values
+    m_previousPosition = m_initial_transform["Position"];
+    m_previousRotation = m_initial_transform["Rotation"];
+    m_previousScale = m_initial_transform["Scale"];
 }
 
 void dx3d::PhysicsComponent::createBody()
@@ -68,18 +99,54 @@ void dx3d::PhysicsComponent::createBody()
     if (!physicsManager.isInitialized()) return;
 
     auto& transform = getGameObject().getTransform();
-    Vec3 pos = transform.getPosition();
-    Vec3 rot = transform.getRotation();
-    Vec3 scale = transform.getScale();
+
+    //Force world matrix update to get correct world position
+    transform.updateWorldMatrix();
+    Mat4x4 worldMat = transform.getAffineWorldMatrix();
+
+    //Extract world position from the world matrix
+    Vec3 worldPos = { worldMat.row(3).x, worldMat.row(3).y, worldMat.row(3).z };
+
+    //Extract world rotation from the world matrix
+    Vec3 wr0 = { worldMat.row(0).x, worldMat.row(0).y, worldMat.row(0).z };
+    Vec3 wr1 = { worldMat.row(1).x, worldMat.row(1).y, worldMat.row(1).z };
+    Vec3 wr2 = { worldMat.row(2).x, worldMat.row(2).y, worldMat.row(2).z };
+
+    float wr0Len = wr0.length();
+    float wr1Len = wr1.length();
+    float wr2Len = wr2.length();
+
+    if (wr0Len > 0.00001f) wr0 = wr0 / wr0Len;
+    if (wr1Len > 0.00001f) wr1 = wr1 / wr1Len;
+    if (wr2Len > 0.00001f) wr2 = wr2 / wr2Len;
+
+    wr0 = Vec3::normalize(wr0);
+    wr1 = Vec3::normalize(wr1 - wr0 * Vec3::dot(wr0, wr1));
+    wr2 = Vec3::cross(wr0, wr1);
+
+    //Extract world rotation from orthonormal rows
+    float sy = std::clamp(-wr0.z, -0.999999f, 0.999999f);
+    float cy = std::sqrt(1.0f - sy * sy);
+    float wy = std::atan2(sy, cy);
+    float wx, wz;
+    if (cy > 0.00001f) {
+        wx = std::atan2(wr1.z, wr2.z);
+        wz = std::atan2(wr0.y, wr0.x);
+    }
+    else {
+        wx = 0.0f;
+        wz = std::atan2(-wr1.x, wr1.y);
+    }
+    Vec3 worldRot = { wx, wy, wz };
 
     //Store initial transform for change detection
-    m_previousPosition = pos;
-    m_previousRotation = rot;
-    m_previousScale = scale;
+    m_previousPosition = worldPos;
+    m_previousRotation = worldRot;
+    m_previousScale = transform.getScale(); //Local scale for collider sizing
 
-    reactphysics3d::Vector3 position(pos.x, pos.y, pos.z);
+    reactphysics3d::Vector3 position(worldPos.x, worldPos.y, worldPos.z);
     reactphysics3d::Quaternion orientation =
-        reactphysics3d::Quaternion::fromEulerAngles(rot.x, rot.y, rot.z);
+        reactphysics3d::Quaternion::fromEulerAngles(worldRot.x, worldRot.y, worldRot.z);
 
     m_rigidBody = physicsManager.createRigidBody(
         reactphysics3d::Transform(position, orientation));
@@ -120,18 +187,30 @@ void dx3d::PhysicsComponent::createBody()
         return;
     }
 
-    //Create primitive collider
-    reactphysics3d::CollisionShape* shape = nullptr;
-    Vec3 scaledSize = { m_colliderSize.x * scale.x, m_colliderSize.y * scale.y, m_colliderSize.z * scale.z };
+    //Create primitive collider using local scale
+    Vec3 localScale = transform.getScale();
+    Vec3 scaledSize = {
+        m_colliderSize.x * localScale.x,
+        m_colliderSize.y * localScale.y,
+        m_colliderSize.z * localScale.z
+    };
 
+    reactphysics3d::CollisionShape* shape = nullptr;
     switch (m_colliderType)
     {
     case PhysicsColliderType::Box:
-        shape = physicsManager.createBoxShape({ scaledSize.x * 0.5f, scaledSize.y * 0.5f, scaledSize.z * 0.5f });
+        shape = physicsManager.createBoxShape({
+            scaledSize.x * 0.5f,
+            scaledSize.y * 0.5f,
+            scaledSize.z * 0.5f
+            });
         break;
     case PhysicsColliderType::Sphere:
-        shape = physicsManager.createSphereShape(scaledSize.x * 0.5f);
+    {
+        float radius = std::max({ scaledSize.x, scaledSize.y, scaledSize.z }) * 0.5f;
+        shape = physicsManager.createSphereShape(radius);
         break;
+    }
     case PhysicsColliderType::Capsule:
         shape = physicsManager.createCapsuleShape(scaledSize.x * 0.5f, scaledSize.y);
         break;
@@ -150,108 +229,149 @@ void dx3d::PhysicsComponent::syncPhysicsToTransform()
     if (!m_physicsEnabled) return;
     if (!m_rigidBody) return;
 
+	//Get the world transform of the game object
     auto& transform = getGameObject().getTransform();
-    Vec3 currentPos = transform.getPosition();
-    Vec3 currentRot = transform.getRotation();
-    Vec3 currentScale = transform.getScale();
+    transform.updateWorldMatrix();
+    Mat4x4 worldMat = transform.getAffineWorldMatrix();
 
+    Vec3 worldPos = { worldMat.row(3).x, worldMat.row(3).y, worldMat.row(3).z };
+    Vec3 localScale = transform.getScale();
+
+	//Collider rescaling if the local scale has changed significantly
+    bool scaleChanged = (std::abs(localScale.x - m_previousScale.x) > 0.0001f ||
+        std::abs(localScale.y - m_previousScale.y) > 0.0001f ||
+        std::abs(localScale.z - m_previousScale.z) > 0.0001f);
+
+    if (scaleChanged && m_rigidBody &&
+        m_colliderType != PhysicsColliderType::ConvexMesh &&
+        m_colliderType != PhysicsColliderType::ConcaveMesh)
+    {
+        //Remove old collider
+        if (m_collider)
+        {
+            m_rigidBody->removeCollider(m_collider);
+            m_collider = nullptr;
+        }
+
+        //Create new collider with updated scale
+        auto& physicsManager = PhysicsManager::getInstance();
+        Vec3 scaledSize = {
+            m_colliderSize.x * localScale.x,
+            m_colliderSize.y * localScale.y,
+            m_colliderSize.z * localScale.z
+        };
+
+        reactphysics3d::CollisionShape* shape = nullptr;
+        switch (m_colliderType)
+        {
+        case PhysicsColliderType::Box:
+            shape = physicsManager.createBoxShape({
+                scaledSize.x * 0.5f,
+                scaledSize.y * 0.5f,
+                scaledSize.z * 0.5f
+                });
+            break;
+        case PhysicsColliderType::Sphere:
+        {
+            float radius = std::max({ scaledSize.x, scaledSize.y, scaledSize.z }) * 0.5f;
+            shape = physicsManager.createSphereShape(radius);
+            break;
+        }
+        case PhysicsColliderType::Capsule:
+            shape = physicsManager.createCapsuleShape(scaledSize.x * 0.5f, scaledSize.y);
+            break;
+        default:
+            break;
+        }
+
+        if (shape)
+        {
+            m_collider = m_rigidBody->addCollider(shape, reactphysics3d::Transform::identity());
+        }
+
+        m_previousScale = localScale;
+    }
+
+	//Static bodies: Only sync from game to physics if the position has changed significantly
     if (m_bodyType == PhysicsBodyType::Static)
     {
-        // Static bodies: always sync from game transform to physics
-        // Check if position changed
-        bool posChanged = (std::abs(currentPos.x - m_previousPosition.x) > 0.0001f ||
-            std::abs(currentPos.y - m_previousPosition.y) > 0.0001f ||
-            std::abs(currentPos.z - m_previousPosition.z) > 0.0001f);
+        bool posChanged = (std::abs(worldPos.x - m_previousPosition.x) > 0.0001f ||
+            std::abs(worldPos.y - m_previousPosition.y) > 0.0001f ||
+            std::abs(worldPos.z - m_previousPosition.z) > 0.0001f);
 
-        bool rotChanged = (std::abs(currentRot.x - m_previousRotation.x) > 0.0001f ||
-            std::abs(currentRot.y - m_previousRotation.y) > 0.0001f ||
-            std::abs(currentRot.z - m_previousRotation.z) > 0.0001f);
-
-        if (posChanged || rotChanged)
+        if (posChanged)
         {
-            reactphysics3d::Vector3 position(currentPos.x, currentPos.y, currentPos.z);
-            reactphysics3d::Quaternion orientation =
-                reactphysics3d::Quaternion::fromEulerAngles(currentRot.x, currentRot.y, currentRot.z);
+            reactphysics3d::Vector3 position(worldPos.x, worldPos.y, worldPos.z);
+            reactphysics3d::Quaternion orientation = m_rigidBody->getTransform().getOrientation();
             m_rigidBody->setTransform(reactphysics3d::Transform(position, orientation));
-
-            m_previousPosition = currentPos;
-            m_previousRotation = currentRot;
+            m_previousPosition = worldPos;
         }
         return;
     }
 
-    // For dynamic/kinematic bodies
-    // Check if game object transform was changed externally (editor, code)
-    bool posChanged = (std::abs(currentPos.x - m_previousPosition.x) > 0.0001f ||
-        std::abs(currentPos.y - m_previousPosition.y) > 0.0001f ||
-        std::abs(currentPos.z - m_previousPosition.z) > 0.0001f);
+	//Dynamic/Kinematic bodies: Only sync from game to physics if the position has changed significantly
+    bool posChanged = (std::abs(worldPos.x - m_previousPosition.x) > 0.0001f ||
+        std::abs(worldPos.y - m_previousPosition.y) > 0.0001f ||
+        std::abs(worldPos.z - m_previousPosition.z) > 0.0001f);
 
-    bool rotChanged = (std::abs(currentRot.x - m_previousRotation.x) > 0.0001f ||
-        std::abs(currentRot.y - m_previousRotation.y) > 0.0001f ||
-        std::abs(currentRot.z - m_previousRotation.z) > 0.0001f);
-
-    if (posChanged || rotChanged)
+    if (posChanged)
     {
-        // GameObject was moved externally - teleport the physics body
-        reactphysics3d::Vector3 position(currentPos.x, currentPos.y, currentPos.z);
-        reactphysics3d::Quaternion orientation =
-            reactphysics3d::Quaternion::fromEulerAngles(currentRot.x, currentRot.y, currentRot.z);
+        //Teleport physics body to world position
+        reactphysics3d::Vector3 position(worldPos.x, worldPos.y, worldPos.z);
+        reactphysics3d::Quaternion orientation = m_rigidBody->getTransform().getOrientation();
         m_rigidBody->setTransform(reactphysics3d::Transform(position, orientation));
 
-        // Reset velocities when teleporting to prevent weird physics
         if (m_rigidBody->getType() == reactphysics3d::BodyType::DYNAMIC)
         {
             m_rigidBody->setLinearVelocity(reactphysics3d::Vector3(0, 0, 0));
             m_rigidBody->setAngularVelocity(reactphysics3d::Vector3(0, 0, 0));
         }
 
-        m_previousPosition = currentPos;
-        m_previousRotation = currentRot;
-        m_previousScale = currentScale;
+        m_previousPosition = worldPos;
         return;
     }
 
-    // No external change - physics drives the transform (for dynamic bodies)
-    if (m_bodyType == PhysicsBodyType::Static) return;
-
+    //Physics to Transform Sync Update the Game Object's transform based on the physics body's transform
     const auto& physicsTransform = m_rigidBody->getTransform();
     const auto& pos = physicsTransform.getPosition();
     const auto& orient = physicsTransform.getOrientation();
 
-    Vec3 newPos = { pos.x, pos.y, pos.z };
+    Vec3 newWorldPos = { pos.x, pos.y, pos.z };
 
-    // Convert quaternion to Euler angles
-    float qx = orient.x;
-    float qy = orient.y;
-    float qz = orient.z;
-    float qw = orient.w;
-
-    // Roll (x-axis rotation)
+    //Convert quaternion to Euler angles
+    float qx = orient.x, qy = orient.y, qz = orient.z, qw = orient.w;
     float sinr_cosp = 2.0f * (qw * qx + qy * qz);
     float cosr_cosp = 1.0f - 2.0f * (qx * qx + qy * qy);
     float roll = std::atan2(sinr_cosp, cosr_cosp);
-
-    // Pitch (y-axis rotation)
     float sinp = 2.0f * (qw * qy - qz * qx);
-    float pitch;
-    if (std::abs(sinp) >= 1.0f)
-        pitch = std::copysign(3.14159265359f / 2.0f, sinp);
-    else
-        pitch = std::asin(sinp);
-
-    // Yaw (z-axis rotation)
+    float pitch = (std::abs(sinp) >= 1.0f) ? std::copysign(3.14159265359f / 2.0f, sinp) : std::asin(sinp);
     float siny_cosp = 2.0f * (qw * qz + qx * qy);
     float cosy_cosp = 1.0f - 2.0f * (qy * qy + qz * qz);
     float yaw = std::atan2(siny_cosp, cosy_cosp);
+    Vec3 newWorldRot = { roll, pitch, yaw };
 
-    Vec3 newRot = { roll, pitch, yaw };
+    //Convert world position/rotation back to local if the object has a parent
+    GameObject* parent = getGameObject().getParent();
+    if (parent)
+    {
+        auto& parentTransform = parent->getTransform();
+        Vec3 parentWorldPos = parentTransform.getWorldPosition();
+        Vec3 parentWorldRot = parentTransform.getWorldRotation();
 
-    // Update game object transform from physics
-    transform.setPosition(newPos);
-    transform.setRotation(newRot);
+        Vec3 localPos = newWorldPos - parentWorldPos;
+        Vec3 localRot = newWorldRot - parentWorldRot;
 
-    m_previousPosition = newPos;
-    m_previousRotation = newRot;
+        transform.setPosition(localPos);
+        transform.setRotation(localRot);
+    }
+    else
+    {
+        transform.setPosition(newWorldPos);
+        transform.setRotation(newWorldRot);
+    }
+
+    m_previousPosition = newWorldPos;
+    m_previousRotation = newWorldRot;
 }
 
 void dx3d::PhysicsComponent::syncTransformToPhysics()
@@ -260,14 +380,50 @@ void dx3d::PhysicsComponent::syncTransformToPhysics()
     if (!m_rigidBody || m_bodyType == PhysicsBodyType::Static) return;
 
     auto& transform = getGameObject().getTransform();
-    Vec3 pos = transform.getPosition();
-    Vec3 rot = transform.getRotation();
+    transform.updateWorldMatrix();
+    Mat4x4 worldMat = transform.getAffineWorldMatrix();
 
-    reactphysics3d::Vector3 position(pos.x, pos.y, pos.z);
+    Vec3 worldPos = { worldMat.row(3).x, worldMat.row(3).y, worldMat.row(3).z };
+
+    //Extract world rotation
+    Vec3 wr0 = { worldMat.row(0).x, worldMat.row(0).y, worldMat.row(0).z };
+    Vec3 wr1 = { worldMat.row(1).x, worldMat.row(1).y, worldMat.row(1).z };
+    Vec3 wr2 = { worldMat.row(2).x, worldMat.row(2).y, worldMat.row(2).z };
+
+    float wr0Len = wr0.length();
+    float wr1Len = wr1.length();
+    float wr2Len = wr2.length();
+
+    if (wr0Len > 0.00001f) wr0 = wr0 / wr0Len;
+    if (wr1Len > 0.00001f) wr1 = wr1 / wr1Len;
+    if (wr2Len > 0.00001f) wr2 = wr2 / wr2Len;
+
+    wr0 = Vec3::normalize(wr0);
+    wr1 = Vec3::normalize(wr1 - wr0 * Vec3::dot(wr0, wr1));
+    wr2 = Vec3::cross(wr0, wr1);
+
+    float sy = std::clamp(-wr0.z, -0.999999f, 0.999999f);
+    float cy = std::sqrt(1.0f - sy * sy);
+    float wy = std::atan2(sy, cy);
+    float wx, wz;
+    if (cy > 0.00001f) {
+        wx = std::atan2(wr1.z, wr2.z);
+        wz = std::atan2(wr0.y, wr0.x);
+    }
+    else {
+        wx = 0.0f;
+        wz = std::atan2(-wr1.x, wr1.y);
+    }
+    Vec3 worldRot = { wx, wy, wz };
+
+    reactphysics3d::Vector3 position(worldPos.x, worldPos.y, worldPos.z);
     reactphysics3d::Quaternion orientation =
-        reactphysics3d::Quaternion::fromEulerAngles(rot.x, rot.y, rot.z);
+        reactphysics3d::Quaternion::fromEulerAngles(worldRot.x, worldRot.y, worldRot.z);
 
     m_rigidBody->setTransform(reactphysics3d::Transform(position, orientation));
+
+    m_previousPosition = worldPos;
+    m_previousRotation = worldRot;
 }
 
 void dx3d::PhysicsComponent::applyForce(const Vec3& force)
@@ -365,7 +521,6 @@ void dx3d::PhysicsComponent::createConvexMeshCollider()
     auto& transform = getGameObject().getTransform();
     Vec3 scale = transform.getScale();
 
-    // Convert vertices and apply scale
     std::vector<reactphysics3d::Vector3> rp3dVertices;
     rp3dVertices.reserve(m_meshVertices.size());
 
@@ -375,7 +530,6 @@ void dx3d::PhysicsComponent::createConvexMeshCollider()
             v.x * scale.x, v.y * scale.y, v.z * scale.z));
     }
 
-    // Create polygon faces
     reactphysics3d::PolygonVertexArray::PolygonFace* faces =
         new reactphysics3d::PolygonVertexArray::PolygonFace[m_meshIndices.size() / 3];
 
@@ -385,7 +539,6 @@ void dx3d::PhysicsComponent::createConvexMeshCollider()
         faces[i].nbVertices = 3;
     }
 
-    // Create PolygonVertexArray
     reactphysics3d::PolygonVertexArray polygonVertexArray(
         static_cast<reactphysics3d::uint>(rp3dVertices.size()),
         rp3dVertices.data(),
@@ -398,7 +551,6 @@ void dx3d::PhysicsComponent::createConvexMeshCollider()
         reactphysics3d::PolygonVertexArray::IndexDataType::INDEX_INTEGER_TYPE
     );
 
-    // Create ConvexMesh using PhysicsManager
     reactphysics3d::ConvexMesh* convexMesh = physicsManager.createConvexMesh(polygonVertexArray);
 
     if (convexMesh && m_rigidBody)
@@ -423,7 +575,6 @@ void dx3d::PhysicsComponent::createConcaveMeshCollider()
     auto& transform = getGameObject().getTransform();
     Vec3 scale = transform.getScale();
 
-    // Convert vertices and apply scale
     std::vector<reactphysics3d::Vector3> rp3dVertices;
     rp3dVertices.reserve(m_meshVertices.size());
 
@@ -433,7 +584,6 @@ void dx3d::PhysicsComponent::createConcaveMeshCollider()
             v.x * scale.x, v.y * scale.y, v.z * scale.z));
     }
 
-    // Create TriangleVertexArray
     reactphysics3d::TriangleVertexArray triangleVertexArray(
         static_cast<reactphysics3d::uint>(rp3dVertices.size()),
         rp3dVertices.data(),
@@ -445,7 +595,6 @@ void dx3d::PhysicsComponent::createConcaveMeshCollider()
         reactphysics3d::TriangleVertexArray::IndexDataType::INDEX_INTEGER_TYPE
     );
 
-    // Create TriangleMesh using PhysicsManager
     reactphysics3d::TriangleMesh* triangleMesh = physicsManager.createTriangleMesh(triangleVertexArray);
 
     if (triangleMesh && m_rigidBody)
