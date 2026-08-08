@@ -59,12 +59,12 @@ dx3d::Game::Game(const GameDesc& desc)
 			if (params.GetBoolExtra("IsPlayMode", false))
 			{
 				m_currentState = SceneState::PLAY;
-				//m_world->onStart();
+				m_world->onStart();
 			}
 			else
 			{
 				m_currentState = SceneState::EDIT;
-				//m_world->onEnd();
+				m_world->onEnd();
 			}
 		}
 	);

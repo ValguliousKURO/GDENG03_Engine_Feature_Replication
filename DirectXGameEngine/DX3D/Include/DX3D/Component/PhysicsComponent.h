@@ -3,6 +3,7 @@
 #include <DX3D/Math/Vec3.h>
 #include <reactphysics3d/reactphysics3d.h>
 #include <vector>
+#include <unordered_map>
 
 namespace dx3d
 {
@@ -20,6 +21,10 @@ namespace dx3d
         void syncPhysicsToTransform();
         void syncTransformToPhysics();
         void onPhysicsDestroy();  // Called when physics manager shuts down
+
+        // Scene lifecycle
+        void onStart();
+        void onEnd();
 
         // Setters
         void setBodyType(PhysicsBodyType type);
@@ -61,5 +66,7 @@ namespace dx3d
         Vec3 m_previousPosition;
         Vec3 m_previousRotation;
         Vec3 m_previousScale;
+
+        std::unordered_map<std::string, Vec3> m_initial_transform{};
     };
 }

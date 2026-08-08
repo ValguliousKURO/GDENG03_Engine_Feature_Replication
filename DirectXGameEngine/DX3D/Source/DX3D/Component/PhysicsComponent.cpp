@@ -33,6 +33,26 @@ void dx3d::PhysicsComponent::onPhysicsDestroy()
     m_initialized = false;
 }
 
+void dx3d::PhysicsComponent::onStart()
+{
+    auto& transformComponent = getGameObject().getTransform();
+
+    m_initial_transform["Position"] = transformComponent.getPosition();
+    m_initial_transform["Scale"] = transformComponent.getScale();
+    m_initial_transform["Rotation"] = transformComponent.getRotation();
+}
+
+void dx3d::PhysicsComponent::onEnd()
+{
+    auto& transformComponent = getGameObject().getTransform();
+
+    transformComponent.setPosition(m_initial_transform["Position"]);
+    transformComponent.setScale(m_initial_transform["Scale"]);
+    transformComponent.setRotation(m_initial_transform["Rotation"]);
+
+    syncTransformToPhysics();
+}
+
 void dx3d::PhysicsComponent::createBody()
 {
     auto& physicsManager = PhysicsManager::getInstance();

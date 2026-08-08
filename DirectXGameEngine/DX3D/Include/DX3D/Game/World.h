@@ -59,7 +59,9 @@ namespace dx3d
 			return reinterpret_cast<T* const*>(getComponentsInternal(T::GetTypeId(), &numComponents));
 		}
 
+		void onStart();
 		void update(f32 deltaTime);
+		void onEnd();
 
 		const std::unordered_map<size_t, std::vector<UniquePtr<GameObject>>>& getGameObjectList();
 		GameObject* getGameObjectById(size_t id) const noexcept;
