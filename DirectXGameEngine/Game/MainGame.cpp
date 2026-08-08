@@ -352,6 +352,26 @@ void MainGame::registerEditorEvents()
 		});
 	});
 
+	events.addObserver(dx3d::EventNames::ON_SET_PHYSICS_ENABLED, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = params.GetGameObjectPtr("Target", nullptr);
+		if (!object || object->isDeleted()) return;
+
+		auto* physicsComponent = object->getComponent<dx3d::PhysicsComponent>();
+		if (!physicsComponent) return;
+
+		const bool oldValue = physicsComponent->isPhysicsEnabled();
+		const bool newValue = params.GetBoolExtra("Enabled", oldValue);
+		if (oldValue == newValue) return;
+
+		executeEditorCommand(EditorCommand{
+			[physicsComponent, oldValue]() { physicsComponent->setPhysicsEnabled(oldValue); },
+			[physicsComponent, newValue]() { physicsComponent->setPhysicsEnabled(newValue); }
+		});
+	});
+
 	events.addObserver(dx3d::EventNames::ON_TRANSFORM_CHANGED, [this](dx3d::Parameters& params)
 	{
 			if (m_isPlayMode) return;

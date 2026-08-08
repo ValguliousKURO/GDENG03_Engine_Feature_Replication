@@ -32,6 +32,7 @@ namespace dx3d
         void setColliderSize(const Vec3& size) { m_colliderSize = size; }
         void setMass(float mass);
         void setUseGravity(bool use);
+        void setPhysicsEnabled(bool enabled);
         void setMeshColliderData(const std::vector<Vec3>& vertices, const std::vector<ui32>& indices);
 
         // Forces
@@ -42,6 +43,8 @@ namespace dx3d
         // Getters
         PhysicsBodyType getBodyType() const { return m_bodyType; }
         float getMass() const { return m_mass; }
+        bool isPhysicsEnabled() const { return m_physicsEnabled; }
+        bool isUseGravityEnabled() const { return m_useGravity; }
         reactphysics3d::RigidBody* getRigidBody() const { return m_rigidBody; }
 
     private:
@@ -54,6 +57,7 @@ namespace dx3d
         Vec3 m_colliderSize = { 1.0f, 1.0f, 1.0f };
         float m_mass = 1.0f;
         bool m_useGravity = true;
+        bool m_physicsEnabled = true;
 
         std::vector<Vec3> m_meshVertices;
         std::vector<ui32> m_meshIndices;
