@@ -66,5 +66,7 @@ namespace dx3d
 		ui32 m_pendingDisplayAdditions{};
 
         std::chrono::steady_clock::time_point m_previousTime{};
+
+        SceneState m_currentState = SceneState::EDIT;
     };
 }

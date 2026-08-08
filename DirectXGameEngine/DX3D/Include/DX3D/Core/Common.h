@@ -225,4 +225,10 @@ namespace dx3d
 		BaseDesc base;
 	};
 
+	enum SceneState
+	{
+		PLAY,
+		EDIT,
+		PAUSE
+	};
 }
