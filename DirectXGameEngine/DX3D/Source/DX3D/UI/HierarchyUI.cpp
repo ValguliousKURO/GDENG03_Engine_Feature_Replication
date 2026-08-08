@@ -4,6 +4,7 @@
 #include <DX3D/EventBroadcasting/EventNames.h>
 #include <DX3D/EventBroadcasting/Parameters.h>
 
+#include <DX3D/Core/DebugLogManager.h>
 dx3d::HierarchyUI::HierarchyUI(const BaseDesc& desc) : BaseUI(desc)
 {
     EventBroadcastManager::getInstance().addObserver(
@@ -55,13 +56,14 @@ void dx3d::HierarchyUI::draw()
                 if (ImGui::MenuItem("Add Empty Game Object"))
                 {
                     EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_EMPTY_GAMEOBJECT);
-                    DX3DLogInfo("Added Empty GameObject.");
+                    DebugLogManager::getInstance().customLog("Added Empty GameObject.");
                 }
                 if (ImGui::MenuItem("Add Cube"))
                 {
                     param.PutExtra("Key", "Cube");
                     EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
-					DX3DLogInfo("Added Cube GameObject.");
+					//DX3DLogInfo("Added Cube GameObject.")
+					DebugLogManager::getInstance().customLog("Added Cube GameObject.");
                 }
              
                 if (ImGui::MenuItem("Add Sphere"))
