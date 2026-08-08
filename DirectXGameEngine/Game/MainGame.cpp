@@ -5,6 +5,7 @@
 #include <DX3D/Component/MeshComponent.h>
 #include <DX3D/Component/CameraComponent.h>
 #include <filesystem>
+#include <functional>
 
 #include <DX3D/UI/DebugWindowUI.h>
 #include <DX3D/UI/HierarchyUI.h>
@@ -323,33 +324,119 @@ void MainGame::registerEditorEvents()
 
 	events.addObserver(dx3d::EventNames::ON_DELETE_GAMEOBJECT, [this](dx3d::Parameters& params)
 	{
-		if (m_isPlayMode) return;
+			if (m_isPlayMode) return;
 
-		auto* object = params.GetGameObjectPtr("Target", nullptr);
-		if (!object || object->isDeleted()) return;
+			auto* object = params.GetGameObjectPtr("Target", nullptr);
+			if (!object || object->isDeleted()) return;
 
-		executeEditorCommand(EditorCommand{
-			[object]() { object->setDeleted(false); },
-			[object]() { object->setDeleted(true); }
-		});
-		selectGameObject(nullptr);
+			//Collect all descendants recursively
+			std::vector<dx3d::GameObject*> allAffected;
+			std::function<void(dx3d::GameObject*)> collectDescendants = [&](dx3d::GameObject* obj)
+				{
+					if (!obj) return;
+					allAffected.push_back(obj);
+					for (auto* child : obj->getChildren())
+					{
+						if (child && !child->isDeleted())
+						{
+							collectDescendants(child);
+						}
+					}
+				};
+			collectDescendants(object);
+
+			//Store old deleted states for all affected objects
+			std::vector<bool> oldStates;
+			for (auto* obj : allAffected)
+			{
+				oldStates.push_back(obj->isDeleted());
+			}
+
+			executeEditorCommand(EditorCommand{
+				//Undo: restore all objects to their previous deleted state
+				[allAffected, oldStates]()
+				{
+					for (size_t i = 0; i < allAffected.size(); i++)
+					{
+						if (allAffected[i])
+						{
+							allAffected[i]->setDeleted(oldStates[i]);
+						}
+					}
+				},
+				//Redo: delete all objects in the hierarchy
+				[allAffected]()
+				{
+					for (auto* obj : allAffected)
+					{
+						if (obj)
+						{
+							obj->setDeleted(true);
+						}
+					}
+				}
+				});
+			selectGameObject(nullptr);
 	});
 
 	events.addObserver(dx3d::EventNames::ON_SET_GAMEOBJECT_ENABLED, [this](dx3d::Parameters& params)
 	{
-		if (m_isPlayMode) return;
+			if (m_isPlayMode) return;
 
-		auto* object = params.GetGameObjectPtr("Target", nullptr);
-		if (!object || object->isDeleted()) return;
+			auto* object = params.GetGameObjectPtr("Target", nullptr);
+			if (!object || object->isDeleted()) return;
 
-		const bool oldValue = object->isEnabled();
-		const bool newValue = params.GetBoolExtra("Enabled", oldValue);
-		if (oldValue == newValue) return;
+			const bool oldValue = object->isEnabled();
+			const bool newValue = params.GetBoolExtra("Enabled", oldValue);
+			if (oldValue == newValue) return;
 
-		executeEditorCommand(EditorCommand{
-			[object, oldValue]() { object->setEnabled(oldValue); },
-			[object, newValue]() { object->setEnabled(newValue); }
-		});
+			//Collect all descendants recursively
+			std::vector<dx3d::GameObject*> allAffected;
+			std::function<void(dx3d::GameObject*)> collectDescendants = [&](dx3d::GameObject* obj)
+				{
+					if (!obj) return;
+					allAffected.push_back(obj);
+					for (auto* child : obj->getChildren())
+					{
+						if (child && !child->isDeleted())
+						{
+							collectDescendants(child);
+						}
+					}
+				};
+			collectDescendants(object);
+
+			//Store old enabled states for all affected objects
+			std::vector<bool> oldStates;
+			for (auto* obj : allAffected)
+			{
+				oldStates.push_back(obj->isEnabled());
+			}
+
+			executeEditorCommand(EditorCommand{
+				//Undo: restore all objects to their previous enabled state
+				[allAffected, oldStates]()
+				{
+					for (size_t i = 0; i < allAffected.size(); i++)
+					{
+						if (allAffected[i])
+						{
+							allAffected[i]->setEnabled(oldStates[i]);
+						}
+					}
+				},
+				//Redo: set all objects to the new enabled state
+				[allAffected, newValue]()
+				{
+					for (auto* obj : allAffected)
+					{
+						if (obj)
+						{
+							obj->setEnabled(newValue);
+						}
+					}
+				}
+				});
 	});
 
 	events.addObserver(dx3d::EventNames::ON_SET_PHYSICS_ENABLED, [this](dx3d::Parameters& params)
