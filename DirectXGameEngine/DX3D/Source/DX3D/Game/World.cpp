@@ -3,12 +3,25 @@
 #include <DX3D/Game/Component.h>
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Component/PhysicsComponent.h>
+#include <DX3D/Component/PhysicsComponent.h>
 #include <DX3D/Physics/PhysicsManager.h>
+#include <ranges>
 
 dx3d::World::World(const WorldDesc& desc) : 
     Base(desc.base), 
     m_gameContext(desc.gameContext)
 {
+}
+
+void dx3d::World::onStart()
+{
+    auto numComponents = 0u;
+    auto p6Components = getComponents<PhysicsComponent>(numComponents);
+    for (auto i : std::views::iota(0u, numComponents))
+    {
+        PhysicsComponent* p6Component = p6Components[i];
+        p6Component->onStart();
+    }
 }
 
 void dx3d::World::update(f32 deltaTime)
@@ -55,6 +68,17 @@ void dx3d::World::update(f32 deltaTime)
         comp->updateWorldMatrix();
     }
     m_dirtyTransforms.clear();
+}
+
+void dx3d::World::onEnd()
+{
+    auto numComponents = 0u;
+    auto p6Components = getComponents<PhysicsComponent>(numComponents);
+    for (auto i : std::views::iota(0u, numComponents))
+    {
+        PhysicsComponent* p6Component = p6Components[i];
+        p6Component->onEnd();
+    }
 }
 
 const std::unordered_map<size_t, std::vector<dx3d::UniquePtr<dx3d::GameObject>>>& dx3d::World::getGameObjectList()

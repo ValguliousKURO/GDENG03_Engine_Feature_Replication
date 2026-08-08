@@ -52,6 +52,38 @@ dx3d::Game::Game(const GameDesc& desc)
 		EventNames::ON_WINDOW_NEW, 
 		[this]() { ++m_pendingDisplayAdditions; });
 
+	EventBroadcastManager::getInstance().addObserver(
+		EventNames::ON_EDITOR_PLAY_MODE_CHANGED,
+		[this](Parameters& params)
+		{
+			if (params.GetBoolExtra("IsPlayMode", false))
+			{
+				m_currentState = SceneState::PLAY;
+				m_world->onStart();
+			}
+			else
+			{
+				m_currentState = SceneState::EDIT;
+				m_world->onEnd();
+			}
+		}
+	);
+
+	EventBroadcastManager::getInstance().addObserver(
+		EventNames::ON_SCENE_PAUSE_STATE_CHANGED,
+		[this](Parameters& params)
+		{
+			if (params.GetBoolExtra("IsPauseState", false))
+			{
+				m_currentState = SceneState::PAUSE;
+			}
+			else
+			{
+				m_currentState = SceneState::PLAY;
+			}
+		}
+	);
+
 	PhysicsManager::getInstance().initialize();
 
 	DX3DLogInfo("Game Initialized!");
@@ -104,7 +136,6 @@ void dx3d::Game::onInternalUpdate()
 	m_previousTime = currentTime;
 	auto deltaTime = delta.count();
 
-	PhysicsManager::getInstance().update(deltaTime);
 
 	if (m_imguiContext)
 		ImGui::SetCurrentContext(m_imguiContext);
@@ -125,8 +156,15 @@ void dx3d::Game::onInternalUpdate()
 
 	//
 
-	onUpdate(deltaTime);
-	m_world->update(deltaTime);
+	switch (m_currentState)
+	{
+	case SceneState::PLAY:
+		PhysicsManager::getInstance().update(deltaTime);
+	case SceneState::EDIT: // Do not put break above, let it pass through
+		m_world->update(deltaTime);
+		onUpdate(deltaTime);
+		break;
+	}
 
 	Display* primaryOpenDisplay{};
 	for (auto& display : m_displays)

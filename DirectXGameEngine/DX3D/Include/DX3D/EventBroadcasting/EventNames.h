@@ -28,6 +28,7 @@ namespace dx3d
 
 
 		inline static const std::string ON_EDITOR_PLAY_MODE_CHANGED = "ON_EDITOR_PLAY_MODE_CHANGED";
+		inline static const std::string ON_SCENE_PAUSE_STATE_CHANGED = "ON_SCENE_PAUSE_STATE_CHANGED";
 
 		inline static const std::string ON_VIEWPORT_FOCUSED = "ON_VIEWPORT_FOCUSED";
 
