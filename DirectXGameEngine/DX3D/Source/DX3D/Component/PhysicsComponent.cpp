@@ -18,11 +18,14 @@ dx3d::PhysicsComponent::~PhysicsComponent()
 
 void dx3d::PhysicsComponent::initialize()
 {
-    if (m_initialized) return;
+    if (m_initialized || !m_physicsEnabled) return;
 
-    PhysicsManager::getInstance().registerComponent(this);
     createBody();
-    m_initialized = true;
+    if (m_rigidBody)
+    {
+        PhysicsManager::getInstance().registerComponent(this);
+        m_initialized = true;
+    }
 }
 
 void dx3d::PhysicsComponent::onPhysicsDestroy()
@@ -35,6 +38,8 @@ void dx3d::PhysicsComponent::onPhysicsDestroy()
 
 void dx3d::PhysicsComponent::onStart()
 {
+    if (!m_physicsEnabled) return;
+
     auto& transformComponent = getGameObject().getTransform();
 
     m_initial_transform["Position"] = transformComponent.getPosition();
@@ -44,6 +49,8 @@ void dx3d::PhysicsComponent::onStart()
 
 void dx3d::PhysicsComponent::onEnd()
 {
+    if (!m_physicsEnabled) return;
+
     auto& transformComponent = getGameObject().getTransform();
 
     transformComponent.setPosition(m_initial_transform["Position"]);
@@ -55,6 +62,8 @@ void dx3d::PhysicsComponent::onEnd()
 
 void dx3d::PhysicsComponent::createBody()
 {
+    if (!m_physicsEnabled || m_rigidBody) return;
+
     auto& physicsManager = PhysicsManager::getInstance();
     if (!physicsManager.isInitialized()) return;
 
@@ -138,6 +147,7 @@ void dx3d::PhysicsComponent::createBody()
 
 void dx3d::PhysicsComponent::syncPhysicsToTransform()
 {
+    if (!m_physicsEnabled) return;
     if (!m_rigidBody) return;
 
     auto& transform = getGameObject().getTransform();
@@ -246,6 +256,7 @@ void dx3d::PhysicsComponent::syncPhysicsToTransform()
 
 void dx3d::PhysicsComponent::syncTransformToPhysics()
 {
+    if (!m_physicsEnabled) return;
     if (!m_rigidBody || m_bodyType == PhysicsBodyType::Static) return;
 
     auto& transform = getGameObject().getTransform();
@@ -261,13 +272,13 @@ void dx3d::PhysicsComponent::syncTransformToPhysics()
 
 void dx3d::PhysicsComponent::applyForce(const Vec3& force)
 {
-    if (m_rigidBody)
+    if (m_physicsEnabled && m_rigidBody)
         m_rigidBody->applyWorldForceAtCenterOfMass({ force.x, force.y, force.z });
 }
 
 void dx3d::PhysicsComponent::applyImpulse(const Vec3& impulse)
 {
-    if (m_rigidBody && m_rigidBody->getType() == reactphysics3d::BodyType::DYNAMIC)
+    if (m_physicsEnabled && m_rigidBody && m_rigidBody->getType() == reactphysics3d::BodyType::DYNAMIC)
     {
         float mass = m_rigidBody->getMass();
         if (mass > 0.0f)
@@ -280,7 +291,7 @@ void dx3d::PhysicsComponent::applyImpulse(const Vec3& impulse)
 
 void dx3d::PhysicsComponent::applyTorque(const Vec3& torque)
 {
-    if (m_rigidBody)
+    if (m_physicsEnabled && m_rigidBody)
         m_rigidBody->applyWorldTorque({ torque.x, torque.y, torque.z });
 }
 
@@ -316,6 +327,27 @@ void dx3d::PhysicsComponent::setUseGravity(bool use)
     m_useGravity = use;
     if (m_rigidBody)
         m_rigidBody->enableGravity(use);
+}
+
+void dx3d::PhysicsComponent::setPhysicsEnabled(bool enabled)
+{
+    if (m_physicsEnabled == enabled) return;
+
+    if (!enabled)
+    {
+        syncPhysicsToTransform();
+        m_physicsEnabled = false;
+        PhysicsManager::getInstance().unregisterComponent(this);
+        PhysicsManager::getInstance().destroyRigidBody(m_rigidBody);
+        m_rigidBody = nullptr;
+        m_collider = nullptr;
+        m_initialized = false;
+        return;
+    }
+
+    m_physicsEnabled = true;
+    initialize();
+    syncTransformToPhysics();
 }
 
 void dx3d::PhysicsComponent::setMeshColliderData(const std::vector<Vec3>& vertices, const std::vector<ui32>& indices)

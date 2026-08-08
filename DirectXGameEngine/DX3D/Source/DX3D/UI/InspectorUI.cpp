@@ -5,6 +5,7 @@
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Component/CubeComponent.h>
 #include <DX3D/Component/MeshComponent.h>
+#include <DX3D/Component/PhysicsComponent.h>
 
 #include <DX3D/Component/CameraComponent.h>
 #include <DX3D/Graphics/GraphicsDevice.h>
@@ -297,6 +298,31 @@ void dx3d::InspectorUI::drawTransformInspector(GameObject& object) // draw the i
 
 void dx3d::InspectorUI::drawComponentInspector(GameObject& object)
 {
-	ImGui::Text("Components inspector - expand to list and edit components. Not out");
+	auto* physicsComponent = object.getComponent<PhysicsComponent>();
+	if (!physicsComponent)
+	{
+		ImGui::Text("No editable components.");
+		return;
+	}
+
+	if (ImGui::CollapsingHeader("Physics Component", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		bool physicsEnabled = physicsComponent->isPhysicsEnabled();
+		ImGui::BeginDisabled(m_isPlayMode || !object.isEnabled());
+		if (ImGui::Checkbox("Physics Enabled", &physicsEnabled))
+		{
+			Parameters params;
+			params.PutExtra("Target", &object);
+			params.PutExtra("Enabled", physicsEnabled);
+			EventBroadcastManager::getInstance().postEvent(EventNames::ON_SET_PHYSICS_ENABLED, params);
+		}
+		ImGui::EndDisabled();
+
+		ImGui::Text("Body Type: %s",
+			physicsComponent->getBodyType() == PhysicsBodyType::Static ? "Static" :
+			physicsComponent->getBodyType() == PhysicsBodyType::Kinematic ? "Kinematic" : "Dynamic");
+		ImGui::Text("Mass: %.2f", physicsComponent->getMass());
+		ImGui::Text("Gravity: %s", physicsComponent->isUseGravityEnabled() ? "On" : "Off");
+	}
 
 }

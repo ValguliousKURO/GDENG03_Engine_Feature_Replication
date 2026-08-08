@@ -20,6 +20,7 @@ namespace dx3d
 		inline static const std::string ON_ADD_3D_OBJECT = "ON_ADD_3D_OBJECT";
 		inline static const std::string ON_DELETE_GAMEOBJECT = "ON_DELETE_GAMEOBJECT";
 		inline static const std::string ON_SET_GAMEOBJECT_ENABLED = "ON_SET_GAMEOBJECT_ENABLED";
+		inline static const std::string ON_SET_PHYSICS_ENABLED = "ON_SET_PHYSICS_ENABLED";
 		inline static const std::string ON_GAMEOBJECT_SELECTED = "ON_GAMEOBJECT_SELECTED";
 		inline static const std::string ON_SET_PARENT = "ON_SET_PARENT";
 		inline static const std::string ON_TRANSFORM_CHANGED = "ON_TRANSFORM_CHANGED";
