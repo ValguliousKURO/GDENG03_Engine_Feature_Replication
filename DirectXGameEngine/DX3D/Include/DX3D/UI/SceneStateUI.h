@@ -15,7 +15,9 @@ namespace dx3d
 
 	private:
 		bool m_showUI = true;
+		bool m_showFrameMenu = false;
 		std::string m_currentStateLabel = "Play";
 		std::string m_currentPauseLabel = "Pause";
+		//std::string m_currframestateLabel = "Pause";
 	};
 }

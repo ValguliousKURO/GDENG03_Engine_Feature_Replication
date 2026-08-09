@@ -68,5 +68,11 @@ namespace dx3d
         std::chrono::steady_clock::time_point m_previousTime{};
 
         SceneState m_currentState = SceneState::EDIT;
+
+        // frame step
+        void stepFrame(f32 deltaTime);
+
+
+
     };
 }

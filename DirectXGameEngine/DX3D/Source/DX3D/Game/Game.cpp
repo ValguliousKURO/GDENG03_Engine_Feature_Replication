@@ -84,6 +84,20 @@ dx3d::Game::Game(const GameDesc& desc)
 		}
 	);
 
+	EventBroadcastManager::getInstance().addObserver(
+		EventNames::ON_SCENE_FRAME_STEP,
+		[this]() {
+			if (m_currentState != SceneState::PAUSE)
+			{
+				DX3DLogInfo("Frame step ignored: scene is not paused.");
+				return;
+			}
+
+			constexpr f32 fixedStep = 1.0f / 60.0f; // single frame step
+			stepFrame(fixedStep);
+		}
+	);
+
 	PhysicsManager::getInstance().initialize();
 
 	DX3DLogInfo("Game Initialized!");
@@ -298,4 +312,12 @@ void dx3d::Game::shutdownImGui()
 	}
 	m_imguiContext = nullptr;
 	m_imguiInitialized = false;
+}
+
+//framestep function
+void dx3d::Game::stepFrame(f32 deltaTime)
+{
+	PhysicsManager::getInstance().update(deltaTime);
+	m_world->update(deltaTime);
+	onUpdate(deltaTime);
 }

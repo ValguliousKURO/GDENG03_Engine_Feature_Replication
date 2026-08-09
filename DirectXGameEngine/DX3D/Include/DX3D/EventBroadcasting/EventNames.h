@@ -37,5 +37,9 @@ namespace dx3d
 		inline static const std::string ON_VIEWPORT_FOCUSED = "ON_VIEWPORT_FOCUSED";
 
 		inline static const std::string ON_DEBUG_LOG_ENTRY = "ON_DEBUG_LOG_ENTRY";
+
+		// for frame step
+		inline static const std::string ON_SCENE_FRAME_STEP = "ON_SCENE_FRAME_STEP";
+
     };
 }
