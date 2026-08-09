@@ -6,6 +6,12 @@
 #include <DX3D/Component/CameraComponent.h>
 #include <filesystem>
 #include <functional>
+#include <fstream>
+#include <iomanip>
+#include <sstream>
+#include <optional>
+#include <algorithm>
+#include <unordered_map>
 
 #include <DX3D/UI/DebugWindowUI.h>
 #include <DX3D/UI/HierarchyUI.h>
@@ -23,6 +29,19 @@
 
 namespace
 {
+	struct SerializableSceneObjectData
+	{
+		size_t id{};
+		size_t parentId{};
+		std::string name;
+		std::string type;
+		bool enabled{};
+		bool physicsEnabled{};
+		dx3d::Vec3 position{};
+		dx3d::Vec3 rotation{};
+		dx3d::Vec3 scale{};
+	};
+
 	std::filesystem::path findObjFilesDirectory()
 	{
 		namespace fs = std::filesystem;
@@ -48,6 +67,178 @@ namespace
 		}
 
 		return current / "Assets" / "ObjFiles";
+	}
+
+	std::string escapeJsonString(const std::string& value)
+	{
+		std::string escaped;
+		escaped.reserve(value.size());
+		for (const auto c : value)
+		{
+			switch (c)
+			{
+			case '\\': escaped += "\\\\"; break;
+			case '"': escaped += "\\\""; break;
+			case '\n': escaped += "\\n"; break;
+			case '\r': escaped += "\\r"; break;
+			case '\t': escaped += "\\t"; break;
+			default: escaped += c; break;
+			}
+		}
+		return escaped;
+	}
+
+	std::string unescapeJsonString(const std::string& value)
+	{
+		std::string unescaped;
+		unescaped.reserve(value.size());
+		for (size_t i = 0; i < value.size(); ++i)
+		{
+			if (value[i] != '\\' || i + 1 >= value.size())
+			{
+				unescaped += value[i];
+				continue;
+			}
+
+			const auto next = value[++i];
+			switch (next)
+			{
+			case '\\': unescaped += '\\'; break;
+			case '"': unescaped += '"'; break;
+			case 'n': unescaped += '\n'; break;
+			case 'r': unescaped += '\r'; break;
+			case 't': unescaped += '\t'; break;
+			default: unescaped += next; break;
+			}
+		}
+		return unescaped;
+	}
+
+	std::optional<std::string> readJsonStringField(const std::string& line, const std::string& fieldName)
+	{
+		const auto key = "\"" + fieldName + "\"";
+		auto keyPos = line.find(key);
+		if (keyPos == std::string::npos) return std::nullopt;
+
+		auto colonPos = line.find(':', keyPos + key.size());
+		if (colonPos == std::string::npos) return std::nullopt;
+
+		auto quoteStart = line.find('"', colonPos + 1);
+		if (quoteStart == std::string::npos) return std::nullopt;
+
+		std::string raw;
+		bool escaped = false;
+		for (size_t i = quoteStart + 1; i < line.size(); ++i)
+		{
+			const auto c = line[i];
+			if (escaped)
+			{
+				raw += '\\';
+				raw += c;
+				escaped = false;
+				continue;
+			}
+			if (c == '\\')
+			{
+				escaped = true;
+				continue;
+			}
+			if (c == '"')
+			{
+				return unescapeJsonString(raw);
+			}
+			raw += c;
+		}
+
+		return std::nullopt;
+	}
+
+	std::optional<size_t> readJsonSizeTField(const std::string& line, const std::string& fieldName)
+	{
+		const auto key = "\"" + fieldName + "\"";
+		auto keyPos = line.find(key);
+		if (keyPos == std::string::npos) return std::nullopt;
+
+		auto colonPos = line.find(':', keyPos + key.size());
+		if (colonPos == std::string::npos) return std::nullopt;
+
+		auto valueStart = line.find_first_not_of(" \t", colonPos + 1);
+		if (valueStart == std::string::npos) return std::nullopt;
+
+		try
+		{
+			return static_cast<size_t>(std::stoull(line.substr(valueStart)));
+		}
+		catch (const std::exception&)
+		{
+			return std::nullopt;
+		}
+	}
+
+	std::optional<bool> readJsonBoolField(const std::string& line, const std::string& fieldName)
+	{
+		const auto key = "\"" + fieldName + "\"";
+		auto keyPos = line.find(key);
+		if (keyPos == std::string::npos) return std::nullopt;
+
+		auto colonPos = line.find(':', keyPos + key.size());
+		if (colonPos == std::string::npos) return std::nullopt;
+
+		auto valueStart = line.find_first_not_of(" \t", colonPos + 1);
+		if (valueStart == std::string::npos) return std::nullopt;
+
+		if (line.compare(valueStart, 4, "true") == 0) return true;
+		if (line.compare(valueStart, 5, "false") == 0) return false;
+		return std::nullopt;
+	}
+
+	std::optional<dx3d::Vec3> readJsonVec3Field(const std::string& line, const std::string& fieldName)
+	{
+		const auto key = "\"" + fieldName + "\"";
+		auto keyPos = line.find(key);
+		if (keyPos == std::string::npos) return std::nullopt;
+
+		auto openBracket = line.find('[', keyPos + key.size());
+		auto closeBracket = line.find(']', openBracket);
+		if (openBracket == std::string::npos || closeBracket == std::string::npos) return std::nullopt;
+
+		std::string values = line.substr(openBracket + 1, closeBracket - openBracket - 1);
+		std::replace(values.begin(), values.end(), ',', ' ');
+
+		std::istringstream stream(values);
+		dx3d::Vec3 result{};
+		if (!(stream >> result.x >> result.y >> result.z)) return std::nullopt;
+
+		return result;
+	}
+
+	bool readSceneObjectFromJson(std::istream& file, SerializableSceneObjectData& data)
+	{
+		std::string line;
+		while (std::getline(file, line))
+		{
+			if (line.find('{') != std::string::npos) break;
+			if (line.find(']') != std::string::npos) return false;
+		}
+
+		if (!file) return false;
+
+		while (std::getline(file, line))
+		{
+			if (line.find('}') != std::string::npos) return true;
+
+			if (auto value = readJsonSizeTField(line, "id")) data.id = *value;
+			else if (auto value = readJsonSizeTField(line, "parentId")) data.parentId = *value;
+			else if (auto value = readJsonStringField(line, "name")) data.name = *value;
+			else if (auto value = readJsonStringField(line, "type")) data.type = *value;
+			else if (auto value = readJsonBoolField(line, "enabled")) data.enabled = *value;
+			else if (auto value = readJsonBoolField(line, "physicsEnabled")) data.physicsEnabled = *value;
+			else if (auto value = readJsonVec3Field(line, "position")) data.position = *value;
+			else if (auto value = readJsonVec3Field(line, "rotation")) data.rotation = *value;
+			else if (auto value = readJsonVec3Field(line, "scale")) data.scale = *value;
+		}
+
+		return false;
 	}
 }
 
@@ -510,6 +701,42 @@ void MainGame::registerEditorEvents()
 
 	events.addObserver(dx3d::EventNames::ON_EDITOR_UNDO, [this]() { undoEditorCommand(); });
 	events.addObserver(dx3d::EventNames::ON_EDITOR_REDO, [this]() { redoEditorCommand(); });
+	events.addObserver(dx3d::EventNames::ON_SCENE_SAVE, [this]()
+	{
+		const auto scenePath = getDefaultScenePath();
+		if (saveSceneToFile(scenePath))
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Info, "Scene saved to {}", scenePath.string());
+		}
+		else
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Warning, "Failed to save scene to {}", scenePath.string());
+		}
+	});
+	events.addObserver(dx3d::EventNames::ON_SCENE_SAVE_AS_NEW, [this]()
+	{
+		const auto scenePath = getNewScenePath();
+		if (saveSceneToFile(scenePath))
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Info, "Scene saved as new file: {}", scenePath.string());
+		}
+		else
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Warning, "Failed to save new scene to {}", scenePath.string());
+		}
+	});
+	events.addObserver(dx3d::EventNames::ON_SCENE_LOAD, [this](dx3d::Parameters& params)
+	{
+		const auto scenePath = std::filesystem::path(params.GetStringExtra("Path", getDefaultScenePath().string()));
+		if (loadSceneFromFile(scenePath))
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Info, "Scene loaded from {}", scenePath.string());
+		}
+		else
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Warning, "Failed to load scene from {}", scenePath.string());
+		}
+	});
 	events.addObserver(dx3d::EventNames::ON_EDITOR_PLAY_MODE_CHANGED, [this](dx3d::Parameters& params)
 	{
 		setPlayMode(params.GetBoolExtra("IsPlayMode", false));
@@ -666,4 +893,212 @@ void MainGame::selectGameObject(dx3d::GameObject* object)
 	dx3d::Parameters params;
 	params.PutExtra("Selected", object);
 	dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::ON_GAMEOBJECT_SELECTED, params);
+}
+
+std::filesystem::path MainGame::getDefaultScenePath() const
+{
+	return std::filesystem::current_path() / "Assets" / "Scenes" / "editor_scene.json";
+}
+
+std::filesystem::path MainGame::getNewScenePath() const
+{
+	const auto scenesDirectory = std::filesystem::current_path() / "Assets" / "Scenes";
+
+	for (size_t index = 1; index < 10000; ++index)
+	{
+		auto candidate = scenesDirectory / ("scene_" + std::to_string(index) + ".json");
+		std::error_code error;
+		if (!std::filesystem::exists(candidate, error))
+		{
+			return candidate;
+		}
+	}
+
+	return scenesDirectory / "scene_new.json";
+}
+
+bool MainGame::saveSceneToFile(const std::filesystem::path& path)
+{
+	std::error_code error;
+	std::filesystem::create_directories(path.parent_path(), error);
+	if (error) return false;
+
+	std::ofstream file(path);
+	if (!file) return false;
+
+	file << "{\n";
+	file << "  \"version\": 1,\n";
+	file << "  \"objects\": [\n";
+
+	bool wroteObject = false;
+
+	for (const auto& [typeId, objects] : getWorld().getGameObjectList())
+	{
+		for (const auto& objectPtr : objects)
+		{
+			auto* object = objectPtr.get();
+			if (!object || object->isDeleted()) continue;
+			if (object->getComponent<dx3d::CameraComponent>()) continue;
+
+			const auto objectType = getSerializableObjectType(*object);
+			if (objectType.empty()) continue;
+
+			auto& transform = object->getTransform();
+			const auto position = transform.getPosition();
+			const auto rotation = transform.getRotation();
+			const auto scale = transform.getScale();
+			auto* physics = object->getComponent<dx3d::PhysicsComponent>();
+			auto* parent = object->getParent();
+			const auto parentId = (parent && !parent->isDeleted() && !parent->getComponent<dx3d::CameraComponent>())
+				? parent->getID()
+				: 0;
+
+			if (wroteObject)
+			{
+				file << ",\n";
+			}
+
+			file << "    {\n"
+				<< "      \"id\": " << object->getID() << ",\n"
+				<< "      \"parentId\": " << parentId << ",\n"
+				<< "      \"name\": \"" << escapeJsonString(object->getName()) << "\",\n"
+				<< "      \"type\": \"" << escapeJsonString(objectType) << "\",\n"
+				<< "      \"enabled\": " << (object->isEnabled() ? "true" : "false") << ",\n"
+				<< "      \"physicsEnabled\": " << ((physics && physics->isPhysicsEnabled()) ? "true" : "false") << ",\n"
+				<< "      \"position\": [" << position.x << ", " << position.y << ", " << position.z << "],\n"
+				<< "      \"rotation\": [" << rotation.x << ", " << rotation.y << ", " << rotation.z << "],\n"
+				<< "      \"scale\": [" << scale.x << ", " << scale.y << ", " << scale.z << "]\n"
+				<< "    }";
+
+			wroteObject = true;
+		}
+	}
+
+	file << "\n  ]\n";
+	file << "}\n";
+
+	return true;
+}
+
+bool MainGame::loadSceneFromFile(const std::filesystem::path& path)
+{
+	std::ifstream file(path);
+	if (!file) return false;
+
+	std::vector<SerializableSceneObjectData> sceneObjects;
+	std::string line;
+	while (std::getline(file, line))
+	{
+		if (line.find("\"objects\"") == std::string::npos) continue;
+
+		while (true)
+		{
+			SerializableSceneObjectData data;
+			const auto beforeRead = file.tellg();
+			if (!readSceneObjectFromJson(file, data)) break;
+			if (data.name.empty() || data.type.empty()) return false;
+			sceneObjects.push_back(data);
+			if (beforeRead == file.tellg()) break;
+		}
+		break;
+	}
+
+	clearSerializableSceneObjects();
+
+	std::unordered_map<size_t, dx3d::GameObject*> loadedObjectsBySavedId;
+	std::vector<std::pair<SerializableSceneObjectData, dx3d::GameObject*>> loadedObjects;
+
+	for (const auto& data : sceneObjects)
+	{
+		auto* object = spawnEditorObject(data.type);
+		if (!object) continue;
+
+		object->setName(data.name);
+		object->setEnabled(data.enabled);
+		if (data.id != 0)
+		{
+			loadedObjectsBySavedId[data.id] = object;
+		}
+		loadedObjects.push_back({ data, object });
+	}
+
+	for (const auto& [data, object] : loadedObjects)
+	{
+		if (!object || data.parentId == 0) continue;
+
+		auto parentIt = loadedObjectsBySavedId.find(data.parentId);
+		if (parentIt != loadedObjectsBySavedId.end())
+		{
+			object->setParent(parentIt->second);
+		}
+	}
+
+	for (const auto& [data, object] : loadedObjects)
+	{
+		if (!object) continue;
+
+		object->getTransform().setPosition(data.position);
+		object->getTransform().setRotation(data.rotation);
+		object->getTransform().setScale(data.scale);
+
+		if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())
+		{
+			physics->syncTransformToPhysics();
+			physics->setPhysicsEnabled(data.physicsEnabled);
+		}
+	}
+
+	m_undoStack.clear();
+	m_redoStack.clear();
+	selectGameObject(nullptr);
+
+	return true;
+}
+
+std::string MainGame::getSerializableObjectType(dx3d::GameObject& object)
+{
+	auto* meshComponent = object.getComponent<dx3d::MeshComponent>();
+	auto* physicsComponent = object.getComponent<dx3d::PhysicsComponent>();
+	const auto prefix = physicsComponent ? std::string{ "Physics-" } : std::string{};
+
+	if (!meshComponent || !meshComponent->getMesh())
+	{
+		return "Empty";
+	}
+
+	const auto& mesh = meshComponent->getMesh();
+	if (mesh == m_spawnCubeMesh) return prefix + "Cube";
+	if (mesh == m_spawnSphereMesh) return prefix + "Sphere";
+	if (mesh == m_spawnCapsuleMesh) return prefix + "Capsule";
+	if (mesh == m_spawnCylinderMesh) return prefix + "Cylinder";
+	if (mesh == m_spawnPlaneMesh) return prefix + "Plane";
+
+	for (const auto& modelName : m_availableObjModels)
+	{
+		if (mesh == getMeshFactory().getCustomMesh(modelName))
+		{
+			return "Obj:" + modelName;
+		}
+	}
+
+	return {};
+}
+
+void MainGame::clearSerializableSceneObjects()
+{
+	for (const auto& [typeId, objects] : getWorld().getGameObjectList())
+	{
+		for (const auto& objectPtr : objects)
+		{
+			auto* object = objectPtr.get();
+			if (!object || object->isDeleted()) continue;
+			if (object->getComponent<dx3d::CameraComponent>()) continue;
+
+			if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())
+			{
+				physics->setPhysicsEnabled(false);
+			}
+			object->setDeleted(true);
+		}
+	}
 }
