@@ -2,11 +2,21 @@
   "version": 1,
   "objects": [
     {
-      "id": 89,
+      "id": 2,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Plane",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [0, 0, 0],
+      "rotation": [0, 0, 0],
+      "scale": [7, 7, 7]
+    },
+    {
+      "id": 5,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-2.8, 0.3, -2.8],
@@ -14,11 +24,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 92,
+      "id": 8,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-1.4, 0.3, -2.8],
@@ -26,11 +35,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 95,
+      "id": 11,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [0, 0.3, -2.8],
@@ -38,11 +46,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 98,
+      "id": 14,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [1.4, 0.3, -2.8],
@@ -50,11 +57,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 101,
+      "id": 17,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [2.8, 0.3, -2.8],
@@ -62,11 +68,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 104,
+      "id": 20,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-2.8, 0.3, -1.4],
@@ -74,11 +79,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 107,
+      "id": 23,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-1.4, 0.3, -1.4],
@@ -86,11 +90,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 110,
+      "id": 26,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [0, 0.3, -1.4],
@@ -98,11 +101,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 113,
+      "id": 29,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [1.4, 0.3, -1.4],
@@ -110,11 +112,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 116,
+      "id": 32,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [2.8, 0.3, -1.4],
@@ -122,11 +123,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 119,
+      "id": 35,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-2.8, 0.3, 0],
@@ -134,11 +134,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 122,
+      "id": 38,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-1.4, 0.3, 0],
@@ -146,11 +145,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 125,
+      "id": 41,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [0, 0.3, 0],
@@ -158,11 +156,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 128,
+      "id": 44,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [1.4, 0.3, 0],
@@ -170,11 +167,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 131,
+      "id": 47,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [2.8, 0.3, 0],
@@ -182,11 +178,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 134,
+      "id": 50,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-2.8, 0.3, 1.4],
@@ -194,11 +189,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 137,
+      "id": 53,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-1.4, 0.3, 1.4],
@@ -206,11 +200,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 140,
+      "id": 56,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [0, 0.3, 1.4],
@@ -218,11 +211,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 143,
+      "id": 59,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [1.4, 0.3, 1.4],
@@ -230,11 +222,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 146,
+      "id": 62,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [2.8, 0.3, 1.4],
@@ -242,11 +233,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 149,
+      "id": 65,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-2.8, 0.3, 2.8],
@@ -254,11 +244,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 152,
+      "id": 68,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [-1.4, 0.3, 2.8],
@@ -266,11 +255,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 155,
+      "id": 71,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [0, 0.3, 2.8],
@@ -278,11 +266,10 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 158,
+      "id": 74,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [1.4, 0.3, 2.8],
@@ -290,39 +277,14 @@
       "scale": [0.5, 0.5, 0.5]
     },
     {
-      "id": 161,
+      "id": 77,
       "parentId": 0,
       "name": "GameObject",
       "type": "Cube",
-      "texture": "wood",
       "enabled": true,
       "physicsEnabled": false,
       "position": [2.8, 0.3, 2.8],
       "rotation": [0, 2.21, 0],
-      "scale": [0.5, 0.5, 0.5]
-    },
-    {
-      "id": 164,
-      "parentId": 0,
-      "name": "Physics-Plane 1",
-      "type": "Physics-Plane",
-      "texture": "floor",
-      "enabled": true,
-      "physicsEnabled": true,
-      "position": [0, 0.5, 0],
-      "rotation": [0, 0, 0],
-      "scale": [0.5, 0.5, 0.5]
-    },
-    {
-      "id": 168,
-      "parentId": 0,
-      "name": "Physics-Cube 1",
-      "type": "Physics-Cube",
-      "texture": "wood",
-      "enabled": true,
-      "physicsEnabled": true,
-      "position": [0, 0.5, 0],
-      "rotation": [0, 0, 0],
       "scale": [0.5, 0.5, 0.5]
     }
   ]

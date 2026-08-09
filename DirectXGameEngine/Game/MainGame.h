@@ -37,6 +37,7 @@ private:
 	void setPlayMode(bool isPlayMode);
 
 	dx3d::GameObject* spawnEditorObject(const std::string& type);
+	dx3d::RefPtr<dx3d::MaterialResource> createEditorMaterial(const std::string& textureName = "wood");
 	void selectGameObject(dx3d::GameObject* object);
 	std::filesystem::path getDefaultScenePath() const;
 	std::filesystem::path getNewScenePath() const;
@@ -53,7 +54,6 @@ private:
 	dx3d::RefPtr<dx3d::Mesh> m_spawnCapsuleMesh{};
 	dx3d::RefPtr<dx3d::Mesh> m_spawnCylinderMesh{};
 	dx3d::RefPtr<dx3d::Mesh> m_spawnPlaneMesh{};
-	dx3d::RefPtr<dx3d::MaterialResource> m_spawnMaterial{};
 	std::vector<EditorCommand> m_undoStack{};
 	std::vector<EditorCommand> m_redoStack{};
 	std::vector<std::string> m_availableObjModels{};

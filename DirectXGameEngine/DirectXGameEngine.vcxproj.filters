@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="DX3D\Source\DX3D\Core\DebugLogManager.cpp" />
@@ -35,6 +35,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Graphics\RenderSystem\IndexBuffer\IndexBuffer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Game\World.cpp" />
     <ClCompile Include="Game\MainGame.cpp" />
+    <ClCompile Include="Game\SceneSerializer.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Component\TransformComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Input\InputSystem.cpp" />
     <ClCompile Include="Game\Objects\Player.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="DX3D\Include\DX3D\Game\GameObject.h" />
     <ClInclude Include="DX3D\Vendor\stb-image\include\stb-image\stb_image.h" />
     <ClInclude Include="Game\MainGame.h" />
+    <ClInclude Include="Game\SceneSerializer.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\TransformComponent.h" />
     <ClInclude Include="DX3D\Include\DX3D\Input\InputSystem.h" />
     <ClInclude Include="Game\Objects\Player.h" />
