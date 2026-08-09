@@ -1,0 +1,291 @@
+{
+  "version": 1,
+  "objects": [
+    {
+      "id": 253,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-2.8, 0.3, -2.8],
+      "rotation": [0, 5.32, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 256,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-1.4, 0.3, -2.8],
+      "rotation": [0, 2.77, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 259,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [0, 0.3, -2.8],
+      "rotation": [0, 4.27, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 262,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [1.4, 0.3, -2.8],
+      "rotation": [0, 4.41, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 265,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [2.8, 0.3, -2.8],
+      "rotation": [0, 5.12, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 268,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-2.8, 0.3, -1.4],
+      "rotation": [0, 3.76, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 271,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-1.4, 0.3, -1.4],
+      "rotation": [0, 3.59, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 274,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [0, 0.3, -1.4],
+      "rotation": [0, 0.47, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 277,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [1.4, 0.3, -1.4],
+      "rotation": [0, 0.97, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 280,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [2.8, 0.3, -1.4],
+      "rotation": [0, 4.04, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 283,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-2.8, 0.3, 0],
+      "rotation": [0, 0.27, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 286,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-1.4, 0.3, 0],
+      "rotation": [0, 1.93, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 289,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [0, 0.3, 0],
+      "rotation": [0, 3.52, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 292,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [1.4, 0.3, 0],
+      "rotation": [0, 1.43, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 295,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [2.8, 0.3, 0],
+      "rotation": [0, 4.07, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 298,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-2.8, 0.3, 1.4],
+      "rotation": [0, 4.42, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 301,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-1.4, 0.3, 1.4],
+      "rotation": [0, 2.29, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 304,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [0, 0.3, 1.4],
+      "rotation": [0, 5.2, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 307,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [1.4, 0.3, 1.4],
+      "rotation": [0, 6.19, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 310,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [2.8, 0.3, 1.4],
+      "rotation": [0, 1.11, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 313,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-2.8, 0.3, 2.8],
+      "rotation": [0, 0.67, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 316,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [-1.4, 0.3, 2.8],
+      "rotation": [0, 4.6, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 319,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [0, 0.3, 2.8],
+      "rotation": [0, 4.07, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 322,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [1.4, 0.3, 2.8],
+      "rotation": [0, 1.5, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 325,
+      "parentId": 0,
+      "name": "GameObject",
+      "type": "Cube",
+      "enabled": true,
+      "physicsEnabled": false,
+      "position": [2.8, 0.3, 2.8],
+      "rotation": [0, 2.21, 0],
+      "scale": [0.5, 0.5, 0.5]
+    },
+    {
+      "id": 328,
+      "parentId": 0,
+      "name": "Physics-Plane 1",
+      "type": "Physics-Plane",
+      "enabled": true,
+      "physicsEnabled": true,
+      "position": [0, 0.5, 0],
+      "rotation": [0, 0, 0],
+      "scale": [0.5, 0.5, 0.5]
+    }
+  ]
+}

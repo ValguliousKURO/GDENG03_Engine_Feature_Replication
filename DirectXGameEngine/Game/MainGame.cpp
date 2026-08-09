@@ -1,4 +1,5 @@
 #include "MainGame.h"
+#include "SceneSerializer.h"
 #include "Objects/Player.h"
 #include "Objects/Camera.h"
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
@@ -6,6 +7,7 @@
 #include <DX3D/Component/CameraComponent.h>
 #include <filesystem>
 #include <functional>
+#include <unordered_map>
 
 #include <DX3D/UI/DebugWindowUI.h>
 #include <DX3D/UI/HierarchyUI.h>
@@ -131,16 +133,6 @@ void MainGame::onCreate()
 	m_spawnPlaneMesh = planeMesh;
 	auto circleMesh = getMeshFactory().createCircleMesh(0.5f, 32);
 	
-
-
-
-	m_spawnMaterial = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
-	if (m_spawnMaterial)
-	{
-		auto matData = dx3d::Vec3(1, 1, 1);
-		m_spawnMaterial->setData(std::as_bytes(std::span{ &matData, 1 }));
-		m_spawnMaterial->setTexture(0, woodTex);
-	}
 
 	{
 		auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base/"DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
@@ -510,6 +502,42 @@ void MainGame::registerEditorEvents()
 
 	events.addObserver(dx3d::EventNames::ON_EDITOR_UNDO, [this]() { undoEditorCommand(); });
 	events.addObserver(dx3d::EventNames::ON_EDITOR_REDO, [this]() { redoEditorCommand(); });
+	events.addObserver(dx3d::EventNames::ON_SCENE_SAVE, [this]()
+	{
+		const auto scenePath = getDefaultScenePath();
+		if (saveSceneToFile(scenePath))
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Info, "Scene saved to {}", scenePath.string());
+		}
+		else
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Warning, "Failed to save scene to {}", scenePath.string());
+		}
+	});
+	events.addObserver(dx3d::EventNames::ON_SCENE_SAVE_AS_NEW, [this]()
+	{
+		const auto scenePath = getNewScenePath();
+		if (saveSceneToFile(scenePath))
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Info, "Scene saved as new file: {}", scenePath.string());
+		}
+		else
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Warning, "Failed to save new scene to {}", scenePath.string());
+		}
+	});
+	events.addObserver(dx3d::EventNames::ON_SCENE_LOAD, [this](dx3d::Parameters& params)
+	{
+		const auto scenePath = std::filesystem::path(params.GetStringExtra("Path", getDefaultScenePath().string()));
+		if (loadSceneFromFile(scenePath))
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Info, "Scene loaded from {}", scenePath.string());
+		}
+		else
+		{
+			getLogger().log(dx3d::Logger::LogLevel::Warning, "Failed to load scene from {}", scenePath.string());
+		}
+	});
 	events.addObserver(dx3d::EventNames::ON_EDITOR_PLAY_MODE_CHANGED, [this](dx3d::Parameters& params)
 	{
 		setPlayMode(params.GetBoolExtra("IsPlayMode", false));
@@ -629,11 +657,11 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 	const auto objectIndex = ++m_spawnedObjectCounters[type];
 	object->setName(displayName + " " + std::to_string(objectIndex));
 
-	if (spawnMesh && m_spawnMaterial)
+	if (spawnMesh)
 	{
 		auto* mesh = object->createOrGetComponent<dx3d::MeshComponent>();
 		mesh->setMesh(spawnMesh);
-		mesh->setMaterial(m_spawnMaterial);
+		mesh->setMaterial(createEditorMaterial());
 	}
 
 	//Add physics component if it's a physics object
@@ -661,9 +689,172 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 	return object;
 }
 
+dx3d::RefPtr<dx3d::MaterialResource> MainGame::createEditorMaterial(const std::string& textureName)
+{
+	std::filesystem::path base = std::filesystem::current_path().parent_path();
+	auto material = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+	if (!material) return {};
+
+	auto matData = dx3d::Vec3(1, 1, 1);
+	material->setData(std::as_bytes(std::span{ &matData, 1 }));
+
+	auto texture = dx3d::TextureManager::getInstance().getTexture(textureName);
+	if (texture)
+	{
+		material->setTexture(0, texture);
+	}
+
+	return material;
+}
+
 void MainGame::selectGameObject(dx3d::GameObject* object)
 {
 	dx3d::Parameters params;
 	params.PutExtra("Selected", object);
 	dx3d::EventBroadcastManager::getInstance().postEvent(dx3d::EventNames::ON_GAMEOBJECT_SELECTED, params);
+}
+
+std::filesystem::path MainGame::getDefaultScenePath() const
+{
+	return std::filesystem::current_path() / "Assets" / "Scenes" / "editor_scene.json";
+}
+
+std::filesystem::path MainGame::getNewScenePath() const
+{
+	const auto scenesDirectory = std::filesystem::current_path() / "Assets" / "Scenes";
+
+	for (size_t index = 1; index < 10000; ++index)
+	{
+		auto candidate = scenesDirectory / ("scene_" + std::to_string(index) + ".json");
+		std::error_code error;
+		if (!std::filesystem::exists(candidate, error))
+		{
+			return candidate;
+		}
+	}
+
+	return scenesDirectory / "scene_new.json";
+}
+
+bool MainGame::saveSceneToFile(const std::filesystem::path& path)
+{
+	return SceneSerializer::saveToJsonFile(
+		path,
+		getWorld(),
+		[this](dx3d::GameObject& object)
+		{
+			return getSerializableObjectType(object);
+		});
+}
+
+bool MainGame::loadSceneFromFile(const std::filesystem::path& path)
+{
+	std::vector<SceneObjectData> sceneObjects;
+	if (!SceneSerializer::loadFromJsonFile(path, sceneObjects)) return false;
+
+	clearSerializableSceneObjects();
+
+	std::unordered_map<size_t, dx3d::GameObject*> loadedObjectsBySavedId;
+	std::vector<std::pair<SceneObjectData, dx3d::GameObject*>> loadedObjects;
+
+	for (const auto& data : sceneObjects)
+	{
+		auto* object = spawnEditorObject(data.type);
+		if (!object) continue;
+
+		object->setName(data.name);
+		object->setEnabled(data.enabled);
+		if (!data.textureName.empty())
+		{
+			if (auto* mesh = object->getComponent<dx3d::MeshComponent>())
+			{
+				mesh->setMaterial(createEditorMaterial(data.textureName));
+			}
+		}
+		if (data.id != 0)
+		{
+			loadedObjectsBySavedId[data.id] = object;
+		}
+		loadedObjects.push_back({ data, object });
+	}
+
+	for (const auto& [data, object] : loadedObjects)
+	{
+		if (!object || data.parentId == 0) continue;
+
+		auto parentIt = loadedObjectsBySavedId.find(data.parentId);
+		if (parentIt != loadedObjectsBySavedId.end())
+		{
+			object->setParent(parentIt->second);
+		}
+	}
+
+	for (const auto& [data, object] : loadedObjects)
+	{
+		if (!object) continue;
+
+		object->getTransform().setPosition(data.position);
+		object->getTransform().setRotation(data.rotation);
+		object->getTransform().setScale(data.scale);
+
+		if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())
+		{
+			physics->syncTransformToPhysics();
+			physics->setPhysicsEnabled(data.physicsEnabled);
+		}
+	}
+
+	m_undoStack.clear();
+	m_redoStack.clear();
+	selectGameObject(nullptr);
+
+	return true;
+}
+
+std::string MainGame::getSerializableObjectType(dx3d::GameObject& object)
+{
+	auto* meshComponent = object.getComponent<dx3d::MeshComponent>();
+	auto* physicsComponent = object.getComponent<dx3d::PhysicsComponent>();
+	const auto prefix = physicsComponent ? std::string{ "Physics-" } : std::string{};
+
+	if (!meshComponent || !meshComponent->getMesh())
+	{
+		return "Empty";
+	}
+
+	const auto& mesh = meshComponent->getMesh();
+	if (mesh == m_spawnCubeMesh) return prefix + "Cube";
+	if (mesh == m_spawnSphereMesh) return prefix + "Sphere";
+	if (mesh == m_spawnCapsuleMesh) return prefix + "Capsule";
+	if (mesh == m_spawnCylinderMesh) return prefix + "Cylinder";
+	if (mesh == m_spawnPlaneMesh) return prefix + "Plane";
+
+	for (const auto& modelName : m_availableObjModels)
+	{
+		if (mesh == getMeshFactory().getCustomMesh(modelName))
+		{
+			return "Obj:" + modelName;
+		}
+	}
+
+	return {};
+}
+
+void MainGame::clearSerializableSceneObjects()
+{
+	for (const auto& [typeId, objects] : getWorld().getGameObjectList())
+	{
+		for (const auto& objectPtr : objects)
+		{
+			auto* object = objectPtr.get();
+			if (!object || object->isDeleted()) continue;
+			if (object->getComponent<dx3d::CameraComponent>()) continue;
+
+			if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())
+			{
+				physics->setPhysicsEnabled(false);
+			}
+			object->setDeleted(true);
+		}
+	}
 }

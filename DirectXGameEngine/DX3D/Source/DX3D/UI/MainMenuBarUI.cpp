@@ -6,6 +6,8 @@
 
 // ImGui's DragFloat3 range uses FLT_MAX.
 #include <cfloat>
+#include <algorithm>
+#include <filesystem>
 #include <imgui.h>
 
 dx3d::MainMenuBarUI::MainMenuBarUI(const BaseDesc& desc) : BaseUI(desc)
@@ -22,6 +24,36 @@ void dx3d::MainMenuBarUI::draw()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
+			if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+			{
+				EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_SAVE);
+			}
+			if (ImGui::MenuItem("Save Scene As New"))
+			{
+				EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_SAVE_AS_NEW);
+			}
+			if (ImGui::BeginMenu("Load Scene"))
+			{
+				const auto sceneFiles = getAvailableSceneFiles();
+				if (sceneFiles.empty())
+				{
+					ImGui::MenuItem("No .json scenes found", nullptr, false, false);
+				}
+				else
+				{
+					for (const auto& scenePath : sceneFiles)
+					{
+						const auto sceneName = scenePath.filename().string();
+						if (ImGui::MenuItem(sceneName.c_str()))
+						{
+							Parameters params;
+							params.PutExtra("Path", scenePath.string());
+							EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_LOAD, params);
+						}
+					}
+				}
+				ImGui::EndMenu();
+			}
 			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Window"))
@@ -59,4 +91,38 @@ void dx3d::MainMenuBarUI::draw()
 		}
 		ImGui::EndMainMenuBar();
 	}
+}
+
+std::filesystem::path dx3d::MainMenuBarUI::getScenesDirectory() const
+{
+	return std::filesystem::current_path() / "Assets" / "Scenes";
+}
+
+std::vector<std::filesystem::path> dx3d::MainMenuBarUI::getAvailableSceneFiles() const
+{
+	namespace fs = std::filesystem;
+
+	std::vector<fs::path> sceneFiles;
+	std::error_code error;
+	const auto scenesDirectory = getScenesDirectory();
+
+	if (!fs::exists(scenesDirectory, error) || !fs::is_directory(scenesDirectory, error))
+	{
+		return sceneFiles;
+	}
+
+	for (const auto& entry : fs::directory_iterator(scenesDirectory, error))
+	{
+		if (error) return sceneFiles;
+		if (!entry.is_regular_file(error)) continue;
+
+		auto path = entry.path();
+		if (path.extension() == ".json" || path.extension() == ".JSON")
+		{
+			sceneFiles.push_back(path);
+		}
+	}
+
+	std::sort(sceneFiles.begin(), sceneFiles.end());
+	return sceneFiles;
 }

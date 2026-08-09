@@ -6,6 +6,8 @@
 #include <DX3D/Resource/MaterialResource.h>
 #include <unordered_map>
 #include <functional>
+#include <filesystem>
+#include <string>
 
 class MainGame : public dx3d::Game
 {
@@ -35,7 +37,14 @@ private:
 	void setPlayMode(bool isPlayMode);
 
 	dx3d::GameObject* spawnEditorObject(const std::string& type);
+	dx3d::RefPtr<dx3d::MaterialResource> createEditorMaterial(const std::string& textureName = "wood");
 	void selectGameObject(dx3d::GameObject* object);
+	std::filesystem::path getDefaultScenePath() const;
+	std::filesystem::path getNewScenePath() const;
+	bool saveSceneToFile(const std::filesystem::path& path);
+	bool loadSceneFromFile(const std::filesystem::path& path);
+	std::string getSerializableObjectType(dx3d::GameObject& object);
+	void clearSerializableSceneObjects();
 
 	std::vector< dx3d::UniquePtr<dx3d::BaseUI>> m_UIs{};
 	std::unordered_map<dx3d::ui32, dx3d::UniquePtr<dx3d::InspectorUI>> m_InspectorUIs{};
@@ -45,7 +54,6 @@ private:
 	dx3d::RefPtr<dx3d::Mesh> m_spawnCapsuleMesh{};
 	dx3d::RefPtr<dx3d::Mesh> m_spawnCylinderMesh{};
 	dx3d::RefPtr<dx3d::Mesh> m_spawnPlaneMesh{};
-	dx3d::RefPtr<dx3d::MaterialResource> m_spawnMaterial{};
 	std::vector<EditorCommand> m_undoStack{};
 	std::vector<EditorCommand> m_redoStack{};
 	std::vector<std::string> m_availableObjModels{};
