@@ -5,6 +5,8 @@
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
 
+#include <DX3D/Core/DebugLogManager.h>
+
 dx3d::SceneStateUI::SceneStateUI(const BaseDesc& desc) : BaseUI(desc)
 {
 }
@@ -51,10 +53,17 @@ void dx3d::SceneStateUI::draw()
 				}
 			}
 			// Framestep
+			ImGui::BeginDisabled(m_currentPauseLabel != "Unpause"); // Disable if not paused
 			if (ImGui::Button("Frame Step"))
 			{
-
+				EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_FRAME_STEP);
+				DebugLogManager::getInstance().customLog("Frame Step Triggered.");
 			}
+			ImGui::EndDisabled();
+		
+		
+
+			
 		}
 		ImGui::End();
 	}
