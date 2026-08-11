@@ -31,11 +31,13 @@ void dx3d::SceneStateUI::draw()
 				{
 					params.PutExtra("IsPlayMode", false);
 					m_currentStateLabel = "Play";
+					m_currentPauseLabel = "Pause";
 					EventBroadcastManager::getInstance().postEvent(EventNames::ON_EDITOR_PLAY_MODE_CHANGED, params);
 				}
 
 			}
 			// Pause/Resume
+			ImGui::BeginDisabled(m_currentStateLabel != "Stop"); // Disable if not paused
 			if (ImGui::Button(m_currentPauseLabel.c_str()))
 			{
 				Parameters params;
@@ -52,6 +54,7 @@ void dx3d::SceneStateUI::draw()
 					EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_PAUSE_STATE_CHANGED, params);
 				}
 			}
+			ImGui::EndDisabled();
 			// Framestep
 			ImGui::BeginDisabled(m_currentPauseLabel != "Unpause"); // Disable if not paused
 			if (ImGui::Button("Frame Step"))
