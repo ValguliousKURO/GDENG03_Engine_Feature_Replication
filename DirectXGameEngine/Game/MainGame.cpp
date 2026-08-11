@@ -163,30 +163,53 @@ void MainGame::onCreate()
 
 	srand((unsigned int)time(NULL));
 
-	// Creating cubes
-	for (auto y = -2; y < 3; y++)
-	{
-		for (auto x = -2; x < 3; x++)
-		{
-			auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base/"DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
-			if (basicMat)
-			{
-				auto matData = dx3d::Vec3(1, 1, 1);
-				basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
-				basicMat->setTexture(0, woodTex);
-			}
+	/*dx3d::PhysicsColliderType colliderType = dx3d::PhysicsColliderType::Box;
+	dx3d::Vec3 colliderSize = { 1.0f, 1.0f, 1.0f };*/
 
-			auto cube = world.createGameObject<dx3d::GameObject>();
-			auto comp = cube->createOrGetComponent<dx3d::MeshComponent>();
-			comp->setMaterial(basicMat);
-			comp->setMesh(cubeMesh);
-			auto roty = (rand() % 628) / 100.0f;
-			cube->getTransform().setScale({ 0.5,0.5,0.5 });
-			cube->getTransform().setPosition({ x * 1.4f, 0.25f + 0.05f, y * 1.4f });
-			cube->getTransform().setRotation({ 0,roty,0 });
-			if (x == 0 && y == 0) m_testObject = cube; // add the cubes.
-		}
-	}
+	// Creating cubes
+	//for (auto z = -2; z < 3; z++)
+	//{
+	//	for (auto y = -2; y < 3; y++)
+	//	{
+	//		for (auto x = -2; x < 3; x++)
+	//		{
+	//			auto basicMat = getResourceManager().createResourceFromFile<dx3d::MaterialResource>((base / "DirectXGameEngine/Game/Assets/Shaders/Basic.hlsl").c_str());
+	//			if (basicMat)
+	//			{
+	//				auto matData = dx3d::Vec3(1, 1, 1);
+	//				basicMat->setData(std::as_bytes(std::span{ &matData, 1 }));
+	//				basicMat->setTexture(0, woodTex);
+	//			}
+
+	//			auto cube = world.createGameObject<dx3d::GameObject>();
+	//			auto comp = cube->createOrGetComponent<dx3d::MeshComponent>();
+	//			comp->setMaterial(basicMat);
+	//			comp->setMesh(cubeMesh);
+
+
+	//			//Add physics component if it's a physics object
+
+	//			auto* physComp = cube->createOrGetComponent<dx3d::PhysicsComponent>();
+
+	//			physComp->setColliderType(colliderType);
+	//			physComp->setColliderSize(colliderSize);
+
+	//			physComp->setBodyType(dx3d::PhysicsBodyType::Dynamic);
+	//			physComp->setMass(1.0f);
+
+	//			physComp->setUseGravity(true);
+	//			physComp->initialize();
+
+	//			auto roty = (rand() % 628) / 100.0f;
+	//			cube->getTransform().setScale({ 0.5,0.5,0.5 });
+	//			cube->getTransform().setPosition({ x * 1.4f, y * 1.4f, z * 1.4f });
+	//			cube->getTransform().setRotation({ 0,roty,0 });
+
+
+	//			if (x == 0 && y == 0) m_testObject = cube; // add the cubes.
+	//		}
+	//	}
+	//}
 
 	// Creating Camera/Player
 	int displayIndex = 0;
