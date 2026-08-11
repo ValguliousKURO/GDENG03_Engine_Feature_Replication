@@ -1,4 +1,4 @@
-﻿#include <DX3D/UI/SceneViewportUI.h>
+#include <DX3D/UI/SceneViewportUI.h>
 
 #include <DX3D/Graphics/GraphicsDevice.h>
 #include <DX3D/Graphics/RenderSystem/DeviceContext/DeviceContext.h>
@@ -185,10 +185,7 @@ void dx3d::SceneViewportUI::renderScene(int width, int height)
 	}
 
 	// Light setup
-	LightData lightData{};
-	lightData.lightDirection = Vec4(0.577f, -0.577f, 0.577f, 0.0f);
-	lightData.lightColor = Vec4(1.0f, 0.95f, 0.9f, 1.0f);
-	lightData.ambientColor = Vec4(0.2f, 0.22f, 0.25f, 1.0f);
+	auto lightData = WorldRenderer::getLightData(m_world);
 	context.updateConstantBuffer(*m_lightCb, std::as_bytes(std::span{ &lightData, 1 }));
 
 	// Mesh loop (copied from renderForDisplay)

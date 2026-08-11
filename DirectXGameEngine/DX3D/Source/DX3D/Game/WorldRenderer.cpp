@@ -1,4 +1,4 @@
-﻿#include <DX3D/Game/WorldRenderer.h>
+#include <DX3D/Game/WorldRenderer.h>
 #include <DX3D/Game/Display.h>
 
 #include <DX3D/Graphics/GraphicsDevice.h>
@@ -15,6 +15,7 @@
 #include <DX3D/Component/CubeComponent.h>
 #include <DX3D/Component/CameraComponent.h>
 #include <DX3D/Component/MeshComponent.h>
+#include <DX3D/Component/PointLightComponent.h>
 
 #include <DX3D/Resource/MaterialResource.h>
 #include <DX3D/Resource/TextureResource.h>
@@ -73,6 +74,35 @@ dx3d::WorldRenderer::WorldRenderer(const WorldRendererDesc& desc) : Base(desc.ba
 		});
 }
 
+dx3d::LightData dx3d::WorldRenderer::getLightData(const World& world)
+{
+	LightData lightData{};
+	lightData.lightDirection = Vec4(0.577f, -0.577f, 0.577f, 0.0f);
+	lightData.lightColor = Vec4(1.0f, 0.95f, 0.9f, 1.0f);
+	lightData.ambientColor = Vec4(0.2f, 0.22f, 0.25f, 1.0f);
+	lightData.pointLightPosition = Vec4(0.0f, 0.0f, 0.0f, 0.0f);
+	lightData.pointLightColor = Vec4(1.0f, 0.95f, 0.85f, 1.0f);
+	lightData.pointLightSettings = Vec4(0.0f, 1.0f, 8.0f, 0.0f);
+
+	ui32 numComponents = 0;
+	auto components = world.getComponents<PointLightComponent>(numComponents);
+	for (auto i : std::views::iota(0u, numComponents))
+	{
+		auto* component = components[i];
+		if (!component || !component->getGameObject().isActiveInHierarchy())
+			continue;
+
+		const auto position = component->getGameObject().getTransform().getPosition();
+		const auto color = component->getColor();
+		lightData.pointLightPosition = Vec4(position.x, position.y, position.z, 1.0f);
+		lightData.pointLightColor = Vec4(color.x, color.y, color.z, 1.0f);
+		lightData.pointLightSettings = Vec4(1.0f, component->getIntensity(), component->getRange(), 0.0f);
+		break;
+	}
+
+	return lightData;
+}
+
 void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 deltaTime)
 {
 	auto size = swapChain.getSize();
@@ -118,10 +148,7 @@ void dx3d::WorldRenderer::render(const World& world, SwapChain& swapChain, f32 d
 	}
 
 	{
-		LightData lightData{};
-		lightData.lightDirection = Vec4(0.577f, -0.577f, 0.577f, 0.0f);
-		lightData.lightColor = Vec4(1.0f, 0.95f, 0.9f, 1.0f);
-		lightData.ambientColor = Vec4(0.2f, 0.22f, 0.25f, 1.0f);
+		auto lightData = getLightData(world);
 		context.updateConstantBuffer(*m_lightCb, std::as_bytes(std::span{ &lightData, 1 }));
 	}
 
@@ -213,10 +240,7 @@ void dx3d::WorldRenderer::renderForDisplay(const World& world, Display& display,
 	else context.clearRaster();
 
 	{
-		LightData lightData{};
-		lightData.lightDirection = Vec4(0.577f, -0.577f, 0.577f, 0.0f);
-		lightData.lightColor = Vec4(1.0f, 0.95f, 0.9f, 1.0f);
-		lightData.ambientColor = Vec4(0.2f, 0.22f, 0.25f, 1.0f);
+		auto lightData = getLightData(world);
 		context.updateConstantBuffer(*m_lightCb, std::as_bytes(std::span{ &lightData, 1 }));
 	}
 

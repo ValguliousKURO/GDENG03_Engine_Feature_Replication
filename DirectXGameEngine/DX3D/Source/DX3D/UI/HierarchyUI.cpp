@@ -1,4 +1,4 @@
-﻿#include <DX3D/UI/HierarchyUI.h>
+#include <DX3D/UI/HierarchyUI.h>
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/EventBroadcasting/EventBroadcastManager.h>
 #include <DX3D/EventBroadcasting/EventNames.h>
@@ -85,6 +85,12 @@ void dx3d::HierarchyUI::draw()
                 {
                     param.PutExtra("Key", "Plane");
                     EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+                }
+                if (ImGui::MenuItem("Add Point Light"))
+                {
+                    param.PutExtra("Key", "Point Light");
+                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
+                    DebugLogManager::getInstance().customLog("Added Point Light GameObject.");
                 }
 
                 ImGui::Separator();

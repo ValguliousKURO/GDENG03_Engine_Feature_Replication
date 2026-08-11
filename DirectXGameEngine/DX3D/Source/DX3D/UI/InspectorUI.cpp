@@ -6,6 +6,7 @@
 #include <DX3D/Component/CubeComponent.h>
 #include <DX3D/Component/MeshComponent.h>
 #include <DX3D/Component/PhysicsComponent.h>
+#include <DX3D/Component/PointLightComponent.h>
 
 #include <DX3D/Component/CameraComponent.h>
 #include <DX3D/Graphics/GraphicsDevice.h>
@@ -299,13 +300,35 @@ void dx3d::InspectorUI::drawTransformInspector(GameObject& object) // draw the i
 void dx3d::InspectorUI::drawComponentInspector(GameObject& object)
 {
 	auto* physicsComponent = object.getComponent<PhysicsComponent>();
-	if (!physicsComponent)
+	auto* pointLightComponent = object.getComponent<PointLightComponent>();
+	if (!physicsComponent && !pointLightComponent)
 	{
 		ImGui::Text("No editable components.");
 		return;
 	}
 
-	if (ImGui::CollapsingHeader("Physics Component", ImGuiTreeNodeFlags_DefaultOpen))
+	if (pointLightComponent && ImGui::CollapsingHeader("Point Light Component", ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		float intensity = pointLightComponent->getIntensity();
+		float range = pointLightComponent->getRange();
+
+		ImGui::BeginDisabled(m_isPlayMode || !object.isEnabled());
+		if (ImGui::DragFloat("Intensity", &intensity, 0.05f, 0.0f, 100.0f, "%.2f"))
+		{
+			pointLightComponent->setIntensity(intensity);
+		}
+		if (ImGui::DragFloat("Size / Range", &range, 0.05f, 0.1f, 100.0f, "%.2f"))
+		{
+			pointLightComponent->setRange(range);
+			const auto markerScale = range * 0.025f;
+			object.getTransform().setScale({ markerScale, markerScale, markerScale });
+		}
+		ImGui::EndDisabled();
+
+		ImGui::Text("Position controls are in the Transform tab.");
+	}
+
+	if (physicsComponent && ImGui::CollapsingHeader("Physics Component", ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		bool physicsEnabled = physicsComponent->isPhysicsEnabled();
 		ImGui::BeginDisabled(m_isPlayMode || !object.isEnabled());

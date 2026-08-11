@@ -205,6 +205,7 @@
     <ClCompile Include="DX3D\Source\DX3D\Resource\TextureManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Component\PhysicsComponent.cpp" />
+    <ClCompile Include="DX3D\Source\DX3D\Component\PointLightComponent.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\Physics\PhysicsManager.cpp" />
     <ClCompile Include="DX3D\Source\DX3D\UI\SceneStateUI.cpp" />
   </ItemGroup>
@@ -275,6 +276,7 @@
     <ClInclude Include="DX3D\Include\DX3D\Resource\TextureManager.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\InspectorTabItems\TextureComponentInspectorUIT.h" />
     <ClInclude Include="DX3D\Include\DX3D\Component\PhysicsComponent.h" />
+    <ClInclude Include="DX3D\Include\DX3D\Component\PointLightComponent.h" />
     <ClInclude Include="DX3D\Include\DX3D\Physics\PhysicsManager.h" />
     <ClInclude Include="DX3D\Include\DX3D\UI\SceneStateUI.h" />
   </ItemGroup>

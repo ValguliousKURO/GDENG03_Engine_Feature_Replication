@@ -26,6 +26,9 @@ namespace dx3d
 		Vec4 lightDirection{};
 		Vec4 lightColor{};
 		Vec4 ambientColor{};
+		Vec4 pointLightPosition{};
+		Vec4 pointLightColor{};
+		Vec4 pointLightSettings{};
 	};
 
 	class WorldRenderer  final: public Base
@@ -42,6 +45,8 @@ namespace dx3d
 		RefPtr<ConstantBuffer> getObjectCb() { return m_objectCb; };
 		RefPtr<ConstantBuffer> getMaterialCb() { return m_materialCb; };
 		RefPtr<ConstantBuffer> getLightCb() { return m_lightCb; };
+		static LightData getLightData(const World& world);
+
 	private:
 		GraphicsDevice& m_graphicsDevice;
 		RefPtr<DeviceContext> m_deviceContext{};

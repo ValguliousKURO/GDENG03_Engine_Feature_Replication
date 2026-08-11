@@ -5,6 +5,7 @@
 #include <DX3D/Graphics/Mesh/MeshFactory.h>
 #include <DX3D/Component/MeshComponent.h>
 #include <DX3D/Component/CameraComponent.h>
+#include <DX3D/Component/PointLightComponent.h>
 #include <filesystem>
 #include <functional>
 #include <unordered_map>
@@ -636,6 +637,16 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 		colliderType = dx3d::PhysicsColliderType::Box;
 		colliderSize = { 10.0f, 0.1f, 10.0f };
 	}
+	else if (cleanType == "Point Light")
+	{
+		spawnMesh = m_spawnSphereMesh;
+		object->getTransform().setPosition({ 0.0f, 2.0f, 0.0f });
+		object->getTransform().setScale({ 0.2f, 0.2f, 0.2f });
+		auto* pointLight = object->createOrGetComponent<dx3d::PointLightComponent>();
+		pointLight->setColor({ 1.0f, 0.95f, 0.85f });
+		pointLight->setIntensity(1.5f);
+		pointLight->setRange(8.0f);
+	}
 	else if (cleanType.rfind("Obj:", 0) == 0)
 	{
 		const auto modelName = cleanType.substr(4);
@@ -774,6 +785,17 @@ bool MainGame::loadSceneFromFile(const std::filesystem::path& path)
 				mesh->setMaterial(createEditorMaterial(data.textureName));
 			}
 		}
+		if (auto* pointLight = object->getComponent<dx3d::PointLightComponent>())
+		{
+			if (data.pointLightIntensity > 0.0f)
+			{
+				pointLight->setIntensity(data.pointLightIntensity);
+			}
+			if (data.pointLightRange > 0.0f)
+			{
+				pointLight->setRange(data.pointLightRange);
+			}
+		}
 		if (data.id != 0)
 		{
 			loadedObjectsBySavedId[data.id] = object;
@@ -819,6 +841,11 @@ std::string MainGame::getSerializableObjectType(dx3d::GameObject& object)
 	auto* meshComponent = object.getComponent<dx3d::MeshComponent>();
 	auto* physicsComponent = object.getComponent<dx3d::PhysicsComponent>();
 	const auto prefix = physicsComponent ? std::string{ "Physics-" } : std::string{};
+
+	if (object.getComponent<dx3d::PointLightComponent>())
+	{
+		return "Point Light";
+	}
 
 	if (!meshComponent || !meshComponent->getMesh())
 	{

@@ -22,6 +22,8 @@ struct SceneObjectData
 	std::string textureName;
 	bool enabled{};
 	bool physicsEnabled{};
+	float pointLightIntensity{};
+	float pointLightRange{};
 	dx3d::Vec3 position{};
 	dx3d::Vec3 rotation{};
 	dx3d::Vec3 scale{};
