@@ -14,6 +14,11 @@ void dx3d::TextureManager::loadAllTextures(dx3d::ResourceManager& resManager)
 	
     loadTexture(resManager, "DirectXGameEngine/Game/Assets/Textures/wood.jpg");
     loadTexture(resManager, "DirectXGameEngine/Game/Assets/Textures/floor.jpg");
+    loadTexture(resManager, "DirectXGameEngine/Game/Assets/Textures/malinapls.jpg");
+    loadTexture(resManager, "DirectXGameEngine/Game/Assets/Textures/brick.jpg");
+
+    loadTexture(resManager, "DirectXGameEngine/Game/Assets/Textures/astonMa.jpg");
+    
 }
 
 void dx3d::TextureManager::loadTexture(dx3d::ResourceManager& resManager, std::string fileName)
