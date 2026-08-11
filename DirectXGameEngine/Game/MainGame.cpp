@@ -504,9 +504,10 @@ void MainGame::registerEditorEvents()
 	events.addObserver(dx3d::EventNames::ON_EDITOR_REDO, [this]() { redoEditorCommand(); });
 	events.addObserver(dx3d::EventNames::ON_SCENE_SAVE, [this]()
 	{
-		const auto scenePath = getDefaultScenePath();
+		const auto scenePath = m_currentScenePath.empty() ? getDefaultScenePath() : m_currentScenePath;
 		if (saveSceneToFile(scenePath))
 		{
+			m_currentScenePath = scenePath;
 			getLogger().log(dx3d::Logger::LogLevel::Info, "Scene saved to {}", scenePath.string());
 		}
 		else
@@ -519,6 +520,7 @@ void MainGame::registerEditorEvents()
 		const auto scenePath = getNewScenePath();
 		if (saveSceneToFile(scenePath))
 		{
+			m_currentScenePath = scenePath;
 			getLogger().log(dx3d::Logger::LogLevel::Info, "Scene saved as new file: {}", scenePath.string());
 		}
 		else
@@ -531,6 +533,7 @@ void MainGame::registerEditorEvents()
 		const auto scenePath = std::filesystem::path(params.GetStringExtra("Path", getDefaultScenePath().string()));
 		if (loadSceneFromFile(scenePath))
 		{
+			m_currentScenePath = scenePath;
 			getLogger().log(dx3d::Logger::LogLevel::Info, "Scene loaded from {}", scenePath.string());
 		}
 		else

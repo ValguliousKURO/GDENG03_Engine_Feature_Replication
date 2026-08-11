@@ -57,6 +57,7 @@ private:
 	std::vector<EditorCommand> m_undoStack{};
 	std::vector<EditorCommand> m_redoStack{};
 	std::vector<std::string> m_availableObjModels{};
+	std::filesystem::path m_currentScenePath{};
 	bool m_isPlayMode{ false };
 	std::unordered_map<std::string, size_t> m_spawnedObjectCounters{};
 	static constexpr size_t MaxUndoCommands = 20;
