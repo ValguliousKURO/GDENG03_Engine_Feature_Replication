@@ -35,6 +35,25 @@ float4 PSMain(VSOutput input) : SV_TARGET
     
     float specularStrength = pow(max(dot(N, H), 0.0f), 32.0f);
     float3 specular = specularStrength * lightColor.rgb * 0.5f;
+
+    if (pointLightSettings.x > 0.5f)
+    {
+        float3 pointVector = pointLightPosition.xyz - input.worldPos;
+        float pointDistance = length(pointVector);
+        float pointRange = max(pointLightSettings.z, 0.001f);
+        float attenuation = saturate(1.0f - pointDistance / pointRange);
+        attenuation *= attenuation;
+
+        float3 pointL = pointVector / max(pointDistance, 0.001f);
+        float3 pointH = normalize(pointL + V);
+        float pointDiffuseStrength = max(dot(N, pointL), 0.0f);
+        float3 pointDiffuse = pointDiffuseStrength * pointLightColor.rgb * pointLightSettings.y * attenuation;
+        float pointSpecularStrength = pow(max(dot(N, pointH), 0.0f), 32.0f);
+        float3 pointSpecular = pointSpecularStrength * pointLightColor.rgb * pointLightSettings.y * attenuation * 0.5f;
+
+        diffuse += pointDiffuse;
+        specular += pointSpecular;
+    }
     
     float3 finalColor = color.rgb * diffuseTex.rgb * (ambient + diffuse) + specular;
     return float4(finalColor, 1.0f);

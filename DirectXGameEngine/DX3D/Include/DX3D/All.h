@@ -9,6 +9,7 @@
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Component/CubeComponent.h>
 #include <DX3D/Component/CameraComponent.h>
+#include <DX3D/Component/PointLightComponent.h>
 
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/World.h>

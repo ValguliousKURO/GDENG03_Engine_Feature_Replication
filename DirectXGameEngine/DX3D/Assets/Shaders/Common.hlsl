@@ -32,4 +32,7 @@ cbuffer LightData : register(b3)
     float4 lightDirection;
     float4 lightColor;
     float4 ambientColor;
+    float4 pointLightPosition;
+    float4 pointLightColor;
+    float4 pointLightSettings;
 };

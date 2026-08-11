@@ -4,6 +4,7 @@
 #include <DX3D/Component/PhysicsComponent.h>
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Component/MeshComponent.h>
+#include <DX3D/Component/PointLightComponent.h>
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/World.h>
 #include <DX3D/Resource/MaterialResource.h>
@@ -139,6 +140,28 @@ namespace
 		return std::nullopt;
 	}
 
+	std::optional<float> readJsonFloatField(const std::string& line, const std::string& fieldName)
+	{
+		const auto key = "\"" + fieldName + "\"";
+		auto keyPos = line.find(key);
+		if (keyPos == std::string::npos) return std::nullopt;
+
+		auto colonPos = line.find(':', keyPos + key.size());
+		if (colonPos == std::string::npos) return std::nullopt;
+
+		auto valueStart = line.find_first_not_of(" \t", colonPos + 1);
+		if (valueStart == std::string::npos) return std::nullopt;
+
+		try
+		{
+			return std::stof(line.substr(valueStart));
+		}
+		catch (const std::exception&)
+		{
+			return std::nullopt;
+		}
+	}
+
 	std::optional<dx3d::Vec3> readJsonVec3Field(const std::string& line, const std::string& fieldName)
 	{
 		const auto key = "\"" + fieldName + "\"";
@@ -181,6 +204,8 @@ namespace
 			else if (auto value = readJsonStringField(line, "texture")) data.textureName = *value;
 			else if (auto value = readJsonBoolField(line, "enabled")) data.enabled = *value;
 			else if (auto value = readJsonBoolField(line, "physicsEnabled")) data.physicsEnabled = *value;
+			else if (auto value = readJsonFloatField(line, "pointLightIntensity")) data.pointLightIntensity = *value;
+			else if (auto value = readJsonFloatField(line, "pointLightRange")) data.pointLightRange = *value;
 			else if (auto value = readJsonVec3Field(line, "position")) data.position = *value;
 			else if (auto value = readJsonVec3Field(line, "rotation")) data.rotation = *value;
 			else if (auto value = readJsonVec3Field(line, "scale")) data.scale = *value;
@@ -243,6 +268,7 @@ bool SceneSerializer::saveToJsonFile(
 					}
 				}
 			}
+			auto* pointLight = object->getComponent<dx3d::PointLightComponent>();
 
 			if (wroteObject)
 			{
@@ -257,6 +283,8 @@ bool SceneSerializer::saveToJsonFile(
 				<< "      \"texture\": \"" << escapeJsonString(textureName) << "\",\n"
 				<< "      \"enabled\": " << (object->isEnabled() ? "true" : "false") << ",\n"
 				<< "      \"physicsEnabled\": " << ((physics && physics->isPhysicsEnabled()) ? "true" : "false") << ",\n"
+				<< "      \"pointLightIntensity\": " << (pointLight ? pointLight->getIntensity() : 0.0f) << ",\n"
+				<< "      \"pointLightRange\": " << (pointLight ? pointLight->getRange() : 0.0f) << ",\n"
 				<< "      \"position\": [" << position.x << ", " << position.y << ", " << position.z << "],\n"
 				<< "      \"rotation\": [" << rotation.x << ", " << rotation.y << ", " << rotation.z << "],\n"
 				<< "      \"scale\": [" << scale.x << ", " << scale.y << ", " << scale.z << "]\n"
