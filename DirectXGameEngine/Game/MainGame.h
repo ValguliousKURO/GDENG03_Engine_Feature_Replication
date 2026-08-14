@@ -38,6 +38,7 @@ private:
 	void setPlayMode(bool isPlayMode);
 
 	dx3d::GameObject* spawnEditorObject(const std::string& type);
+	void spawnRigidBodyCubeBatch(size_t count);
 	dx3d::RefPtr<dx3d::MaterialResource> createEditorMaterial(const std::string& textureName = "wood");
 	dx3d::PhysicsComponent* addRigidBodyComponent(dx3d::GameObject& object);
 	void removeRigidBodyComponent(dx3d::GameObject& object);

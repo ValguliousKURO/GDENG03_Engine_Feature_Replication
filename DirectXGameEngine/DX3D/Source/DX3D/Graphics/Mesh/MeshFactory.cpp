@@ -359,17 +359,6 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
 	for (ui32 i = 1; i < segments; ++i)
 	{
 		indices.push_back(0);
-		indices.push_back(i);
-		indices.push_back(i + 1);
-	}
-	indices.push_back(0);
-	indices.push_back(segments);
-	indices.push_back(1);
-
-	// Top cap (inward, reversed winding)
-	for (ui32 i = 1; i < segments; ++i)
-	{
-		indices.push_back(0);
 		indices.push_back(i + 1);
 		indices.push_back(i);
 	}
@@ -388,17 +377,6 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
 	indices.push_back(bottomCenterIdx + segments);
 	indices.push_back(bottomCenterIdx + 1);
 
-	// Bottom cap (inward, reversed winding)
-	for (ui32 i = 1; i < segments; ++i)
-	{
-		indices.push_back(bottomCenterIdx);
-		indices.push_back(bottomCenterIdx + i + 1);
-		indices.push_back(bottomCenterIdx + i);
-	}
-	indices.push_back(bottomCenterIdx);
-	indices.push_back(bottomCenterIdx + 1);
-	indices.push_back(bottomCenterIdx + segments);
-
 	// Side faces
 	for (ui32 i = 0; i < segments; ++i)
 	{
@@ -408,12 +386,12 @@ dx3d::RefPtr<dx3d::Mesh> dx3d::MeshFactory::createCylinderMesh(f32 radius, f32 h
 		ui32 bottom2 = top2 + 1;
 
 		indices.push_back(top1);
-		indices.push_back(bottom1);
 		indices.push_back(top2);
+		indices.push_back(bottom1);
 
 		indices.push_back(top2);
-		indices.push_back(bottom1);
 		indices.push_back(bottom2);
+		indices.push_back(bottom1);
 	}
 
 	return std::make_shared<Mesh>(vertices, indices);

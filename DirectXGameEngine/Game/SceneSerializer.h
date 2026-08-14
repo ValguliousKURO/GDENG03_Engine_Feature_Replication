@@ -33,7 +33,7 @@ struct SceneObjectData
 	float pointLightRange{};
 	dx3d::Vec3 position{};
 	dx3d::Vec3 rotation{};
-	dx3d::Vec3 scale{};
+	dx3d::Vec3 scale{ 1.0f, 1.0f, 1.0f };
 };
 
 class SceneSerializer

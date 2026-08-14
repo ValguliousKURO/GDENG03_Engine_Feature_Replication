@@ -95,7 +95,7 @@ public sealed class LevelImporterExporter : EditorWindow
 
             gameObject.transform.SetParent(parent, false);
             gameObject.transform.localPosition = data.position;
-            gameObject.transform.localEulerAngles = data.rotation;
+            gameObject.transform.localEulerAngles = RadiansToDegrees(data.rotation);
             gameObject.transform.localScale = data.scale == Vector3.zero ? Vector3.one : data.scale;
         }
 
@@ -244,7 +244,7 @@ public sealed class LevelImporterExporter : EditorWindow
                 pointLightIntensity = light && light.type == LightType.Point ? light.intensity : 0.0f,
                 pointLightRange = light && light.type == LightType.Point ? light.range : 0.0f,
                 position = transform.localPosition,
-                rotation = transform.localEulerAngles,
+                rotation = DegreesToRadians(transform.localEulerAngles),
                 scale = transform.localScale
             };
 
@@ -409,6 +409,16 @@ public sealed class LevelImporterExporter : EditorWindow
     private static string WriteBool(bool value)
     {
         return value ? "true" : "false";
+    }
+
+    private static Vector3 RadiansToDegrees(Vector3 radians)
+    {
+        return radians * Mathf.Rad2Deg;
+    }
+
+    private static Vector3 DegreesToRadians(Vector3 degrees)
+    {
+        return degrees * Mathf.Deg2Rad;
     }
 
     private static string FormatFloat(float value)

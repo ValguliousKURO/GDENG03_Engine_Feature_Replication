@@ -49,6 +49,13 @@ void dx3d::HierarchyUI::draw()
             {
                 ImGui::OpenPopup("GameObjectOptionsPopup");
             }
+            if (ImGui::Button("Spawn 50 Rigid Body Cubes"))
+            {
+                Parameters param;
+                param.PutExtra("Count", static_cast<size_t>(50));
+                EventBroadcastManager::getInstance().postEvent(EventNames::ON_SPAWN_RIGID_BODY_CUBE_BATCH, param);
+                DebugLogManager::getInstance().customLog("Spawned 50 rigid body cubes.");
+            }
 
             if (ImGui::BeginPopup("GameObjectOptionsPopup"))
             {
@@ -117,7 +124,13 @@ void dx3d::HierarchyUI::draw()
                 }
 
                 ImGui::Separator();
-                ImGui::TextDisabled("Rigid Bodies are attached from the Inspector.");
+                if (ImGui::MenuItem("Add 50 Rigid Body Cubes"))
+                {
+                    param.PutExtra("Count", static_cast<size_t>(50));
+                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_SPAWN_RIGID_BODY_CUBE_BATCH, param);
+                    DebugLogManager::getInstance().customLog("Spawned 50 rigid body cubes.");
+                }
+                ImGui::TextDisabled("Single-object rigid bodies are attached from the Inspector.");
                 ImGui::EndPopup();
             }
 

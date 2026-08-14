@@ -17,6 +17,13 @@
 
 namespace
 {
+	const dx3d::Vec3 kEditorCapsuleMeshRotationOffset{ -1.5707963f, 0.0f, 0.0f };
+
+	bool isCapsuleObjectType(const std::string& type)
+	{
+		return type == "Capsule" || type == "Physics-Capsule";
+	}
+
 	std::string getPhysicsBodyTypeName(dx3d::PhysicsBodyType bodyType)
 	{
 		switch (bodyType)
@@ -204,6 +211,18 @@ namespace
 		return result;
 	}
 
+	void completeMultilineArrayField(std::istream& file, std::string& line)
+	{
+		if (line.find('[') == std::string::npos || line.find(']') != std::string::npos) return;
+
+		std::string nextLine;
+		while (std::getline(file, nextLine))
+		{
+			line += " " + nextLine;
+			if (nextLine.find(']') != std::string::npos) break;
+		}
+	}
+
 	bool readSceneObjectFromJson(std::istream& file, SceneObjectData& data)
 	{
 		std::string line;
@@ -218,6 +237,7 @@ namespace
 		while (std::getline(file, line))
 		{
 			if (line.find('}') != std::string::npos) return true;
+			completeMultilineArrayField(file, line);
 
 			if (auto value = readJsonSizeTField(line, "id")) data.id = *value;
 			else if (auto value = readJsonSizeTField(line, "parentId")) data.parentId = *value;
@@ -284,8 +304,14 @@ bool SceneSerializer::saveToJsonFile(
 
 			auto& transform = object->getTransform();
 			const auto position = transform.getPosition();
-			const auto rotation = transform.getRotation();
+			auto rotation = transform.getRotation();
 			const auto scale = transform.getScale();
+			if (isCapsuleObjectType(objectType))
+			{
+				rotation.x -= kEditorCapsuleMeshRotationOffset.x;
+				rotation.y -= kEditorCapsuleMeshRotationOffset.y;
+				rotation.z -= kEditorCapsuleMeshRotationOffset.z;
+			}
 			auto* physics = object->getComponent<dx3d::PhysicsComponent>();
 			auto* parent = object->getParent();
 			const auto parentId = (parent && !parent->isDeleted() && !parent->getComponent<dx3d::CameraComponent>())

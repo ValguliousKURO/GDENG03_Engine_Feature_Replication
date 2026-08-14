@@ -8,6 +8,7 @@
 #include <DX3D/Component/PointLightComponent.h>
 #include <filesystem>
 #include <functional>
+#include <random>
 #include <unordered_map>
 
 #include <DX3D/UI/DebugWindowUI.h>
@@ -26,6 +27,14 @@
 
 namespace
 {
+	const dx3d::Vec3 kEditorCapsuleMeshRotationOffset{ -1.5707963f, 0.0f, 0.0f };
+
+	bool isCapsuleObjectType(const std::string& type)
+	{
+		if (type == "Capsule" || type == "Physics-Capsule") return true;
+		return false;
+	}
+
 	std::filesystem::path findObjFilesDirectory()
 	{
 		namespace fs = std::filesystem;
@@ -336,6 +345,14 @@ void MainGame::registerEditorEvents()
 			[object]() { object->setDeleted(false); }
 		});
 		selectGameObject(object);
+	});
+
+	events.addObserver(dx3d::EventNames::ON_SPAWN_RIGID_BODY_CUBE_BATCH, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		const auto count = params.GetSizeTExtra("Count", 50);
+		spawnRigidBodyCubeBatch(count);
 	});
 
 	events.addObserver(dx3d::EventNames::ON_DELETE_GAMEOBJECT, [this](dx3d::Parameters& params)
@@ -687,6 +704,7 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 	else if (cleanType == "Capsule")
 	{
 		spawnMesh = m_spawnCapsuleMesh;
+		object->getTransform().setRotation(kEditorCapsuleMeshRotationOffset);
 	}
 	else if (cleanType == "Cylinder")
 	{
@@ -744,6 +762,78 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 	}
 
 	return object;
+}
+
+void MainGame::spawnRigidBodyCubeBatch(size_t count)
+{
+	if (count == 0) return;
+
+	std::vector<dx3d::GameObject*> spawnedObjects;
+	spawnedObjects.reserve(count);
+
+	std::random_device randomDevice;
+	std::mt19937 rng(randomDevice());
+	std::uniform_real_distribution<float> horizontalJitter(-0.25f, 0.25f);
+	std::uniform_real_distribution<float> depthJitter(-2.5f, 2.5f);
+	std::uniform_real_distribution<float> heightJitter(0.0f, 0.75f);
+
+	for (size_t index = 0; index < count; ++index)
+	{
+		auto* object = spawnEditorObject("Physics-Cube");
+		if (!object) continue;
+
+		const auto column = static_cast<float>(index % 10);
+		const auto row = static_cast<float>(index / 10);
+
+		object->getTransform().setPosition({
+			(column - 4.5f) * 0.85f + horizontalJitter(rng),
+			3.0f + row * 1.0f + heightJitter(rng),
+			depthJitter(rng)
+		});
+		object->getTransform().setRotation({ 0.0f, 0.0f, 0.0f });
+
+		if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())
+		{
+			physics->syncTransformToPhysics();
+			physics->setPhysicsEnabled(false);
+		}
+
+		object->setDeleted(true);
+		spawnedObjects.push_back(object);
+	}
+
+	if (spawnedObjects.empty()) return;
+
+	executeEditorCommand(EditorCommand{
+		[spawnedObjects]()
+		{
+			for (auto* object : spawnedObjects)
+			{
+				if (!object) continue;
+				if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())
+				{
+					physics->setPhysicsEnabled(false);
+				}
+				object->setDeleted(true);
+			}
+		},
+		[spawnedObjects]()
+		{
+			for (auto* object : spawnedObjects)
+			{
+				if (!object) continue;
+				object->setDeleted(false);
+				if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())
+				{
+					physics->setPhysicsEnabled(true);
+					physics->syncTransformToPhysics();
+				}
+			}
+		}
+	});
+
+	selectGameObject(spawnedObjects.back());
+	getLogger().log(dx3d::Logger::LogLevel::Info, "Spawned {} rigid body cubes.", spawnedObjects.size());
 }
 
 dx3d::RefPtr<dx3d::MaterialResource> MainGame::createEditorMaterial(const std::string& textureName)
@@ -935,7 +1025,14 @@ bool MainGame::loadSceneFromFile(const std::filesystem::path& path)
 		if (!object) continue;
 
 		object->getTransform().setPosition(data.position);
-		object->getTransform().setRotation(data.rotation);
+		auto loadedRotation = data.rotation;
+		if (isCapsuleObjectType(data.type))
+		{
+			loadedRotation.x += kEditorCapsuleMeshRotationOffset.x;
+			loadedRotation.y += kEditorCapsuleMeshRotationOffset.y;
+			loadedRotation.z += kEditorCapsuleMeshRotationOffset.z;
+		}
+		object->getTransform().setRotation(loadedRotation);
 		object->getTransform().setScale(data.scale);
 
 		if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())

@@ -71,7 +71,7 @@ dx3d::Window::Window(const WindowDesc& desc)
     m_handle = CreateWindowEx(
         0,
         MAKEINTATOM(windowClassId),
-        L"C++ 3D Engine | Based on PardCode C++ 3D Game Tutorial Series",
+        L"Dacanay Finals",
         WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU,
         CW_USEDEFAULT, CW_USEDEFAULT,
         rc.right - rc.left, rc.bottom - rc.top,

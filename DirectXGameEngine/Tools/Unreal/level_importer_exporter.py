@@ -14,13 +14,12 @@ UNREAL_TO_LEVEL_SCALE = 1.0 / LEVEL_TO_UNREAL_SCALE
 # the centimeter conversion. Therefore imported planes need 10x horizontal scale.
 EDITOR_PLANE_BASE_SIZE = 10.0
 
-# Match the current Unity handoff script behavior.
-# Set to True only if you decide to store rotations in radians for cross-engine import/export.
-ROTATION_VALUES_ARE_RADIANS = False
+# The C++ editor stores rotations in radians.
+ROTATION_VALUES_ARE_RADIANS = True
 
-# Your C++ editor uses Y-up. Unreal uses Z-up.
+# Your C++ editor uses Unity-style Y-up axes:
 # Level/editor vector: X=right, Y=up, Z=forward/depth
-# Unreal vector:       X=right, Y=forward/depth, Z=up
+# Unreal vector:       X=forward/depth, Y=right, Z=up
 REMAP_Y_UP_TO_UNREAL_Z_UP = True
 
 
@@ -57,6 +56,7 @@ def import_level(level_path):
             object_id = int(object_data.get("id", 0))
             actor.set_actor_label(object_data.get("name") or object_data.get("type") or "GameObject")
             _set_actor_enabled(actor, bool(object_data.get("enabled", True)))
+            _apply_material(actor, object_data)
             _apply_point_light(actor, object_data)
 
             created_actors[object_id] = actor
@@ -127,7 +127,7 @@ def export_level(level_path):
 
     os.makedirs(os.path.dirname(level_path), exist_ok=True)
     with open(level_path, "w", encoding="utf-8") as file:
-        json.dump(output, file, indent=2)
+        file.write(_write_level_json(output))
 
     unreal.log("Exported {0} actors to {1}".format(len(objects), level_path))
 
@@ -142,6 +142,60 @@ def _spawn_actor_for_object(object_data):
         return unreal.EditorLevelLibrary.spawn_actor_from_object(mesh, unreal.Vector(0.0, 0.0, 0.0))
 
     return _spawn_empty_actor(object_type or "GameObject")
+
+
+def _write_level_json(output):
+    lines = [
+        "{",
+        "  \"version\": {0},".format(int(output.get("version", 1))),
+        "  \"objects\": [",
+    ]
+
+    objects = output.get("objects", [])
+    for index, object_data in enumerate(objects):
+        lines.extend([
+            "    {",
+            "      \"id\": {0},".format(int(object_data.get("id", 0))),
+            "      \"parentId\": {0},".format(int(object_data.get("parentId", 0))),
+            "      \"name\": {0},".format(json.dumps(object_data.get("name", ""))),
+            "      \"type\": {0},".format(json.dumps(object_data.get("type", ""))),
+            "      \"texture\": {0},".format(json.dumps(object_data.get("texture", ""))),
+            "      \"enabled\": {0},".format(_json_bool(object_data.get("enabled", True))),
+            "      \"hasRigidBody\": {0},".format(_json_bool(object_data.get("hasRigidBody", False))),
+            "      \"physicsEnabled\": {0},".format(_json_bool(object_data.get("physicsEnabled", False))),
+            "      \"rigidBodyEnabled\": {0},".format(_json_bool(object_data.get("rigidBodyEnabled", False))),
+            "      \"rigidBodyType\": {0},".format(json.dumps(object_data.get("rigidBodyType", ""))),
+            "      \"rigidBodyCollider\": {0},".format(json.dumps(object_data.get("rigidBodyCollider", ""))),
+            "      \"rigidBodyColliderSize\": {0},".format(_json_vector(object_data.get("rigidBodyColliderSize", [0.0, 0.0, 0.0]))),
+            "      \"rigidBodyMass\": {0},".format(_json_float(object_data.get("rigidBodyMass", 0.0))),
+            "      \"rigidBodyUseGravity\": {0},".format(_json_bool(object_data.get("rigidBodyUseGravity", False))),
+            "      \"pointLightIntensity\": {0},".format(_json_float(object_data.get("pointLightIntensity", 0.0))),
+            "      \"pointLightRange\": {0},".format(_json_float(object_data.get("pointLightRange", 0.0))),
+            "      \"position\": {0},".format(_json_vector(object_data.get("position", [0.0, 0.0, 0.0]))),
+            "      \"rotation\": {0},".format(_json_vector(object_data.get("rotation", [0.0, 0.0, 0.0]))),
+            "      \"scale\": {0}".format(_json_vector(object_data.get("scale", [1.0, 1.0, 1.0]))),
+            "    }" + ("," if index < len(objects) - 1 else ""),
+        ])
+
+    lines.extend([
+        "  ]",
+        "}",
+    ])
+    return "\n".join(lines) + "\n"
+
+
+def _json_bool(value):
+    return "true" if bool(value) else "false"
+
+
+def _json_float(value):
+    return "{0:g}".format(float(value))
+
+
+def _json_vector(values):
+    if not isinstance(values, list) or len(values) < 3:
+        values = [0.0, 0.0, 0.0]
+    return "[{0}, {1}, {2}]".format(_json_float(values[0]), _json_float(values[1]), _json_float(values[2]))
 
 
 def _spawn_empty_actor(label):
@@ -208,7 +262,7 @@ def _attach_actor(actor, parent_actor):
 
 def _apply_relative_transform(actor, object_data):
     location = _level_vector_to_unreal(object_data.get("position", [0.0, 0.0, 0.0]))
-    rotation = _level_rotation_to_unreal(object_data.get("rotation", [0.0, 0.0, 0.0]))
+    rotation = _level_rotation_to_unreal(object_data.get("rotation", [0.0, 0.0, 0.0]), object_data.get("type", ""))
     scale = _level_scale_to_unreal(object_data.get("scale", [1.0, 1.0, 1.0]), object_data.get("type", ""))
 
     root = _get_root_component(actor)
@@ -384,6 +438,47 @@ def _apply_point_light(actor, object_data):
         point_light.set_attenuation_radius(light_range * LEVEL_TO_UNREAL_SCALE)
 
 
+def _apply_material(actor, object_data):
+    component = _get_static_mesh_component(actor)
+    if component is None:
+        return
+
+    texture_name = object_data.get("texture", "")
+    if not texture_name:
+        return
+
+    material = _find_material_by_name(texture_name)
+    if material is None:
+        unreal.log_warning("Could not find Unreal material/texture named '{0}' for actor '{1}'.".format(texture_name, actor.get_actor_label()))
+        return
+
+    component.set_material(0, material)
+
+
+def _find_material_by_name(asset_name):
+    asset_name_lower = asset_name.lower()
+    material_classes = (
+        "Material",
+        "MaterialInstanceConstant",
+        "MaterialInstance",
+    )
+
+    for asset_path in unreal.EditorAssetLibrary.list_assets("/Game", True, False):
+        filename = os.path.splitext(os.path.basename(asset_path))[0].lower()
+        if filename != asset_name_lower:
+            continue
+
+        asset = unreal.EditorAssetLibrary.load_asset(asset_path)
+        if asset is None:
+            continue
+
+        class_name = asset.get_class().get_name()
+        if class_name in material_classes or "Material" in class_name:
+            return asset
+
+    return None
+
+
 def _apply_physics(actor, object_data):
     component = _get_static_mesh_component(actor)
     if component is None:
@@ -454,8 +549,7 @@ def _resolve_collider_size(actor, component):
     if component is None or not _has_rigid_body(component):
         return [0.0, 0.0, 0.0]
 
-    bounds = component.bounds
-    extent = bounds.box_extent
+    origin, extent = actor.get_actor_bounds(False)
     actor_scale = actor.get_actor_scale3d()
     safe_scale = unreal.Vector(
         actor_scale.x if abs(actor_scale.x) > 0.0001 else 1.0,
@@ -513,7 +607,22 @@ def _should_export_actor(actor):
         return False
 
     class_name = actor.get_class().get_name()
-    if class_name in ("WorldSettings", "Brush", "LevelScriptActor", "DefaultPhysicsVolume"):
+    if class_name in (
+        "WorldSettings",
+        "Brush",
+        "LevelScriptActor",
+        "DefaultPhysicsVolume",
+        "SkyAtmosphere",
+        "SkyLight",
+        "DirectionalLight",
+        "ExponentialHeightFog",
+        "VolumetricCloud",
+        "PlayerStart",
+    ):
+        return False
+
+    actor_label = actor.get_actor_label()
+    if actor_label in ("SM_SkySphere", "SkySphere", "SkyAtmosphere", "SkyLight", "DirectionalLight", "ExponentialHeightFog", "VolumetricCloud"):
         return False
 
     if actor.get_components_by_class(unreal.CameraComponent):
@@ -526,8 +635,8 @@ def _level_vector_to_unreal(values):
     vector = _plain_vector(values)
     if REMAP_Y_UP_TO_UNREAL_Z_UP:
         return unreal.Vector(
-            vector.x * LEVEL_TO_UNREAL_SCALE,
             vector.z * LEVEL_TO_UNREAL_SCALE,
+            vector.x * LEVEL_TO_UNREAL_SCALE,
             vector.y * LEVEL_TO_UNREAL_SCALE,
         )
     return unreal.Vector(
@@ -540,9 +649,9 @@ def _level_vector_to_unreal(values):
 def _unreal_vector_to_level(vector):
     if REMAP_Y_UP_TO_UNREAL_Z_UP:
         return [
-            float(vector.x * UNREAL_TO_LEVEL_SCALE),
-            float(vector.z * UNREAL_TO_LEVEL_SCALE),
             float(vector.y * UNREAL_TO_LEVEL_SCALE),
+            float(vector.z * UNREAL_TO_LEVEL_SCALE),
+            float(vector.x * UNREAL_TO_LEVEL_SCALE),
         ]
     return [
         float(vector.x * UNREAL_TO_LEVEL_SCALE),
@@ -558,15 +667,16 @@ def _unreal_vector_to_plain(vector):
 def _level_scale_to_unreal(values, object_type=""):
     vector = _plain_vector(values)
     if REMAP_Y_UP_TO_UNREAL_Z_UP:
-        scale = unreal.Vector(vector.x, vector.z, vector.y)
+        scale = unreal.Vector(vector.z, vector.x, vector.y)
     else:
         scale = vector
 
     if _is_plane_type(object_type):
-        scale.x *= EDITOR_PLANE_BASE_SIZE
         if REMAP_Y_UP_TO_UNREAL_Z_UP:
+            scale.x *= EDITOR_PLANE_BASE_SIZE
             scale.y *= EDITOR_PLANE_BASE_SIZE
         else:
+            scale.x *= EDITOR_PLANE_BASE_SIZE
             scale.z *= EDITOR_PLANE_BASE_SIZE
 
     return scale
@@ -575,23 +685,24 @@ def _level_scale_to_unreal(values, object_type=""):
 def _unreal_scale_to_level(vector, object_type=""):
     adjusted = unreal.Vector(vector.x, vector.y, vector.z)
     if _is_plane_type(object_type):
-        adjusted.x /= EDITOR_PLANE_BASE_SIZE
         if REMAP_Y_UP_TO_UNREAL_Z_UP:
+            adjusted.x /= EDITOR_PLANE_BASE_SIZE
             adjusted.y /= EDITOR_PLANE_BASE_SIZE
         else:
+            adjusted.x /= EDITOR_PLANE_BASE_SIZE
             adjusted.z /= EDITOR_PLANE_BASE_SIZE
 
     if REMAP_Y_UP_TO_UNREAL_Z_UP:
-        return [float(adjusted.x), float(adjusted.z), float(adjusted.y)]
+        return [float(adjusted.y), float(adjusted.z), float(adjusted.x)]
     return _unreal_vector_to_plain(adjusted)
 
 
 def _unreal_size_to_level(vector):
     if REMAP_Y_UP_TO_UNREAL_Z_UP:
         return [
-            float(vector.x * UNREAL_TO_LEVEL_SCALE),
-            float(vector.z * UNREAL_TO_LEVEL_SCALE),
             float(vector.y * UNREAL_TO_LEVEL_SCALE),
+            float(vector.z * UNREAL_TO_LEVEL_SCALE),
+            float(vector.x * UNREAL_TO_LEVEL_SCALE),
         ]
     return _unreal_vector_to_level(vector)
 
@@ -623,7 +734,7 @@ def _transform_rotator(transform):
         return transform.get_rotation().rotator()
 
 
-def _level_rotation_to_unreal(values):
+def _level_rotation_to_unreal(values, object_type=""):
     vector = _plain_vector(values)
     if ROTATION_VALUES_ARE_RADIANS:
         vector = unreal.Vector(
@@ -631,14 +742,83 @@ def _level_rotation_to_unreal(values):
             math.degrees(vector.y),
             math.degrees(vector.z),
         )
-    return unreal.Rotator(vector.x, vector.y, vector.z)
+    if not REMAP_Y_UP_TO_UNREAL_Z_UP:
+        return unreal.Rotator(vector.x, vector.y, vector.z)
+
+    rotation_radians = _plain_vector(values)
+    if not ROTATION_VALUES_ARE_RADIANS:
+        rotation_radians = unreal.Vector(
+            math.radians(rotation_radians.x),
+            math.radians(rotation_radians.y),
+            math.radians(rotation_radians.z),
+        )
+
+    editor_rows = _editor_rotation_rows(rotation_radians.x, rotation_radians.y, rotation_radians.z)
+
+    # Editor local axes are row0=right(X), row1=up(Y), row2=forward(Z).
+    # Unreal local axes are X=forward, Y=right, Z=up.
+    unreal_forward = _level_direction_to_unreal(editor_rows[2])
+    unreal_right = _level_direction_to_unreal(editor_rows[0])
+    unreal_up = _level_direction_to_unreal(editor_rows[1])
+
+    try:
+        return unreal.MathLibrary.make_rotation_from_axes(unreal_forward, unreal_right, unreal_up)
+    except Exception:
+        pass
+    try:
+        return unreal.KismetMathLibrary.make_rotation_from_axes(unreal_forward, unreal_right, unreal_up)
+    except Exception:
+        return _unreal_rows_to_rotator([unreal_forward, unreal_right, unreal_up])
 
 
 def _unreal_rotator_to_level(rotator):
-    values = [float(rotator.roll), float(rotator.pitch), float(rotator.yaw)]
+    values = [float(rotator.pitch), float(rotator.yaw), float(rotator.roll)]
     if ROTATION_VALUES_ARE_RADIANS:
         values = [math.radians(value) for value in values]
     return values
+
+
+def _unreal_rows_to_rotator(rows):
+    r0 = rows[0]
+    r1 = rows[1]
+    r2 = rows[2]
+
+    sy = max(-0.999999, min(0.999999, -float(r0.z)))
+    cy = math.sqrt(max(0.0, 1.0 - sy * sy))
+    pitch = math.degrees(math.atan2(sy, cy))
+
+    if cy > 0.00001:
+        roll = math.degrees(math.atan2(float(r1.z), float(r2.z)))
+        yaw = math.degrees(math.atan2(float(r0.y), float(r0.x)))
+    else:
+        roll = 0.0
+        yaw = math.degrees(math.atan2(-float(r1.x), float(r1.y)))
+
+    return unreal.Rotator(pitch, yaw, roll)
+
+
+def _editor_rotation_rows(x, y, z):
+    cx = math.cos(x)
+    sx = math.sin(x)
+    cy = math.cos(y)
+    sy = math.sin(y)
+    cz = math.cos(z)
+    sz = math.sin(z)
+
+    # Matches the C++ editor: Mat4x4::rotateX(x) * rotateY(y) * rotateZ(z)
+    return [
+        [cy * cz, cy * sz, -sy],
+        [sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy],
+        [cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy],
+    ]
+
+
+def _level_direction_to_unreal(values):
+    return unreal.Vector(
+        float(values[2]),
+        float(values[0]),
+        float(values[1]),
+    )
 
 
 # Usage from Unreal Python console:
