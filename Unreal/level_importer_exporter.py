@@ -8,10 +8,6 @@ import unreal
 # Unreal uses centimeters. This treats 1 editor/unity-style level unit as 100 Unreal units.
 LEVEL_TO_UNREAL_SCALE = 100.0
 UNREAL_TO_LEVEL_SCALE = 1.0 / LEVEL_TO_UNREAL_SCALE
-
-# The C++ editor creates plane meshes with createPlaneMesh(10.0f, 10.0f).
-# Unreal's /Engine/BasicShapes/Plane behaves like a 1x1 level-unit plane after
-# the centimeter conversion. Therefore imported planes need 10x horizontal scale.
 EDITOR_PLANE_BASE_SIZE = 10.0
 
 # The C++ editor stores rotations in radians.
