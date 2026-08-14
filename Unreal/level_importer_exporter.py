@@ -4,7 +4,7 @@ import os
 import unreal
 
 
-# Change this if you want a different size conversion.
+
 # Unreal uses centimeters. This treats 1 editor/unity-style level unit as 100 Unreal units.
 LEVEL_TO_UNREAL_SCALE = 100.0
 UNREAL_TO_LEVEL_SCALE = 1.0 / LEVEL_TO_UNREAL_SCALE
@@ -17,7 +17,7 @@ EDITOR_PLANE_BASE_SIZE = 10.0
 # The C++ editor stores rotations in radians.
 ROTATION_VALUES_ARE_RADIANS = True
 
-# Your C++ editor uses Unity-style Y-up axes:
+
 # Level/editor vector: X=right, Y=up, Z=forward/depth
 # Unreal vector:       X=forward/depth, Y=right, Z=up
 REMAP_Y_UP_TO_UNREAL_Z_UP = True
