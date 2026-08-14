@@ -834,7 +834,7 @@ void MainGame::selectGameObject(dx3d::GameObject* object)
 
 std::filesystem::path MainGame::getDefaultScenePath() const
 {
-	return std::filesystem::current_path() / "Assets" / "Scenes" / "editor_scene.json";
+	return std::filesystem::current_path() / "Assets" / "Scenes" / "editor_scene.level";
 }
 
 std::filesystem::path MainGame::getNewScenePath() const
@@ -843,7 +843,7 @@ std::filesystem::path MainGame::getNewScenePath() const
 
 	for (size_t index = 1; index < 10000; ++index)
 	{
-		auto candidate = scenesDirectory / ("scene_" + std::to_string(index) + ".json");
+		auto candidate = scenesDirectory / ("scene_" + std::to_string(index) + ".level");
 		std::error_code error;
 		if (!std::filesystem::exists(candidate, error))
 		{
@@ -851,7 +851,7 @@ std::filesystem::path MainGame::getNewScenePath() const
 		}
 	}
 
-	return scenesDirectory / "scene_new.json";
+	return scenesDirectory / "scene_new.level";
 }
 
 bool MainGame::saveSceneToFile(const std::filesystem::path& path)
@@ -882,6 +882,18 @@ bool MainGame::loadSceneFromFile(const std::filesystem::path& path)
 
 		object->setName(data.name);
 		object->setEnabled(data.enabled);
+		const bool shouldAttachRigidBody = data.hasRigidBody || data.physicsEnabled || data.type.rfind("Physics-", 0) == 0;
+		if (shouldAttachRigidBody && !object->getComponent<dx3d::PhysicsComponent>())
+		{
+			addRigidBodyComponent(*object);
+		}
+		if (shouldAttachRigidBody)
+		{
+			if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())
+			{
+				physics->setPhysicsEnabled(false);
+			}
+		}
 		if (!data.textureName.empty())
 		{
 			if (auto* mesh = object->getComponent<dx3d::MeshComponent>())
@@ -928,8 +940,27 @@ bool MainGame::loadSceneFromFile(const std::filesystem::path& path)
 
 		if (auto* physics = object->getComponent<dx3d::PhysicsComponent>())
 		{
-			physics->syncTransformToPhysics();
-			physics->setPhysicsEnabled(data.physicsEnabled);
+			if (data.rigidBodyType == "Static") physics->setBodyType(dx3d::PhysicsBodyType::Static);
+			else if (data.rigidBodyType == "Kinematic") physics->setBodyType(dx3d::PhysicsBodyType::Kinematic);
+			else if (data.hasRigidBody || data.physicsEnabled) physics->setBodyType(dx3d::PhysicsBodyType::Dynamic);
+
+			if (data.rigidBodyCollider == "Sphere") physics->setColliderType(dx3d::PhysicsColliderType::Sphere);
+			else if (data.rigidBodyCollider == "Capsule") physics->setColliderType(dx3d::PhysicsColliderType::Capsule);
+			else if (data.rigidBodyCollider == "ConvexMesh") physics->setColliderType(dx3d::PhysicsColliderType::ConvexMesh);
+			else if (data.rigidBodyCollider == "ConcaveMesh") physics->setColliderType(dx3d::PhysicsColliderType::ConcaveMesh);
+			else if (!data.rigidBodyCollider.empty()) physics->setColliderType(dx3d::PhysicsColliderType::Box);
+
+			if (data.rigidBodyColliderSize.x > 0.0f || data.rigidBodyColliderSize.y > 0.0f || data.rigidBodyColliderSize.z > 0.0f)
+			{
+				physics->setColliderSize(data.rigidBodyColliderSize);
+			}
+			if (data.rigidBodyMass > 0.0f || data.rigidBodyType == "Static")
+			{
+				physics->setMass(data.rigidBodyMass);
+			}
+			physics->setUseGravity(data.rigidBodyUseGravity);
+			const bool restoredPhysicsEnabled = data.rigidBodyEnabledSpecified ? data.physicsEnabled : (data.hasRigidBody || data.physicsEnabled);
+			physics->setPhysicsEnabled(restoredPhysicsEnabled);
 		}
 	}
 
@@ -943,8 +974,6 @@ bool MainGame::loadSceneFromFile(const std::filesystem::path& path)
 std::string MainGame::getSerializableObjectType(dx3d::GameObject& object)
 {
 	auto* meshComponent = object.getComponent<dx3d::MeshComponent>();
-	auto* physicsComponent = object.getComponent<dx3d::PhysicsComponent>();
-	const auto prefix = physicsComponent ? std::string{ "Physics-" } : std::string{};
 
 	if (object.getComponent<dx3d::PointLightComponent>())
 	{
@@ -957,11 +986,11 @@ std::string MainGame::getSerializableObjectType(dx3d::GameObject& object)
 	}
 
 	const auto& mesh = meshComponent->getMesh();
-	if (mesh == m_spawnCubeMesh) return prefix + "Cube";
-	if (mesh == m_spawnSphereMesh) return prefix + "Sphere";
-	if (mesh == m_spawnCapsuleMesh) return prefix + "Capsule";
-	if (mesh == m_spawnCylinderMesh) return prefix + "Cylinder";
-	if (mesh == m_spawnPlaneMesh) return prefix + "Plane";
+	if (mesh == m_spawnCubeMesh) return "Cube";
+	if (mesh == m_spawnSphereMesh) return "Sphere";
+	if (mesh == m_spawnCapsuleMesh) return "Capsule";
+	if (mesh == m_spawnCylinderMesh) return "Cylinder";
+	if (mesh == m_spawnPlaneMesh) return "Plane";
 
 	for (const auto& modelName : m_availableObjModels)
 	{

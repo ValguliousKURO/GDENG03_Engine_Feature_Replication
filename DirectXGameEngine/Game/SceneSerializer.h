@@ -20,8 +20,15 @@ struct SceneObjectData
 	std::string name;
 	std::string type;
 	std::string textureName;
-	bool enabled{};
+	bool enabled{ true };
+	bool hasRigidBody{};
 	bool physicsEnabled{};
+	bool rigidBodyEnabledSpecified{};
+	std::string rigidBodyType;
+	std::string rigidBodyCollider;
+	dx3d::Vec3 rigidBodyColliderSize{};
+	float rigidBodyMass{};
+	bool rigidBodyUseGravity{};
 	float pointLightIntensity{};
 	float pointLightRange{};
 	dx3d::Vec3 position{};

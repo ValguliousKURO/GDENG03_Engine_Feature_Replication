@@ -24,20 +24,20 @@ void dx3d::MainMenuBarUI::draw()
 	{
 		if (ImGui::BeginMenu("File"))
 		{
-			if (ImGui::MenuItem("Save Scene", "Ctrl+S"))
+			if (ImGui::MenuItem("Save Level", "Ctrl+S"))
 			{
 				EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_SAVE);
 			}
-			if (ImGui::MenuItem("Save Scene As New"))
+			if (ImGui::MenuItem("Save Level As New"))
 			{
 				EventBroadcastManager::getInstance().postEvent(EventNames::ON_SCENE_SAVE_AS_NEW);
 			}
-			if (ImGui::BeginMenu("Load Scene"))
+			if (ImGui::BeginMenu("Load Level"))
 			{
 				const auto sceneFiles = getAvailableSceneFiles();
 				if (sceneFiles.empty())
 				{
-					ImGui::MenuItem("No .json scenes found", nullptr, false, false);
+					ImGui::MenuItem("No .level files found", nullptr, false, false);
 				}
 				else
 				{
@@ -117,7 +117,8 @@ std::vector<std::filesystem::path> dx3d::MainMenuBarUI::getAvailableSceneFiles()
 		if (!entry.is_regular_file(error)) continue;
 
 		auto path = entry.path();
-		if (path.extension() == ".json" || path.extension() == ".JSON")
+		const auto extension = path.extension().string();
+		if (extension == ".level" || extension == ".LEVEL" || extension == ".json" || extension == ".JSON")
 		{
 			sceneFiles.push_back(path);
 		}

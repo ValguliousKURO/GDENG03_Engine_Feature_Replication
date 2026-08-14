@@ -17,6 +17,28 @@
 
 namespace
 {
+	std::string getPhysicsBodyTypeName(dx3d::PhysicsBodyType bodyType)
+	{
+		switch (bodyType)
+		{
+		case dx3d::PhysicsBodyType::Static: return "Static";
+		case dx3d::PhysicsBodyType::Kinematic: return "Kinematic";
+		default: return "Dynamic";
+		}
+	}
+
+	std::string getPhysicsColliderTypeName(dx3d::PhysicsColliderType colliderType)
+	{
+		switch (colliderType)
+		{
+		case dx3d::PhysicsColliderType::Sphere: return "Sphere";
+		case dx3d::PhysicsColliderType::Capsule: return "Capsule";
+		case dx3d::PhysicsColliderType::ConvexMesh: return "ConvexMesh";
+		case dx3d::PhysicsColliderType::ConcaveMesh: return "ConcaveMesh";
+		default: return "Box";
+		}
+	}
+
 	std::string escapeJsonString(const std::string& value)
 	{
 		std::string escaped;
@@ -203,7 +225,23 @@ namespace
 			else if (auto value = readJsonStringField(line, "type")) data.type = *value;
 			else if (auto value = readJsonStringField(line, "texture")) data.textureName = *value;
 			else if (auto value = readJsonBoolField(line, "enabled")) data.enabled = *value;
-			else if (auto value = readJsonBoolField(line, "physicsEnabled")) data.physicsEnabled = *value;
+			else if (auto value = readJsonBoolField(line, "hasRigidBody")) data.hasRigidBody = *value;
+			else if (auto value = readJsonBoolField(line, "rigidBody")) data.hasRigidBody = *value;
+			else if (auto value = readJsonBoolField(line, "physicsEnabled"))
+			{
+				data.physicsEnabled = *value;
+				data.rigidBodyEnabledSpecified = true;
+			}
+			else if (auto value = readJsonBoolField(line, "rigidBodyEnabled"))
+			{
+				data.physicsEnabled = *value;
+				data.rigidBodyEnabledSpecified = true;
+			}
+			else if (auto value = readJsonStringField(line, "rigidBodyType")) data.rigidBodyType = *value;
+			else if (auto value = readJsonStringField(line, "rigidBodyCollider")) data.rigidBodyCollider = *value;
+			else if (auto value = readJsonVec3Field(line, "rigidBodyColliderSize")) data.rigidBodyColliderSize = *value;
+			else if (auto value = readJsonFloatField(line, "rigidBodyMass")) data.rigidBodyMass = *value;
+			else if (auto value = readJsonBoolField(line, "rigidBodyUseGravity")) data.rigidBodyUseGravity = *value;
 			else if (auto value = readJsonFloatField(line, "pointLightIntensity")) data.pointLightIntensity = *value;
 			else if (auto value = readJsonFloatField(line, "pointLightRange")) data.pointLightRange = *value;
 			else if (auto value = readJsonVec3Field(line, "position")) data.position = *value;
@@ -282,7 +320,14 @@ bool SceneSerializer::saveToJsonFile(
 				<< "      \"type\": \"" << escapeJsonString(objectType) << "\",\n"
 				<< "      \"texture\": \"" << escapeJsonString(textureName) << "\",\n"
 				<< "      \"enabled\": " << (object->isEnabled() ? "true" : "false") << ",\n"
+				<< "      \"hasRigidBody\": " << (physics ? "true" : "false") << ",\n"
 				<< "      \"physicsEnabled\": " << ((physics && physics->isPhysicsEnabled()) ? "true" : "false") << ",\n"
+				<< "      \"rigidBodyEnabled\": " << ((physics && physics->isPhysicsEnabled()) ? "true" : "false") << ",\n"
+				<< "      \"rigidBodyType\": \"" << (physics ? getPhysicsBodyTypeName(physics->getBodyType()) : "") << "\",\n"
+				<< "      \"rigidBodyCollider\": \"" << (physics ? getPhysicsColliderTypeName(physics->getColliderType()) : "") << "\",\n"
+				<< "      \"rigidBodyColliderSize\": [" << (physics ? physics->getColliderSize().x : 0.0f) << ", " << (physics ? physics->getColliderSize().y : 0.0f) << ", " << (physics ? physics->getColliderSize().z : 0.0f) << "],\n"
+				<< "      \"rigidBodyMass\": " << (physics ? physics->getMass() : 0.0f) << ",\n"
+				<< "      \"rigidBodyUseGravity\": " << ((physics && physics->isUseGravityEnabled()) ? "true" : "false") << ",\n"
 				<< "      \"pointLightIntensity\": " << (pointLight ? pointLight->getIntensity() : 0.0f) << ",\n"
 				<< "      \"pointLightRange\": " << (pointLight ? pointLight->getRange() : 0.0f) << ",\n"
 				<< "      \"position\": [" << position.x << ", " << position.y << ", " << position.z << "],\n"
