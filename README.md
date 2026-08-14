@@ -152,3 +152,6 @@ The Unreal script supports:
 - enabled/visibility state
 - rigid body/physics simulation state
 - scene export back to the same `.level` JSON schema
+
+
+Note: I had Codex assist with Readme Formatting
