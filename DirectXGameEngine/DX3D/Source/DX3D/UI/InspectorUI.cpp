@@ -301,9 +301,37 @@ void dx3d::InspectorUI::drawComponentInspector(GameObject& object)
 {
 	auto* physicsComponent = object.getComponent<PhysicsComponent>();
 	auto* pointLightComponent = object.getComponent<PointLightComponent>();
+	const bool canAttachRigidBody = !object.getComponent<CameraComponent>() && !pointLightComponent;
+
+	ImGui::BeginDisabled(m_isPlayMode || !object.isEnabled() || !canAttachRigidBody);
+	if (!physicsComponent)
+	{
+		if (ImGui::Button("Add Rigid Body"))
+		{
+			Parameters params;
+			params.PutExtra("Target", &object);
+			EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_RIGID_BODY, params);
+		}
+	}
+	else
+	{
+		if (ImGui::Button("Remove Rigid Body"))
+		{
+			Parameters params;
+			params.PutExtra("Target", &object);
+			EventBroadcastManager::getInstance().postEvent(EventNames::ON_REMOVE_RIGID_BODY, params);
+		}
+	}
+	ImGui::EndDisabled();
+
+	if (!canAttachRigidBody)
+	{
+		ImGui::TextDisabled("Rigid Body is not available for this object type.");
+	}
+
 	if (!physicsComponent && !pointLightComponent)
 	{
-		ImGui::Text("No editable components.");
+		ImGui::Text("No attached editable components.");
 		return;
 	}
 

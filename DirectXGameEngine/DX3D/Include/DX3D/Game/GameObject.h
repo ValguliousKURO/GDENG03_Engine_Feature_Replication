@@ -33,6 +33,12 @@ namespace dx3d
 			return static_cast<T*>(getComponentInternal(T::GetTypeId()));
 		}
 
+		template <typename T>
+		bool removeComponent() requires IsRegistered<Component, T>
+		{
+			return removeComponentInternal(T::GetTypeId());
+		}
+
 		TransformComponent& getTransform() noexcept;
 		World& getWorld() noexcept;
 		InputSystem& getInputSystem() noexcept;
@@ -66,6 +72,7 @@ namespace dx3d
 	private:
 		Component* createComponentInternal(UniquePtr<Component>& component);
 		Component* getComponentInternal(size_t id);
+		bool removeComponentInternal(size_t id);
 	private:
 		std::string m_name = "GameObject";
 		size_t m_ID;

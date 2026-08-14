@@ -455,6 +455,55 @@ void MainGame::registerEditorEvents()
 				});
 	});
 
+	events.addObserver(dx3d::EventNames::ON_ADD_RIGID_BODY, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = params.GetGameObjectPtr("Target", nullptr);
+		if (!object || object->isDeleted()) return;
+		if (object->getComponent<dx3d::PhysicsComponent>()) return;
+		if (object->getComponent<dx3d::CameraComponent>()) return;
+		if (object->getComponent<dx3d::PointLightComponent>()) return;
+
+		executeEditorCommand(EditorCommand{
+			[this, object]() { removeRigidBodyComponent(*object); },
+			[this, object]() { addRigidBodyComponent(*object); }
+		});
+	});
+
+	events.addObserver(dx3d::EventNames::ON_REMOVE_RIGID_BODY, [this](dx3d::Parameters& params)
+	{
+		if (m_isPlayMode) return;
+
+		auto* object = params.GetGameObjectPtr("Target", nullptr);
+		if (!object || object->isDeleted()) return;
+
+		auto* physicsComponent = object->getComponent<dx3d::PhysicsComponent>();
+		if (!physicsComponent) return;
+
+		const auto bodyType = physicsComponent->getBodyType();
+		const auto colliderType = physicsComponent->getColliderType();
+		const auto colliderSize = physicsComponent->getColliderSize();
+		const auto mass = physicsComponent->getMass();
+		const auto useGravity = physicsComponent->isUseGravityEnabled();
+		const auto physicsEnabled = physicsComponent->isPhysicsEnabled();
+
+		executeEditorCommand(EditorCommand{
+			[this, object, bodyType, colliderType, colliderSize, mass, useGravity, physicsEnabled]()
+			{
+				auto* restoredPhysics = addRigidBodyComponent(*object);
+				if (!restoredPhysics) return;
+				restoredPhysics->setBodyType(bodyType);
+				restoredPhysics->setColliderType(colliderType);
+				restoredPhysics->setColliderSize(colliderSize);
+				restoredPhysics->setMass(mass);
+				restoredPhysics->setUseGravity(useGravity);
+				restoredPhysics->setPhysicsEnabled(physicsEnabled);
+			},
+			[this, object]() { removeRigidBodyComponent(*object); }
+		});
+	});
+
 	events.addObserver(dx3d::EventNames::ON_SET_PHYSICS_ENABLED, [this](dx3d::Parameters& params)
 	{
 		if (m_isPlayMode) return;
@@ -627,38 +676,25 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 	dx3d::RefPtr<dx3d::Mesh> spawnMesh{};
 	std::string displayName = cleanType == "Empty" ? std::string{ "Empty GameObject" } : cleanType;
 
-	dx3d::PhysicsColliderType colliderType = dx3d::PhysicsColliderType::Box;
-	dx3d::Vec3 colliderSize = { 1.0f, 1.0f, 1.0f };
-
 	if (cleanType == "Cube")
 	{
 		spawnMesh = m_spawnCubeMesh;
-		colliderType = dx3d::PhysicsColliderType::Box;
-		colliderSize = { 1.0f, 1.0f, 1.0f };
 	}
 	else if (cleanType == "Sphere")
 	{
 		spawnMesh = m_spawnSphereMesh;
-		colliderType = dx3d::PhysicsColliderType::Sphere;
-		colliderSize = { 1.0f, 1.0f, 1.0f };
 	}
 	else if (cleanType == "Capsule")
 	{
 		spawnMesh = m_spawnCapsuleMesh;
-		colliderType = dx3d::PhysicsColliderType::Capsule;
-		colliderSize = { 1.0f, 2.0f, 1.0f };
 	}
 	else if (cleanType == "Cylinder")
 	{
 		spawnMesh = m_spawnCylinderMesh;
-		colliderType = dx3d::PhysicsColliderType::Capsule;
-		colliderSize = { 1.0f, 2.0f, 1.0f };
 	}
 	else if (cleanType == "Plane")
 	{
 		spawnMesh = m_spawnPlaneMesh;
-		colliderType = dx3d::PhysicsColliderType::Box;
-		colliderSize = { 10.0f, 0.1f, 10.0f };
 	}
 	else if (cleanType == "Point Light")
 	{
@@ -704,23 +740,7 @@ dx3d::GameObject* MainGame::spawnEditorObject(const std::string& type)
 	//Add physics component if it's a physics object
 	if (isPhysics && spawnMesh)
 	{
-		auto* physComp = object->createOrGetComponent<dx3d::PhysicsComponent>();
-
-		physComp->setColliderType(colliderType);
-		physComp->setColliderSize(colliderSize);
-
-		if (cleanType == "Plane")
-		{
-			physComp->setBodyType(dx3d::PhysicsBodyType::Static);
-			physComp->setMass(0.0f);
-		}
-		else
-		{
-			physComp->setBodyType(dx3d::PhysicsBodyType::Dynamic);
-			physComp->setMass(1.0f);
-		}
-		physComp->setUseGravity(true);
-		physComp->initialize();
+		addRigidBodyComponent(*object);
 	}
 
 	return object;
@@ -742,6 +762,67 @@ dx3d::RefPtr<dx3d::MaterialResource> MainGame::createEditorMaterial(const std::s
 	}
 
 	return material;
+}
+
+dx3d::PhysicsComponent* MainGame::addRigidBodyComponent(dx3d::GameObject& object)
+{
+	if (object.isDeleted()) return nullptr;
+	if (object.getComponent<dx3d::CameraComponent>()) return nullptr;
+	if (object.getComponent<dx3d::PointLightComponent>()) return nullptr;
+
+	auto* physicsComponent = object.createOrGetComponent<dx3d::PhysicsComponent>();
+	if (!physicsComponent) return nullptr;
+
+	configureRigidBodyForObject(object, *physicsComponent);
+	physicsComponent->setPhysicsEnabled(true);
+	physicsComponent->initialize();
+	physicsComponent->syncTransformToPhysics();
+
+	return physicsComponent;
+}
+
+void MainGame::removeRigidBodyComponent(dx3d::GameObject& object)
+{
+	if (auto* physicsComponent = object.getComponent<dx3d::PhysicsComponent>())
+	{
+		physicsComponent->setPhysicsEnabled(false);
+	}
+	object.removeComponent<dx3d::PhysicsComponent>();
+}
+
+void MainGame::configureRigidBodyForObject(dx3d::GameObject& object, dx3d::PhysicsComponent& physicsComponent)
+{
+	auto colliderType = dx3d::PhysicsColliderType::Box;
+	auto colliderSize = dx3d::Vec3{ 1.0f, 1.0f, 1.0f };
+	auto bodyType = dx3d::PhysicsBodyType::Dynamic;
+	auto mass = 1.0f;
+
+	if (auto* meshComponent = object.getComponent<dx3d::MeshComponent>())
+	{
+		const auto& mesh = meshComponent->getMesh();
+		if (mesh == m_spawnSphereMesh)
+		{
+			colliderType = dx3d::PhysicsColliderType::Sphere;
+		}
+		else if (mesh == m_spawnCapsuleMesh || mesh == m_spawnCylinderMesh)
+		{
+			colliderType = dx3d::PhysicsColliderType::Capsule;
+			colliderSize = { 1.0f, 2.0f, 1.0f };
+		}
+		else if (mesh == m_spawnPlaneMesh)
+		{
+			colliderType = dx3d::PhysicsColliderType::Box;
+			colliderSize = { 10.0f, 0.1f, 10.0f };
+			bodyType = dx3d::PhysicsBodyType::Static;
+			mass = 0.0f;
+		}
+	}
+
+	physicsComponent.setColliderType(colliderType);
+	physicsComponent.setColliderSize(colliderSize);
+	physicsComponent.setBodyType(bodyType);
+	physicsComponent.setMass(mass);
+	physicsComponent.setUseGravity(bodyType == dx3d::PhysicsBodyType::Dynamic);
 }
 
 void MainGame::selectGameObject(dx3d::GameObject* object)

@@ -1,4 +1,4 @@
-﻿#include<DX3D/Game/GameObject.h>
+#include<DX3D/Game/GameObject.h>
 #include <DX3D/Game/Component.h>
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Game/World.h>
@@ -131,4 +131,19 @@ dx3d::Component* dx3d::GameObject::getComponentInternal(size_t id)
 	auto it = m_components.find(id);
 	if (it == m_components.end()) return {};
 	return it->second.get();
+}
+
+bool dx3d::GameObject::removeComponentInternal(size_t id)
+{
+	if (m_transform && id == m_transform->getTypeId()) return false;
+
+	auto it = m_components.find(id);
+	if (it == m_components.end()) return false;
+
+	if (it->second)
+	{
+		m_world.removeComponentInternal(*it->second);
+	}
+	m_components.erase(it);
+	return true;
 }

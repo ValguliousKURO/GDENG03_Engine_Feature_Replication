@@ -1,10 +1,11 @@
-﻿#include <DX3D/Game/World.h>
+#include <DX3D/Game/World.h>
 #include <DX3D/Game/GameObject.h>
 #include <DX3D/Game/Component.h>
 #include <DX3D/Component/TransformComponent.h>
 #include <DX3D/Component/PhysicsComponent.h>
 #include <DX3D/Component/PhysicsComponent.h>
 #include <DX3D/Physics/PhysicsManager.h>
+#include <algorithm>
 #include <ranges>
 
 dx3d::World::World(const WorldDesc& desc) : 
@@ -124,6 +125,15 @@ void dx3d::World::addComponentInternal(Component& component)
 	auto typeId = component.getTypeId();
     component.setID(generateId());
 	m_components[typeId].push_back(&component);
+}
+
+void dx3d::World::removeComponentInternal(Component& component)
+{
+    auto typeId = component.getTypeId();
+    auto it = m_components.find(typeId);
+    if (it == m_components.end()) return;
+
+    std::erase(it->second, &component);
 }
 
 void dx3d::World::addDirtyTransformInternal(TransformComponent& component)

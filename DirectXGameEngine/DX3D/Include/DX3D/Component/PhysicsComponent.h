@@ -42,6 +42,8 @@ namespace dx3d
 
         // Getters
         PhysicsBodyType getBodyType() const { return m_bodyType; }
+        PhysicsColliderType getColliderType() const { return m_colliderType; }
+        Vec3 getColliderSize() const { return m_colliderSize; }
         float getMass() const { return m_mass; }
         bool isPhysicsEnabled() const { return m_physicsEnabled; }
         bool isUseGravityEnabled() const { return m_useGravity; }

@@ -3,6 +3,7 @@
 #include <DX3D/UI/InspectorUI.h>
 #include <DX3D/UI/MainMenuBarUI.h>
 #include <DX3D/Graphics/Mesh/Mesh.h>
+#include <DX3D/Component/PhysicsComponent.h>
 #include <DX3D/Resource/MaterialResource.h>
 #include <unordered_map>
 #include <functional>
@@ -38,6 +39,9 @@ private:
 
 	dx3d::GameObject* spawnEditorObject(const std::string& type);
 	dx3d::RefPtr<dx3d::MaterialResource> createEditorMaterial(const std::string& textureName = "wood");
+	dx3d::PhysicsComponent* addRigidBodyComponent(dx3d::GameObject& object);
+	void removeRigidBodyComponent(dx3d::GameObject& object);
+	void configureRigidBodyForObject(dx3d::GameObject& object, dx3d::PhysicsComponent& physicsComponent);
 	void selectGameObject(dx3d::GameObject* object);
 	std::filesystem::path getDefaultScenePath() const;
 	std::filesystem::path getNewScenePath() const;

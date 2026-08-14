@@ -10,6 +10,7 @@ namespace dx3d
 		dx3d_typeid(Component)
 	public:
 		explicit Component(const ComponentDesc& desc);
+		virtual ~Component() = default;
 		GameObject& getGameObject() noexcept;
 
 		void setID(size_t _id) { m_ID = _id; }

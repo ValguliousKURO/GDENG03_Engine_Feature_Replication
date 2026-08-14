@@ -68,6 +68,7 @@ namespace dx3d
 	private:
 		GameObject* createGameObjectInternal(UniquePtr<GameObject>& object);
 		void addComponentInternal(Component& component);
+		void removeComponentInternal(Component& component);
 		void addDirtyTransformInternal(TransformComponent& component);
 
 		Component* const* getComponentsInternal(size_t typeId, ui32* numComponents) const noexcept;

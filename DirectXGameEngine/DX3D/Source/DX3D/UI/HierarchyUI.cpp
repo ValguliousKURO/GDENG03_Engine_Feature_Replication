@@ -117,33 +117,7 @@ void dx3d::HierarchyUI::draw()
                 }
 
                 ImGui::Separator();
-                ImGui::TextColored(ImVec4(0.5f, 0.8f, 1.0f, 1.0f), "Physics Objects");
-                if (ImGui::MenuItem("Add Physics-Cube"))
-                {
-                    param.PutExtra("Key", "Physics-Cube");
-                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
-                    DX3DLogInfo("Added Physics-Cube GameObject.");
-                }
-                if (ImGui::MenuItem("Add Physics-Sphere"))
-                {
-                    param.PutExtra("Key", "Physics-Sphere");
-                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
-                }
-                if (ImGui::MenuItem("Add Physics-Capsule"))
-                {
-                    param.PutExtra("Key", "Physics-Capsule");
-                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
-                }
-                if (ImGui::MenuItem("Add Physics-Cylinder"))
-                {
-                    param.PutExtra("Key", "Physics-Cylinder");
-                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
-                }
-                if (ImGui::MenuItem("Add Physics-Plane"))
-                {
-                    param.PutExtra("Key", "Physics-Plane");
-                    EventBroadcastManager::getInstance().postEvent(EventNames::ON_ADD_3D_OBJECT, param);
-                }
+                ImGui::TextDisabled("Rigid Bodies are attached from the Inspector.");
                 ImGui::EndPopup();
             }
 
