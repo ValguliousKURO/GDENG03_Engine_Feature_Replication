@@ -234,8 +234,8 @@ public sealed class LevelImporterExporter : EditorWindow
                 texture = string.Empty,
                 enabled = gameObject.activeSelf,
                 hasRigidBody = rigidbody != null,
-                physicsEnabled = rigidbody != null && !rigidbody.isKinematic,
-                rigidBodyEnabled = rigidbody != null && !rigidbody.isKinematic,
+                physicsEnabled = rigidbody != null,
+                rigidBodyEnabled = rigidbody != null,
                 rigidBodyType = ResolveRigidBodyType(rigidbody),
                 rigidBodyCollider = ResolveColliderType(gameObject),
                 rigidBodyColliderSize = ResolveColliderSize(gameObject),
@@ -451,7 +451,8 @@ public sealed class LevelImporterExporter : EditorWindow
     private static string ResolveRigidBodyType(Rigidbody rigidbody)
     {
         if (!rigidbody) return string.Empty;
-        return rigidbody.isKinematic ? "Kinematic" : "Dynamic";
+        if (!rigidbody.isKinematic) return "Dynamic";
+        return rigidbody.useGravity ? "Kinematic" : "Static";
     }
 
     private static string ResolveColliderType(GameObject gameObject)
