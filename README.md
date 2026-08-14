@@ -49,6 +49,12 @@ Unity support is handled by the editor script:
 DirectXGameEngine/Tools/Unity/LevelImporterExporter.cs
 ```
 
+Repository location of the Unity importer/exporter:
+
+```text
+DirectXGameEngine/Tools/Unity/LevelImporterExporter.cs
+```
+
 Unity setup:
 
 1. Open your Unity project.
@@ -85,6 +91,12 @@ The Unity script supports:
 ## Unreal import/export
 
 Unreal support is handled by the Python script:
+
+```text
+DirectXGameEngine/Tools/Unreal/level_importer_exporter.py
+```
+
+Repository location of the Unreal importer/exporter:
 
 ```text
 DirectXGameEngine/Tools/Unreal/level_importer_exporter.py

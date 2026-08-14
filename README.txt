@@ -39,6 +39,9 @@ Unity import/export
 Unity support is handled by:
 DirectXGameEngine/Tools/Unity/LevelImporterExporter.cs
 
+Repository location of the Unity importer/exporter:
+DirectXGameEngine/Tools/Unity/LevelImporterExporter.cs
+
 Unity setup:
 
 1. Open your Unity project.
@@ -58,6 +61,9 @@ The Unity script supports primitive objects, transforms, enabled/disabled state,
 Unreal import/export
 
 Unreal support is handled by:
+DirectXGameEngine/Tools/Unreal/level_importer_exporter.py
+
+Repository location of the Unreal importer/exporter:
 DirectXGameEngine/Tools/Unreal/level_importer_exporter.py
 
 Unreal setup:
